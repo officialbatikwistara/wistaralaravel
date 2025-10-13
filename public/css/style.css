@@ -1,0 +1,702 @@
+/* ========================== HEADER.PHP =========================== */
+
+body{
+  font-family: "Cabin", sans-serif;
+  overflow-x: hidden;
+  padding-top: 80px;
+}
+
+html{
+  overflow-x: hidden; /* cegah scroll horizontal */
+}
+
+a, p, i{
+  font-family: "Cabin", sans-serif;
+}
+
+h1, h2, h3, h4, h5 {
+  font-family: "Libre Caslon Text", serif;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.text-gold {
+  color: #ffae00;
+}
+
+/* ========================== Navbar.php ========================== */
+.navbar {
+  letter-spacing: 0.5px;
+  font-size: 0.95rem;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+/*  LINK DASAR  */
+.navbar .nav-link {
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 700;
+  transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.navbar-nav .nav-item {
+  margin: 0 15px; /* kiri-kanan 15px */
+}
+
+/* ===== HALAMAN AKTIF ===== */
+.navbar .nav-link.active {
+  color: #ffae00; 
+  font-weight: 700;
+}
+
+/* ===== HOVER ===== */
+.navbar .nav-link:hover {
+  color: #ffae00;
+  transform: translateY(-1px);
+}
+
+.btn-signin {
+  font-family: 'cabin', serif !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+/* ===== NAVBAR TRANSPARAN ===== */
+#navbarWistara {
+  background-color: transparent;
+  transition: background-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+/* ===== NAVBAR SAAT SCROLL ===== */
+#navbarWistara.scrolled {
+  background-color: #ffffff;
+  backdrop-filter: blur(8px);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+#navbarWistara.scrolled .nav-link {
+  color: #1a2247; 
+  font-weight: 700;
+}
+
+#navbarWistara.scrolled .nav-link.active {
+  color: #ffae00;
+  font-weight: 700;
+}
+
+#navbarWistara.scrolled .nav-link:hover {
+  color: #ffae00;
+}
+
+/* Sembunyikan logo warna saat awal */
+.logo-warna {
+  display: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Logo putih tampil saat awal */
+.logo-putih {
+  display: block;
+  transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* Saat scroll - ganti logo */
+#navbarWistara.scrolled .logo-putih {
+  display: none;
+}
+
+#navbarWistara.scrolled .logo-warna {
+  display: block;
+}
+
+#navbarWistara .fa-cart-shopping {
+  color: white;
+  transition: color 0.3s;
+}
+
+#navbarWistara.scrolled .fa-cart-shopping {
+  color: #000;
+}
+
+#navbarWistara.scrolled .btn-signin {
+  color: #000;
+}
+
+#navbarWistara .badge {
+  font-size: 0.7rem;
+  padding: 4px 6px;
+}
+
+/* ========================== HERO SECTION ========================== */
+.hero-section {
+  position: relative;
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  overflow: hidden;
+  margin-top: -80px;
+  z-index: 1;
+}
+
+.background-video {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  min-width: 100%;
+  min-height: 100%;
+  width: auto;
+  height: auto;
+  z-index: -2;
+  transform: translate(-50%, -50%);
+  object-fit: cover;
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.55));
+  z-index: -1;
+}
+
+.hero-logo {
+  max-height: 150px;
+  margin-bottom: 30px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.btn-hero {
+  display: inline-block;
+  background-color: #ffae00;
+  color: #ffffff;
+  padding: 12px 32px;
+  border-radius: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.btn-hero:hover {
+  background-color: #9b6903;
+  color: #ffffff;
+  box-shadow: 0 0 15px rgba(255,255,255,0.4);
+}
+
+/* ========================== SECTION ABOUT ========================== */
+.section-about {
+  position: relative;
+  z-index: 2;
+  padding-top: 100px;
+  padding-bottom: 100px;
+  background: url('../img/background1.svg') center/cover no-repeat fixed;
+  overflow: hidden;
+}
+
+.about-title {
+  font-size: 2.6rem;
+  color: #cfae67;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.about-paragraph {
+  color: #1a2247;
+  font-size: 1.15rem;
+  line-height: 1.9;
+  margin-bottom: 2rem;
+}
+
+.about-button {
+  display: inline-block;
+  padding: 12px 36px;
+  border: 2px solid #cfae67;
+  color: #cfae67;
+  font-weight: 600;
+  border-radius: 50px;
+  text-decoration: none;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.about-button:hover {
+  background-color: #cfae67;
+  color: #ffffff;
+  box-shadow: 0 0 10px rgba(207, 174, 103, 0.6);
+  transform: translateY(-3px);
+}
+
+.about-image {
+  width: 100%;
+  max-width: 480px;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto;
+  border: 3px solid #cfae67;
+  transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.about-image:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 25px rgba(207, 174, 103, 0.3);
+}
+
+@media (max-width: 992px) {
+  .about-title {
+    font-size: 2rem;
+  }
+  .about-paragraph {
+    font-size: 1rem;
+  }
+  .about-image {
+    max-width: 90%;
+  }
+  .about-textbox {
+    text-align: center;
+  }
+}
+
+/* ========================== SECTION BERITA ========================== */
+.section-berita {
+  position: relative;
+  font-family: 'Libre Caslon Text', serif;
+  background-color: #ffffff;
+  padding: 100px 0;
+  z-index: 2;
+}
+
+.berita-title {
+  color: #3E2723;
+  font-size: 2rem;
+  text-align: center;
+  font-weight: 700;
+}
+
+.berita-divider {
+  width: 90px;
+  height: 4px;
+  background-color: #cfae67;
+  border: none;
+  margin: 20px auto 40px auto;
+  border-radius: 3px;
+}
+
+/* ========================== GRID ========================== */
+.berita-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: auto;
+  padding: 0 15px;
+}
+
+/* ========================== CARD ========================== */
+.berita-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background-color: #fff;
+  border: none;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  transition: all 0.3s ease;
+}
+
+.berita-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+}
+
+/* ========================== GAMBAR ========================== */
+.berita-img-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.berita-img-wrapper img {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.berita-card:hover .berita-img-wrapper img {
+  transform: scale(1.05);
+}
+
+/* Overlay sumber */
+.berita-sumber-overlay {
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  font-size: 12px;
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+/* ========================== TEKS ========================== */
+.berita-judul {
+  font-size: 1.1rem;
+  font-weight: 700;
+  margin: 15px 15px 5px;
+  color: #1a2247;
+  line-height: 1.4;
+  min-height: 50px;
+}
+
+.berita-deskripsi {
+  color: #555;
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0 15px 15px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;    /* Maksimal 3 baris */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ========================== LINK ========================== */
+.berita-link {
+  display: inline-block;
+  color: #b9932b;
+  font-weight: 600;
+  text-decoration: none;
+  margin: 0 15px 20px;
+  transition: color 0.3s ease;
+}
+
+.berita-link:hover {
+  color: #dfbe02;
+  text-decoration: underline;
+}
+
+/* ========================== TOMBOL LIHAT SEMUA ========================== */
+.berita-footer {
+  text-align: center;
+  margin-top: 40px;
+}
+
+.btn-lihat-semua {
+  display: inline-block;
+  background-color: #3E2723;
+  color: #fff;
+  padding: 10px 24px;
+  border-radius: 50px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.btn-lihat-semua:hover {
+  background-color: #cfae67;
+  color: #000;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+@media (max-width: 768px) {
+  .berita-title {
+    font-size: 1.8rem;
+  }
+
+  .berita-img-wrapper img {
+    height: 220px;
+  }
+}
+
+@media (max-width: 576px) {
+  .berita-img-wrapper img {
+    height: 250px;
+  }
+
+  .berita-judul {
+    font-size: 1rem;
+  }
+}
+
+/* ========================== INDEX.PHP KATALOG ========================== */
+.section-katalog-slider {
+  background: url('../img/background2.svg') center/cover no-repeat;
+}
+
+.section-katalog-slider .katalog-media {
+  width: 100%;
+  max-width: 370px;       /* ❗ batasi lebar maksimal video */
+  aspect-ratio: 3 / 4;    /* ❗ bikin video proporsional */
+  display: flex;
+}
+
+.section-katalog-slider video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.produk-card {
+  transition: all 0.3s ease;
+}
+
+.produk-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+}
+
+.produk-img {
+  height: 220px;
+  object-fit: cover;
+  border-top-left-radius: 0.5rem;
+  border-top-right-radius: 0.5rem;
+}
+
+/* Tombol beli besar */
+.modal .btn-light {
+  background-color: #ffffff;
+  outline: #8B4513;
+  font-size: 1rem;
+  padding: 10px 0;
+  border-radius: 6px;
+}
+
+/* Tombol kecil channel */
+.modal .btn-sm {
+  padding: 6px 10px;
+  font-size: 0.85rem;
+  border-radius: 6px;
+}
+
+.modal .btn-sm i {
+  font-size: 1rem;
+}
+
+/* Keranjang */
+.modal .btn-outline-dark {
+  padding: 10px 14px;
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+  .modal .btn-dark {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .section-katalog-slider .katalog-media {
+    max-width: 100%;
+    aspect-ratio: 16 / 9; /* supaya responsif di mobile */
+  }
+
+  .produk-img {
+    height: 180px;
+  }
+}
+
+/* ========================== ABOUT.PHP ========================== */
+.page-header {
+  position: relative;
+  height: 300px; /* tinggi banner tidak full layar */
+  background: url('../img/bghero.svg') center/cover no-repeat;
+  margin-top: -80px; /* supaya naik ke bawah navbar transparan */
+}
+
+.page-header .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 0;
+}
+
+.page-header .container {
+  position: relative;
+  z-index: 1;
+}
+
+.page-title {
+  font-size: 2.8rem;
+  color: #ffffff; 
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* ==== LOGO GLOW ==== */
+.logo-glow {
+  max-width: 180px;
+  height: auto;
+  filter: drop-shadow(0 0 10px white) drop-shadow(0 0 20px white);
+}
+
+@media (max-width: 768px) {
+  .page-header {
+    height: 220px;
+  }
+  .page-title {
+    font-size: 2rem;
+  }
+  .logo-glow {
+    max-width: 130px;
+  }
+}
+
+/* ==========================
+PAGE DETAIL BERITA
+========================== */
+.berita-isi {
+  font-size: 16px;
+  line-height: 1.8;
+  text-align: justify;
+}
+
+/* ==========================
+LOGIN PAGE
+========================== */
+.login-page {
+  background: url('../img/bghero.svg') center center/cover no-repeat;
+  position: relative;
+  margin-top: -80px;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.login-box {
+  position: relative;
+  z-index: 2;
+}
+/* ==========================
+   REGISTER & LOGIN PAGE
+========================== */
+.register-page {
+  background: url('../img/bghero.svg') center center/cover no-repeat;
+  position: relative;
+
+  /* ini membuat section naik ke belakang navbar */
+  margin-top: -80px;
+
+  /* tetap full layar */
+  min-height: 100vh;
+
+  /* sedikit jarak dari atas agar isi tidak ketumpuk navbar */
+  padding-top: 100px;
+  padding-bottom: 60px;
+}
+
+.register-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(2px);
+}
+
+.register-box {
+  max-width: 480px;
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+
+.font-caslon {
+  font-family: 'Libre Caslon Text', serif;
+}
+
+
+/* ==========================
+FOOTER
+========================== */
+footer a:hover {
+  color: #ac7b32 !important;
+  text-decoration: underline;
+}
+
+.email-popup {
+  display: none;
+  position: fixed;
+  z-index: 9999;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+.email-popup-content {
+  background: #fff;
+  padding: 30px;
+  max-width: 400px;
+  margin: 100px auto;
+  border-radius: 10px;
+  position: relative;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.email-popup-close {
+  position: absolute;
+  top: 10px; right: 15px;
+  font-size: 24px;
+  cursor: pointer;
+}
+
+#popupEmailForm input,
+#popupEmailForm textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+#popupEmailForm button {
+  width: 100%;
+  background-color: #8B4513;
+  color: #fff;
+  padding: 10px;
+  border: none;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* FOOTER RESPONSIVE UNTUK MOBILE */
+@media (max-width: 600px) {
+footer .container {
+  overflow-x: hidden;
+}
+
+
+  /* Buat kolom footer full-width di mobile */
+  footer .row > div {
+    flex: 0 0 100%;
+    max-width: 100%;
+  }
+
+  /* Pastikan text/link membungkus dengan baik */
+  footer a {
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  /* Tambahan opsional: buat teks kontak lebih rapi */
+  footer ul {
+    padding-left: 0;
+  }
+
+  footer ul li {
+    font-size: 14px;
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+}
