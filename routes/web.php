@@ -8,6 +8,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
 
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use Illuminate\Http\Request;
+
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+
 /*
 |--------------------------------------------------------------------------
 | Route Halaman Utama & Static Page
@@ -50,20 +56,43 @@ Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('car
 |--------------------------------------------------------------------------
 */
 
-// 👤 Login User
-Route::get('/login', [UserAuthController::class, 'showUserLogin'])->name('user.login');
+Route::get('/login', [UserAuthController::class, 'showUserLogin'])->name('login');
 Route::post('/login', [UserAuthController::class, 'userLogin'])->name('user.login.post');
+
 Route::get('/logout-user', [UserAuthController::class, 'userLogout'])->name('user.logout');
 Route::get('/register', [UserAuthController::class, 'showRegister'])->name('user.register');
 Route::post('/register', [UserAuthController::class, 'register'])->name('user.register.post');
 
 // 🛡️ Dashboard User (middleware proteksi)
-Route::middleware(['user'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/user/dashboard', function () {
         return view('user.dashboard');
-    })->name('user.dashboard');
+    });
 });
 
+// Halaman verifikasi email
+Route::get('/email/verify', function () {
+    return view('auth.verify-email');
+})->middleware('auth')->name('verification.notice');
+
+// Proses klik link verifikasi
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+    return redirect('/login');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+// Kirim ulang email verifikasi
+Route::post('/email/verification-notification', function (Request $request) {
+    $request->user()->sendEmailVerificationNotification();
+    return back()->with('message', 'Link verifikasi telah dikirim ulang!');
+})->middleware(['auth', 'throttle:6,1'])->name('verification.send');
+
+// ✨ Reset Password
+Route::get('/forgot-password', [ForgotPasswordController::class, 'showLinkRequestForm'])->name('password.request');
+Route::post('/forgot-password', [ForgotPasswordController::class, 'sendResetLinkEmail'])->name('password.email');
+
+Route::get('/reset-password/{token}', [ResetPasswordController::class, 'showResetForm'])->name('password.reset');
+Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name('password.update');
 
 /*
 |--------------------------------------------------------------------------

@@ -1,13 +1,14 @@
 @include('inc.header')
 
-<div class="register-page d-flex align-items-center justify-content-center">
+<div class="register-page d-flex align-items-center justify-content-center min-vh-100">
   <!-- Overlay -->
   <div class="register-overlay"></div>
 
   <!-- Box Register -->
-  <div class="register-box bg-white shadow rounded p-4 p-md-5">
+  <div class="register-box bg-white shadow rounded p-4 p-md-5 position-relative">
     <h2 class="text-center fw-bold mb-4 font-caslon">Daftar Akun</h2>
 
+    {{-- Alert Pesan --}}
     @if(session('error'))
       <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
@@ -17,6 +18,7 @@
 
     <form method="POST" action="{{ route('user.register.post') }}">
       @csrf
+
       <!-- Nama -->
       <div class="mb-3">
         <label for="name" class="form-label fw-semibold text-dark">Nama Lengkap</label>
@@ -26,29 +28,60 @@
       <!-- Email -->
       <div class="mb-3">
         <label for="email" class="form-label fw-semibold text-dark">Email</label>
-        <input type="email" name="email" id="email" class="form-control" placeholder="Masukkan email" required>
+        <input 
+          type="email"
+          name="email"
+          id="email"
+          class="form-control"
+          placeholder="contoh: nama@email.com"
+          required
+        >
+        <small class="text-muted">Gunakan format email yang valid.</small>
+        <div id="emailError" class="text-danger small mt-1"></div>
       </div>
 
       <!-- Nomor Telepon -->
       <div class="mb-3">
         <label for="phone" class="form-label fw-semibold text-dark">Nomor Telepon</label>
-        <input type="text" name="phone" id="phone" class="form-control" placeholder="Masukkan nomor telepon" required>
+        <input
+          type="tel"
+          name="phone"
+          id="phone"
+          class="form-control"
+          placeholder="Contoh: 081234567890"
+          maxlength="15"
+          required
+        >
+        <div id="phoneError" class="text-danger small mt-1"></div>
       </div>
 
       <!-- Password -->
-      <div class="mb-3">
+      <div class="mb-3 position-relative">
         <label for="password" class="form-label fw-semibold text-dark">Password</label>
-        <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password" required>
-        <small class="text-muted">
+        <div class="input-group">
+          <input type="password" name="password" id="password" class="form-control" placeholder="Masukkan password" required>
+          <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
+        <small class="text-muted d-block mt-1">
           Minimal 8 karakter, harus mengandung huruf besar, huruf kecil, angka, dan simbol.
         </small>
-        <div id="passwordError" class="text-danger small mt-1"></div>
+        <div id="passwordStrengthBar" class="progress mt-2" style="height: 5px;">
+          <div class="progress-bar" role="progressbar"></div>
+        </div>
+        <div id="passwordStrengthText" class="small mt-1 fw-semibold"></div>
       </div>
 
       <!-- Konfirmasi Password -->
-      <div class="mb-3">
+      <div class="mb-3 position-relative">
         <label for="password_confirmation" class="form-label fw-semibold text-dark">Konfirmasi Password</label>
-        <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Ulangi password" required>
+        <div class="input-group">
+          <input type="password" name="password_confirmation" id="password_confirmation" class="form-control" placeholder="Ulangi password" required>
+          <button class="btn btn-outline-secondary toggle-password" type="button" data-target="password_confirmation">
+            <i class="fa fa-eye"></i>
+          </button>
+        </div>
       </div>
 
       <!-- Tombol -->
@@ -60,7 +93,8 @@
 
       <!-- Link Login -->
       <div class="text-center">
-        <small class="text-dark">Sudah punya akun?
+        <small class="text-dark">
+          Sudah punya akun?
           <a href="{{ url('/login') }}" class="text-decoration-none fw-semibold">Login di sini</a>
         </small>
       </div>
@@ -69,23 +103,84 @@
 </div>
 
 <script>
-  const passwordInput = document.getElementById('password');
-  const passwordError = document.getElementById('passwordError');
+  // 🛡️ Validasi Strength Password
+  const passwordField = document.getElementById('password');
+  const strengthBar = document.querySelector('#passwordStrengthBar .progress-bar');
+  const strengthText = document.getElementById('passwordStrengthText');
 
-  passwordInput.addEventListener('input', function () {
+  passwordField.addEventListener('input', function () {
     const val = this.value;
-    const valid = /[a-z]/.test(val) &&
-                  /[A-Z]/.test(val) &&
-                  /[0-9]/.test(val) &&
-                  /[@$!%*#?&]/.test(val) &&
-                  val.length >= 8;
+    let strength = 0;
+    if (/[a-z]/.test(val)) strength++;
+    if (/[A-Z]/.test(val)) strength++;
+    if (/[0-9]/.test(val)) strength++;
+    if (/[\W_]/.test(val)) strength++;
+    if (val.length >= 8) strength++;
 
-    if (!valid) {
-      passwordError.textContent = "Password belum memenuhi syarat keamanan.";
+    let width = (strength / 5) * 100;
+    strengthBar.style.width = width + '%';
+
+    if (strength === 0) {
+      strengthBar.className = 'progress-bar';
+      strengthText.textContent = '';
+    } else if (strength <= 2) {
+      strengthBar.className = 'progress-bar bg-danger';
+      strengthText.textContent = 'Password Lemah';
+    } else if (strength <= 4) {
+      strengthBar.className = 'progress-bar bg-warning';
+      strengthText.textContent = 'Password Sedang';
+    } else {
+      strengthBar.className = 'progress-bar bg-success';
+      strengthText.textContent = 'Password Kuat';
+    }
+  });
+
+  // 👁️ Toggle Show / Hide Password
+  document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const input = document.getElementById(targetId);
+      const icon = btn.querySelector('i');
+
+      if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.replace('fa-eye', 'fa-eye-slash');
+      } else {
+        input.type = 'password';
+        icon.classList.replace('fa-eye-slash', 'fa-eye');
+      }
+    });
+  });
+
+  // 📞 Validasi Nomor HP
+  const phoneInput = document.getElementById('phone');
+  const phoneError = document.getElementById('phoneError');
+  phoneInput.addEventListener('input', function () {
+    const val = this.value;
+    const regex = /^\+?[0-9]{10,15}$/;
+    if (!regex.test(val)) {
+      phoneError.textContent = "Nomor telepon harus 10–15 digit (boleh diawali +).";
       this.classList.add('is-invalid');
       this.classList.remove('is-valid');
     } else {
-      passwordError.textContent = "";
+      phoneError.textContent = "";
+      this.classList.remove('is-invalid');
+      this.classList.add('is-valid');
+    }
+  });
+
+  // 📧 Validasi Email
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('emailError');
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  emailInput.addEventListener('input', function () {
+    const val = this.value.trim();
+    if (!emailRegex.test(val)) {
+      emailError.textContent = "Format email tidak valid.";
+      this.classList.add('is-invalid');
+      this.classList.remove('is-valid');
+    } else {
+      emailError.textContent = "";
       this.classList.remove('is-invalid');
       this.classList.add('is-valid');
     }

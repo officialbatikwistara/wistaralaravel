@@ -52,27 +52,31 @@ class UserAuthController extends Controller
             'password' => [
                 'required',
                 'string',
-                'min:8', // minimal 8 karakter
-                'regex:/[a-z]/',      // minimal 1 huruf kecil
-                'regex:/[A-Z]/',      // minimal 1 huruf besar
-                'regex:/[0-9]/',      // minimal 1 angka
-                'regex:/[@$!%*#?&]/', // minimal 1 simbol spesial
-                'confirmed',          // cocok dengan konfirmasi
+                'min:8',
+                'regex:/[a-z]/',
+                'regex:/[A-Z]/',
+                'regex:/[0-9]/',
+                'regex:/[\W_]/',
+                'confirmed',
             ],
-        ], [
-            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, angka, dan simbol.',
-            'password.min' => 'Password minimal 8 karakter.',
         ]);
 
-        // Simpan user baru
-        $user = new \App\Models\User();
-        $user->name = $request->name;
-        $user->email = $request->email;
-        $user->phone = $request->phone;
-        $user->password = bcrypt($request->password);
-        $user->save();
+        $user = \App\Models\User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'phone' => $request->phone,
+            'password' => bcrypt($request->password),
+        ]);
 
-        return redirect('/login')->with('success', 'Akun berhasil dibuat! Silakan login.');
+        // ✅ Login langsung setelah register
+        Auth::login($user);
+
+        // 📩 Kirim email verifikasi
+        $user->sendEmailVerificationNotification();
+
+        // 🚀 Arahkan ke halaman verifikasi email
+        return redirect()->route('verification.notice')
+                        ->with('message', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.');
     }
 
 }
