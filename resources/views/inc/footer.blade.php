@@ -61,6 +61,19 @@
     </div>
   </div>
 </footer>
-  
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    AOS.init({
+      once: false,          // ❗ animasi akan dijalankan ulang setiap scroll masuk viewport
+      duration: 1000,       // durasi animasi (ms)
+      easing: 'ease-in-out',
+      offset: 120           // jarak sebelum elemen muncul
+    });
+  });
+</script>
+
+
 </body>
 </html>

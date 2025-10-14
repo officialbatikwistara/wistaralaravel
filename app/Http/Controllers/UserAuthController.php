@@ -79,4 +79,26 @@ class UserAuthController extends Controller
                         ->with('message', 'Akun berhasil dibuat! Silakan cek email Anda untuk verifikasi.');
     }
 
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'phone' => 'nullable|string|max:20',
+            'password' => 'nullable|min:8',
+        ]);
+
+        $user->name = $request->name;
+        $user->phone = $request->phone;
+
+        if ($request->filled('password')) {
+            $user->password = bcrypt($request->password);
+        }
+
+        $user->save();
+
+        return back()->with('success', 'Profil Anda berhasil diperbarui ✅');
+    }
+
 }

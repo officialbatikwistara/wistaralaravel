@@ -9,48 +9,40 @@ use Illuminate\Support\Facades\Auth;
 
 class CartController extends Controller
 {
-    // Tambah ke keranjang
-    public function addToCart(Request $request, $id)
-    {
-        $produk = Produk::findOrFail($id);
-
-        // jika user login
-        $userId = Auth::check() ? Auth::id() : null;
-
-        // cek apakah produk sudah ada di cart
-        $cartItem = Cart::where('produk_id', $produk->id_produk)
-                        ->where('user_id', $userId)
-                        ->first();
-
-        if ($cartItem) {
-            $cartItem->jumlah += 1;
-            $cartItem->save();
-        } else {
-            Cart::create([
-                'user_id' => $userId,
-                'produk_id' => $produk->id_produk,
-                'jumlah' => 1,
-            ]);
-        }
-
-        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang 🛒');
-    }
-
-    // Lihat keranjang
     public function index()
     {
-        $userId = Auth::check() ? Auth::id() : null;
-        $cartItems = Cart::with('produk')
-                        ->where('user_id', $userId)
-                        ->get();
-
+        $cartItems = Cart::where('user_id', Auth::id())->with('produk')->get();
         return view('cart.index', compact('cartItems'));
     }
 
-    // Hapus item
+    public function add(Request $request, $produkId)
+    {
+        if (!Auth::check()) {
+            return redirect()->route('login')->with('error', 'Silakan login dulu untuk menambahkan ke keranjang');
+        }
+
+        $cartItem = Cart::where('user_id', Auth::id())
+                        ->where('produk_id', $produkId)
+                        ->first();
+
+        if ($cartItem) {
+            $cartItem->increment('jumlah');
+        } else {
+            Cart::create([
+                'user_id' => Auth::id(),
+                'produk_id' => $produkId,
+                'jumlah' => 1
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
+    }
+
     public function remove($id)
     {
-        Cart::destroy($id);
-        return back()->with('success', 'Produk dihapus dari keranjang 🗑️');
+        $cartItem = Cart::where('user_id', Auth::id())->where('id', $id)->firstOrFail();
+        $cartItem->delete();
+
+        return redirect()->back()->with('success', 'Produk berhasil dihapus dari keranjang');
     }
 }

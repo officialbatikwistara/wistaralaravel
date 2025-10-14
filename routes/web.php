@@ -46,22 +46,32 @@ Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
 | Route Keranjang
 |--------------------------------------------------------------------------
 */
-Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
-Route::post('/cart/add/{id}', [CartController::class, 'addToCart'])->name('cart.add');
-Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 
+Route::middleware('auth')->group(function () {
+    Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/cart/add/{produkId}', [CartController::class, 'add'])->name('cart.add');
+    Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
+});
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth User
 |--------------------------------------------------------------------------
 */
 
+// 👤 Login User
 Route::get('/login', [UserAuthController::class, 'showUserLogin'])->name('login');
-Route::post('/login', [UserAuthController::class, 'userLogin'])->name('user.login.post');
+Route::post('/login', [\App\Http\Controllers\UserAuthController::class, 'userLogin'])->name('user.login.post');
 
+// 👤 Logout User
 Route::get('/logout-user', [UserAuthController::class, 'userLogout'])->name('user.logout');
 Route::get('/register', [UserAuthController::class, 'showRegister'])->name('user.register');
 Route::post('/register', [UserAuthController::class, 'register'])->name('user.register.post');
+
+// 👤 edit User
+Route::middleware(['auth'])->group(function () {
+    Route::put('/user/update-profile', [\App\Http\Controllers\UserAuthController::class, 'updateProfile'])
+        ->name('user.update.profile');
+});
 
 // 🛡️ Dashboard User (middleware proteksi)
 Route::middleware(['auth', 'verified'])->group(function () {
