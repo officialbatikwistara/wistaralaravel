@@ -109,15 +109,23 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name(
 | Route Login & Auth Admin
 |--------------------------------------------------------------------------
 */
-
 // 🔐 Login Admin
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
-Route::post('/admin/login', [AuthController::class, 'adminLogin']);
-Route::get('/logout-admin', [AuthController::class, 'adminLogout'])->name('admin.logout');
+Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.post');
 
-// 🛡️ Dashboard Admin (butuh middleware admin)
-Route::middleware('admin')->group(function () {
-    Route::get('/admin/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('admin.dashboard');
-});
+// 🚪 Logout Admin
+Route::get('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+// 📊 Dashboard Admin
+Route::get('/admin/dashboard', function () {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login')->with('error', 'Silakan login sebagai admin.');
+    }
+
+    return view('admin.dashboard');
+})->name('admin.dashboard');
+
+
+
+
+

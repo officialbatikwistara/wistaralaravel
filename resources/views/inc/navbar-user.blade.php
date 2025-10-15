@@ -35,11 +35,22 @@
     <!-- Bagian Kanan -->
     <div class="d-flex align-items-center gap-3" id="rightNavbarIcons">
       <!-- 🛒 Ikon Keranjang -->
-      <a href="{{ url('/cart') }}" class="position-relative text-white nav-link p-0">
+      @php
+          $cartCount = 0;
+          if (Auth::check()) {
+              $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('jumlah');
+          }
+      @endphp
+
+      <a href="{{ url('/cart') }}" 
+        class="nav-link text-white position-relative p-0 d-inline-flex align-items-center">
         <i class="fa-solid fa-cart-shopping fa-lg"></i>
-        @if(session('cart_count') && session('cart_count') > 0)
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{ session('cart_count') }}
+
+        @if($cartCount > 0)
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                style="font-size: 0.7rem; min-width: 20px; padding: 4px 6px;">
+            {{ $cartCount }}
+            <span class="visually-hidden">item di keranjang</span>
           </span>
         @endif
       </a>

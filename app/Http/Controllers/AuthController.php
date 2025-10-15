@@ -3,37 +3,40 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Facades\Hash;
+use App\Models\Admin;
 
 class AuthController extends Controller
 {
     public function showAdminLogin()
     {
-        return view('auth.login-admin');
+        return view('admin.login');
     }
 
     public function adminLogin(Request $request)
     {
-        $username = $request->input('username');
-        $password = md5($request->input('password'));
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-        $admin = DB::table('admin')
-            ->where('username', $username)
-            ->where('password', $password)
-            ->first();
+        $admin = Admin::where('email', $request->email)->first();
 
-        if ($admin) {
-            Session::put('admin', $admin->username);
-            return redirect('/admin/dashboard');
-        } else {
-            return back()->with('error', 'Username atau password salah!');
+        if ($admin && Hash::check($request->password, $admin->password)) {
+            session([
+                'admin_logged_in' => true,
+                'admin_id' => $admin->id,
+                'admin_name' => $admin->name
+            ]);
+            return redirect()->route('admin.dashboard');
         }
+
+        return back()->with('error', 'Email atau password salah.');
     }
 
     public function adminLogout()
     {
-        Session::forget('admin');
-        return redirect('/admin/login');
+        session()->forget(['admin_logged_in', 'admin_id', 'admin_name']);
+        return redirect()->route('admin.login')->with('success', 'Berhasil logout.');
     }
 }
