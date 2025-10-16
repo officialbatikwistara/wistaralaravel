@@ -154,29 +154,39 @@
     <!-- Grid Berita -->
     <div class="berita-grid">
       @foreach($berita as $index => $b)
-        <div class="berita-card" 
-             data-aos="fade-up" 
-             data-aos-duration="1000" 
+        <div class="berita-card"
+             data-aos="fade-up"
+             data-aos-duration="1000"
              data-aos-delay="{{ $index * 150 }}">
              
-          <!-- Gambar + sumber overlay -->
+          <!-- Gambar + Sumber Overlay -->
           <div class="berita-img-wrapper position-relative">
             @if(filter_var($b->gambar, FILTER_VALIDATE_URL))
               <img src="{{ $b->gambar }}" alt="{{ $b->judul }}">
             @else
-              <img src="{{ asset('uploads/berita/'.$b->gambar) }}" alt="{{ $b->judul }}">
+              <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
             @endif
 
             @if(!empty($b->sumber))
               <div class="berita-sumber-overlay">
-                Sumber: {{ $b->sumber }}
+                Sumber:
+                @if(!empty($b->tautan_sumber))
+                  <a href="{{ $b->tautan_sumber }}" target="_blank">{{ $b->sumber }}</a>
+                @else
+                  {{ $b->sumber }}
+                @endif
               </div>
             @endif
           </div>
 
-          <!-- Judul & Deskripsi -->
+          <!-- Judul & Konten Singkat -->
           <h3 class="berita-judul mt-3">{{ $b->judul }}</h3>
-          <p class="berita-deskripsi">{{ Str::limit(strip_tags($b->deskripsi), 150) }}</p>
+          <p class="berita-deskripsi">{{ Str::limit(strip_tags($b->konten), 150) }}</p>
+
+          <!-- Tanggal -->
+          <p class="berita-tanggal text-muted mb-2">
+            <small>{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}</small>
+          </p>
 
           <!-- Link -->
           @if(!empty($b->tautan_sumber))
@@ -192,12 +202,14 @@
       @endforeach
     </div>
 
-    <!-- Tombol lihat semua -->
+    <!-- Tombol Lihat Semua -->
     <div class="berita-footer mt-4 text-center" data-aos="fade-up" data-aos-delay="200">
       <a href="{{ url('/berita') }}" class="btn-lihat-semua">Lihat Semua Berita</a>
     </div>
   </div>
 </section>
+
+
 
 
 @foreach($produk as $p)

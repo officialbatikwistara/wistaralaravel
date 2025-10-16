@@ -310,55 +310,56 @@ h1, h2, h3, h4, h5 {
   }
 }
 
-/* ========================== SECTION BERITA ========================== */
+/* ========================== SECTION BERITA INDEX ========================== */
 .section-berita {
-  position: relative;
-  font-family: 'Libre Caslon Text', serif;
-  background-color: #ffffff;
-  padding: 100px 0;
-  z-index: 2;
+  background-color: #f9f9f9;
 }
 
 .berita-title {
-  color: #3E2723;
-  font-size: 2rem;
-  text-align: center;
   font-weight: 700;
+  font-size: 2rem;
+  color: #222;
 }
 
 .berita-divider {
-  width: 90px;
-  height: 4px;
-  background-color: #cfae67;
-  border: none;
-  margin: 20px auto 40px auto;
-  border-radius: 3px;
+  width: 100px;
+  height: 3px;
+  background-color: #CDA349; /* warna emas khas Wistara */
+  border-radius: 2px;
 }
 
-.berita-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
-  gap: 24px;
+.container-berita {
   max-width: 1200px;
-  margin: auto;
+  margin: 0 auto;
   padding: 0 15px;
 }
 
+/* Grid layout responsif */
+.berita-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1.5rem;
+}
+
+@media (min-width: 1200px) {
+  .berita-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
 .berita-card {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  background-color: #fff;
-  border: none;
+  background: #fff;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
   transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
 }
 
 .berita-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+  transform: translateY(-6px);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
 }
 
 .berita-img-wrapper {
@@ -368,7 +369,7 @@ h1, h2, h3, h4, h5 {
 
 .berita-img-wrapper img {
   width: 100%;
-  height: 200px;
+  height: 220px;
   object-fit: cover;
   transition: transform 0.4s ease;
 }
@@ -377,93 +378,97 @@ h1, h2, h3, h4, h5 {
   transform: scale(1.05);
 }
 
-/* Overlay sumber */
 .berita-sumber-overlay {
   position: absolute;
-  bottom: 10px;
-  left: 10px;
-  background: rgba(0, 0, 0, 0.6);
+  bottom: 0;
+  left: 0;
+  background: rgba(0,0,0,0.6);
   color: #fff;
-  font-size: 12px;
+  font-size: 0.85rem;
   padding: 5px 10px;
-  border-radius: 4px;
+  width: 100%;
 }
 
-/* ========================== BERITA INDEX ========================== */
+.berita-sumber-overlay a {
+  color: #CDA349;
+  text-decoration: none;
+  font-weight: 500;
+}
+
 .berita-judul {
   font-size: 1.1rem;
   font-weight: 700;
-  margin: 15px 15px 5px;
-  color: #1a2247;
-  line-height: 1.4;
-  min-height: 50px;
+  margin: 1rem 1rem 0.5rem;
+  color: #222;
 }
 
 .berita-deskripsi {
-  color: #555;
   font-size: 0.9rem;
-  line-height: 1.6;
-  margin: 0 15px 15px;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;    /* Maksimal 3 baris */
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  color: #555;
+  margin: 0 1rem 0.5rem;
+  line-height: 1.5;
 }
+
+.berita-tanggal {
+  font-size: 0.85rem;
+  color: #888;
+  margin: 0 1rem;
+}
+
 .berita-link {
   display: inline-block;
-  color: #b9932b;
+  margin: 0.8rem 1rem 1rem;
+  color: #CDA349;
   font-weight: 600;
   text-decoration: none;
-  margin: 0 15px 20px;
   transition: color 0.3s ease;
 }
 
 .berita-link:hover {
-  color: #dfbe02;
-  text-decoration: underline;
-}
-
-.berita-footer {
-  text-align: center;
-  margin-top: 40px;
+  color: #a88122;
 }
 
 .btn-lihat-semua {
-  display: inline-block;
-  background-color: #3E2723;
+  background-color: #CDA349;
   color: #fff;
-  padding: 10px 24px;
+  padding: 10px 20px;
+  font-weight: 600;
   border-radius: 50px;
   text-decoration: none;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  transition: background 0.3s ease;
 }
 
 .btn-lihat-semua:hover {
-  background-color: #cfae67;
+  background-color: #a88122;
+}
+.pagination {
+  gap: 0.5rem;
+}
+
+.page-link {
   color: #000;
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 6px;
+  transition: 0.3s;
 }
 
-@media (max-width: 768px) {
-  .berita-title {
-    font-size: 1.8rem;
-  }
-
-  .berita-img-wrapper img {
-    height: 220px;
-  }
+.page-link:hover {
+  background-color: #CDA349;
+  color: #fff;
 }
 
+.page-item.active .page-link {
+  background-color: #CDA349;
+  border-color: #CDA349;
+  color: #fff;
+}
+
+/* Responsif */
 @media (max-width: 576px) {
   .berita-img-wrapper img {
-    height: 250px;
+    height: 180px;
   }
-
-  .berita-judul {
-    font-size: 1rem;
+  .berita-title {
+    font-size: 1.5rem;
   }
 }
 

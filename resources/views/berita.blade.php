@@ -1,4 +1,4 @@
-
+{{-- resources/views/berita.blade.php --}}
 @include('inc.header')
 
 <!-- ===== Page Header / Banner Section ===== -->
@@ -9,24 +9,30 @@
   </div>
 </section>
 
+<!-- ================= HALAMAN BERITA ================= -->
 <section class="section-berita py-5 bg-light">
-  <div class="container">
-
-    <h2 class="text-center text-dark mb-2">Berita Terkini Wistara Batik</h2>
-    <p class="text-center text-muted mb-4">Lihat informasi dan kegiatan terbaru dari Batik Wistara</p>
-    <hr class="w-25 mx-auto mb-4">
+  <div class="container-berita container">
+    <!-- Judul -->
+    <div class="text-center mb-4" data-aos="fade-up" data-aos-duration="1000">
+      <h2 class="berita-title">Berita Terkini Wistara Batik</h2>
+      <p class="text-muted mb-3">Lihat informasi dan kegiatan terbaru dari Batik Wistara</p>
+      <hr class="berita-divider mx-auto">
+    </div>
 
     <!-- Filter Form -->
-    <form method="GET" action="{{ route('berita') }}" class="row gy-2 gx-3 align-items-center justify-content-center mb-5">
+    <form method="GET" action="{{ route('berita') }}" 
+          class="row gy-2 gx-3 align-items-center justify-content-center mb-5" 
+          data-aos="fade-up" data-aos-delay="100">
+
       <div class="col-12 col-sm-8 col-md-5">
-        <div class="input-group">
+        <div class="input-group shadow-sm">
           <span class="input-group-text bg-white"><i class="bi bi-search"></i></span>
           <input type="text" name="search" class="form-control" placeholder="Cari berita..." value="{{ $search }}">
         </div>
       </div>
 
       <div class="col-6 col-sm-3 col-md-auto">
-        <select name="limit" class="form-select" onchange="this.form.submit()">
+        <select name="limit" class="form-select shadow-sm" onchange="this.form.submit()">
           <option value="8"  {{ $limit == 8 ? 'selected' : '' }}>8</option>
           <option value="20" {{ $limit == 20 ? 'selected' : '' }}>20</option>
           <option value="50" {{ $limit == 50 ? 'selected' : '' }}>50</option>
@@ -34,7 +40,7 @@
       </div>
 
       <div class="col-6 col-sm-3 col-md-auto">
-        <button type="submit" class="btn btn-dark w-100 d-flex align-items-center justify-content-center gap-1">
+        <button type="submit" class="btn btn-dark w-100 d-flex align-items-center justify-content-center gap-1 shadow-sm">
           <i class="bi bi-funnel-fill"></i>
           <span>Cari</span>
         </button>
@@ -42,52 +48,63 @@
     </form>
 
     <!-- Grid Berita -->
-    <div class="row g-4">
-      @forelse($berita as $b)
-        <div class="col-12 col-sm-6 col-lg-3">
-          <div class="card h-100 shadow-sm border-0 berita-card">
-            <div class="position-relative">
-              @php
-                $gambar = filter_var($b->gambar, FILTER_VALIDATE_URL)
-                    ? $b->gambar
-                    : asset('uploads/berita/'.$b->gambar);
-              @endphp
-              <img src="{{ $gambar }}" class="card-img-top" alt="{{ $b->judul }}" style="height: 220px; object-fit: cover;">
+    <div class="berita-grid">
+      @foreach($berita as $index => $b)
+        <div class="berita-card"
+             data-aos="fade-up"
+             data-aos-duration="1000"
+             data-aos-delay="{{ $index * 150 }}">
+             
+          <!-- Gambar + Sumber Overlay -->
+          <div class="berita-img-wrapper position-relative">
+            @if(filter_var($b->gambar, FILTER_VALIDATE_URL))
+              <img src="{{ $b->gambar }}" alt="{{ $b->judul }}">
+            @else
+              <img src="{{ asset($b->gambar) }}" alt="{{ $b->judul }}">
+            @endif
 
-              @if(!empty($b->sumber))
-                <small class="position-absolute bottom-0 end-0 m-2 bg-white bg-opacity-75 px-2 py-1 rounded text-muted">
-                  Sumber: {{ $b->sumber }}
-                </small>
-              @endif
-            </div>
-
-            <div class="card-body d-flex flex-column">
-              <h5 class="card-title">{{ $b->judul }}</h5>
-              <p class="card-text small text-muted mb-2">{{ \Carbon\Carbon::parse($b->tanggal)->translatedFormat('d F Y') }}</p>
-              <p class="card-text flex-grow-1">{{ Str::limit(strip_tags($b->deskripsi), 120) }}</p>
-
-              @if(!empty($b->tautan_sumber))
-                <a href="{{ $b->tautan_sumber }}" target="_blank" class="berita-link">Baca Selengkapnya →</a>
-              @else
-                <a href="{{ route('berita.detail', $b->slug) }}" class="berita-link">Baca Selengkapnya →</a>
-              @endif
-            </div>
+            @if(!empty($b->sumber))
+              <div class="berita-sumber-overlay">
+                Sumber:
+                @if(!empty($b->tautan_sumber))
+                  <a href="{{ $b->tautan_sumber }}" target="_blank">{{ $b->sumber }}</a>
+                @else
+                  {{ $b->sumber }}
+                @endif
+              </div>
+            @endif
           </div>
+
+          <!-- Judul & Konten Singkat -->
+          <h3 class="berita-judul mt-3">{{ $b->judul }}</h3>
+          <p class="berita-deskripsi">{{ Str::limit(strip_tags($b->konten), 150) }}</p>
+
+          <!-- Tanggal -->
+          <p class="berita-tanggal text-muted mb-2">
+            <small>{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}</small>
+          </p>
+
+          <!-- Link -->
+          @if(!empty($b->tautan_sumber))
+            <a href="{{ $b->tautan_sumber }}" target="_blank" class="berita-link">
+              Baca Selengkapnya →
+            </a>
+          @else
+            <a href="{{ route('berita.detail', $b->slug) }}" class="berita-link">
+              Baca Selengkapnya →
+            </a>
+          @endif
         </div>
-      @empty
-        <div class="col-12 text-center">
-          <div class="alert alert-warning">Berita tidak ditemukan.</div>
-        </div>
-      @endforelse
+      @endforeach
     </div>
 
     <!-- Pagination -->
-    <div class="mt-5 d-flex justify-content-center">
-      {{ $berita->links() }}
-    </div>
-
+    @if ($berita->hasPages())
+      <div class="mt-5 d-flex justify-content-center">
+        {{ $berita->links('pagination::bootstrap-5') }}
+      </div>
+    @endif
   </div>
 </section>
+
 @include('inc.footer')
-
-

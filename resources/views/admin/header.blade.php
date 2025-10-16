@@ -48,29 +48,12 @@
     <!-- Menu -->
     <div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
       <ul class="navbar-nav mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link {{ request()->is('admin/dashboard') ? 'active' : '' }}" href="{{ route('admin.dashboard') }}">
-            <i class="fa-solid fa-chart-line me-1"></i> Dashboard
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {{ request()->is('admin/produk*') ? 'active' : '' }}" href="#">
-            <i class="fa-solid fa-box me-1"></i> Produk
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link {{ request()->is('admin/pesanan*') ? 'active' : '' }}" href="#">
-            <i class="fa-solid fa-receipt me-1"></i> Pesanan
-          </a>
-        </li>
         <li class="nav-item dropdown">
           <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="fa-solid fa-user-shield me-1"></i>
             {{ session('admin_name') ?? 'Admin' }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end shadow">
-            <li><a class="dropdown-item" href="#">Profil</a></li>
-            <li><hr class="dropdown-divider"></li>
             <li>
               <a class="dropdown-item text-danger" href="{{ route('admin.logout') }}">
                 <i class="fa-solid fa-right-from-bracket me-1"></i> Logout

@@ -7,6 +7,7 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Admin\BeritaAdminController;
 
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
@@ -125,7 +126,22 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
+Route::get('/admin/produk', function () {
+    return view('admin.produk.index');
+})->name('admin.produk');
 
+Route::get('/admin/pesanan', function () {
+    return view('admin.pesanan.index');
+})->name('admin.pesanan');
+
+Route::prefix('admin/berita')->group(function () {
+    Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
+    Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');
+    Route::post('/store', [BeritaAdminController::class, 'store'])->name('admin.berita.store');
+    Route::get('/edit/{id}', [BeritaAdminController::class, 'edit'])->name('admin.berita.edit');
+    Route::post('/update/{id}', [BeritaAdminController::class, 'update'])->name('admin.berita.update');
+    Route::delete('/delete/{id}', [BeritaAdminController::class, 'destroy'])->name('admin.berita.delete');
+});
 
 
 
