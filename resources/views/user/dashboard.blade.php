@@ -19,7 +19,7 @@
             <a href="{{ url('/cart') }}" class="btn btn-outline-dark px-4 py-2 rounded-pill position-relative">
               <i class="fa-solid fa-cart-shopping me-2"></i> Keranjang Saya
               @php
-                $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('jumlah');
+                $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
               @endphp
               @if($cartCount > 0)
                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">

@@ -37,7 +37,7 @@
 
     <!-- Logo / Brand -->
     <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-      <i class="fa-solid fa-crown me-2 text-warning"></i> Admin Panel
+      <i class="fa-solid me-2 text-warning"></i> Admin Panel
     </a>
 
     <!-- Toggle mobile -->

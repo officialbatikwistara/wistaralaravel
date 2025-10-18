@@ -14,7 +14,21 @@
     <div class="col-md-4">
       <div class="card p-4 shadow-sm h-100 border-0">
         <div class="d-flex justify-content-between align-items-center mb-2">
-          <h4 class="mb-0 fw-bold">🧵 Produk</h4>
+          <h4 class="mb-0 fw-bold">Kategori Produk</h4>
+          <i class="fa-solid fa-shirt fa-lg text-secondary"></i>
+        </div>
+        <p class="text-muted">Kelola Kategori produk Batik Wistara, tambah Kategori Produk</p>
+        <a href="{{ url('/admin/kategori') }}" class="btn btn-dark w-100">
+          Kelola Produk
+        </a>
+      </div>
+    </div>
+
+    <!-- Produk -->
+    <div class="col-md-4">
+      <div class="card p-4 shadow-sm h-100 border-0">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h4 class="mb-0 fw-bold">Produk</h4>
           <i class="fa-solid fa-shirt fa-lg text-secondary"></i>
         </div>
         <p class="text-muted">Kelola katalog produk Batik Wistara, tambah & ubah koleksi.</p>

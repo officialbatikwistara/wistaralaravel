@@ -16,11 +16,14 @@
       <div class="col-lg-8">
 
         <!-- Gambar Berita -->
-        @php
-          $gambar = filter_var($berita->gambar, FILTER_VALIDATE_URL)
-              ? $berita->gambar
-              : asset('uploads/berita/'.$berita->gambar);
-        @endphp
+@php
+  $fileName = basename($berita->gambar);
+  $gambarPath = public_path('uploads/berita/'.$fileName);
+  $gambar = (file_exists($gambarPath) && $fileName)
+      ? asset('uploads/berita/'.$fileName)
+      : asset('img/no-image.jpg');
+@endphp
+
 
         <div class="mb-4 text-center">
           <img src="{{ $gambar }}" alt="{{ $berita->judul }}" class="img-fluid rounded shadow-lg w-100" style="max-height: 450px; object-fit: cover;">
@@ -34,7 +37,7 @@
 
         <!-- Isi Berita -->
         <div class="berita-isi text-justify fs-5 lh-lg" style="color:#333;">
-          {!! nl2br(e($berita->isi_berita)) !!}
+          {!! nl2br(e($berita->konten)) !!}
         </div>
 
       </div>

@@ -47,7 +47,7 @@
   </div>
 </section>
 
-<!-- ================= KATALOG PRODUK SLIDER ================= -->
+<!-- ================= KATALOG PRODUK SLIDER ================= --> 
 <section class="section-katalog-slider py-5">
   <div class="container">
 
@@ -71,21 +71,31 @@
 
       <!-- KANAN: Carousel Produk -->
       <div class="col-lg-7" data-aos="fade-left" data-aos-duration="1000" data-aos-delay="200">
-        <div id="carouselKatalog" class="carousel slide mb-4" data-bs-ride="carousel" data-bs-interval="0">
+        <div id="carouselKatalog" class="carousel slide mb-4" data-bs-interval="0">
           <div class="carousel-inner">
+            
             @foreach($produk->chunk(3) as $chunkIndex => $chunk)
               <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
                 <div class="row g-4 justify-content-center">
+
                   @foreach($chunk as $p)
+                    @php
+                      $path = public_path($p->gambar);
+                      $gambarUrl = file_exists($path) && $p->gambar
+                          ? asset($p->gambar)
+                          : asset('img/no-image.jpg');
+                    @endphp
+
                     <div class="col-12 col-sm-6 col-md-4" data-aos="zoom-in" data-aos-duration="800">
                       <div class="card produk-card h-100 border-0 shadow-sm">
                         
                         <!-- Gambar Produk -->
                         <div class="produk-img-wrapper position-relative">
-                          <img src="{{ asset('uploads/produk/'.$p->gambar) }}" 
-                              alt="{{ $p->nama_produk }}" 
-                              class="card-img-top produk-img">
-                          <!-- Badge kategori di atas gambar -->
+                          <img src="{{ $gambarUrl }}" 
+                               alt="{{ $p->nama_produk }}" 
+                               class="card-img-top produk-img">
+
+                          <!-- Badge kategori -->
                           <span class="kategori-badge badge bg-dark position-absolute top-0 start-0 m-2">
                             {{ $p->nama_kategori }}
                           </span>
@@ -115,9 +125,11 @@
                       </div>
                     </div>
                   @endforeach
+
                 </div>
               </div>
             @endforeach
+
           </div>
 
           <!-- Navigasi Carousel -->
@@ -140,6 +152,123 @@
       </div>
     </div>
   </div>
+
+  <!-- ===== Modal Detail Produk ===== -->
+  @foreach($produk as $p)
+  @php
+    $path = public_path($p->gambar);
+    $gambarUrl = file_exists($path) && $p->gambar
+        ? asset($p->gambar)
+        : asset('img/no-image.jpg');
+  @endphp
+
+  <!-- Modal Produk -->
+  <div class="modal fade" id="produkModal{{ $p->id_produk }}" tabindex="-1" aria-labelledby="produkModalLabel{{ $p->id_produk }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
+
+        <!-- HEADER -->
+        <div class="modal-header border-0 bg-dark text-light py-3 px-4">
+          <h5 class="modal-title fw-bold">{{ $p->nama_produk }}</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+
+        <!-- BODY -->
+        <div class="modal-body p-4">
+          <div class="row g-4 align-items-start">
+
+            <!-- Gambar Produk -->
+            <div class="col-md-5 text-center">
+              <img src="{{ $gambarUrl }}" class="img-fluid rounded-4 shadow-sm border" alt="{{ $p->nama_produk }}">
+            </div>
+
+            <!-- Info Produk -->
+            <div class="col-md-7">
+              <span class="badge bg-secondary mb-2">{{ $p->nama_kategori }}</span>
+              <h4 class="fw-bold text-warning mb-3">
+                Rp {{ number_format($p->harga, 0, ',', '.') }}
+              </h4>
+              <p class="mb-4 text-muted" style="line-height: 1.7;">
+                {!! nl2br(e($p->deskripsi)) !!}
+              </p>
+
+              <!-- Tombol Aksi -->
+              <div class="d-flex flex-column flex-md-row gap-2 mb-3">
+                <!-- Beli Sekarang -->
+                <a href="{{ url('checkout/'.$p->id_produk) }}" class="btn btn-dark flex-fill fw-semibold py-2">
+                  🛍️ Beli Sekarang
+                </a>
+
+                @auth
+                <!-- Tombol Icon Keranjang Kecil -->
+                <button type="button"
+                        class="btn btn-outline-dark d-flex align-items-center justify-content-center"
+                        style="width: 45px; height: 45px; padding: 0;"
+                        data-bs-toggle="modal"
+                        data-bs-target="#qtyModal{{ $p->id_produk }}">
+                  <i class="bi bi-cart-plus fs-5"></i>
+                </button>
+                @else
+                <a href="{{ route('login') }}"
+                  class="btn btn-outline-dark d-flex align-items-center justify-content-center"
+                  style="width: 45px; height: 45px; padding: 0;">
+                  <i class="bi bi-cart-plus fs-5"></i>
+                </a>
+                @endauth
+              </div>
+
+              <hr class="my-3">
+
+              <!-- Channel Lain -->
+              <p class="fw-semibold mb-2">Atau beli melalui:</p>
+              <div class="d-flex flex-wrap gap-2">
+                <a href="https://wa.me/62895381110035?text={{ urlencode('Halo admin, saya tertarik dengan produk '.$p->nama_produk) }}"
+                  target="_blank" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2">
+                  <i class="bi bi-whatsapp"></i> WhatsApp
+                </a>
+                @if($p->link_shopee)
+                <a href="{{ $p->link_shopee }}" target="_blank" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2">
+                  <i class="bi bi-bag"></i> Shopee
+                </a>
+                @endif
+                @if($p->link_tiktok)
+                <a href="{{ $p->link_tiktok }}" target="_blank" class="btn btn-outline-dark btn-sm d-flex align-items-center gap-2">
+                  <i class="bi bi-tiktok"></i> TikTokShop
+                </a>
+                @endif
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ===== Modal Qty Kecil ===== -->
+  @auth
+  <div class="modal fade" id="qtyModal{{ $p->id_produk }}" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+      <div class="modal-content border-0 rounded-4 shadow-lg">
+        <div class="modal-header bg-dark text-white py-2">
+          <h6 class="modal-title fw-semibold">Jumlah ke Keranjang</h6>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <form action="{{ route('cart.add', $p->id_produk) }}" method="POST">
+          @csrf
+          <div class="modal-body text-center">
+            <input type="number" name="qty" value="1" min="1" max="{{ $p->stok }}" 
+                  class="form-control text-center mb-3 mx-auto" style="max-width: 100px;">
+            <button type="submit" class="btn btn-dark w-100">
+              <i class="bi bi-cart-plus me-1"></i> Tambah ke Keranjang
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  @endauth
+  @endforeach
 </section>
 
 <!-- ================= BERITA TERKINI ================= -->
@@ -147,7 +276,7 @@
   <div class="container-berita">
     <!-- Judul -->
     <div class="text-center mb-4" data-aos="fade-up" data-aos-duration="1000">
-      <h2 class="berita-title">Berita Terkini</h2>
+      <h2 class="text-gold">Berita Terkini</h2>
       <hr class="berita-divider mx-auto">
     </div>
 
@@ -208,96 +337,5 @@
     </div>
   </div>
 </section>
-
-
-
-
-@foreach($produk as $p)
-<div class="modal fade" id="produkModal{{ $p->id_produk }}" tabindex="-1" aria-labelledby="produkModalLabel{{ $p->id_produk }}" aria-hidden="true">
-  <div class="modal-dialog modal-lg modal-dialog-centered">
-    <div class="modal-content rounded-4 border-0 shadow-lg">
-
-      <!-- HEADER -->
-      <div class="modal-header border-0 pb-0">
-        <h5 class="modal-title fw-bold" id="produkModalLabel{{ $p->id_produk }}">
-          {{ $p->nama_produk }}
-        </h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-      </div>
-
-      <!-- BODY -->
-      <div class="modal-body">
-        <div class="row g-4 align-items-start">
-
-          <!-- Gambar Produk -->
-          <div class="col-md-5 text-center">
-            <img src="{{ asset('uploads/produk/'.$p->gambar) }}" class="img-fluid rounded shadow-sm" alt="{{ $p->nama_produk }}">
-          </div>
-
-          <!-- Info Produk -->
-          <div class="col-md-7">
-            <span class="badge bg-secondary mb-2">{{ $p->nama_kategori }}</span>
-            <h4 class="fw-bold text-warning mb-3">
-              Rp {{ number_format($p->harga, 0, ',', '.') }}
-            </h4>
-            <p class="mb-4" style="line-height: 1.6;">{{ $p->deskripsi }}</p>
-
-            <!-- Tombol Beli & Keranjang -->
-            <div class="d-flex gap-2 mb-3">
-              <a href="{{ url('checkout/'.$p->id_produk) }}" class="btn btn-dark flex-grow-1 fw-semibold">
-                🛍️ Beli Sekarang
-              </a>
-
-              @auth
-              <form action="{{ route('cart.add', $p->id_produk) }}" method="POST">
-                @csrf
-                <button type="submit" class="btn btn-outline-dark px-3" title="Tambah ke Keranjang">
-                  <i class="bi bi-cart-plus fs-5"></i>
-                </button>
-              </form>
-              @else
-              <a href="{{ route('login') }}" class="btn btn-outline-dark px-3" title="Login untuk menambahkan ke keranjang">
-                <i class="bi bi-cart-plus fs-5"></i>
-              </a>
-              @endauth
-            </div>
-
-            <hr>
-
-            <!-- Tombol Channel Lain -->
-            <p class="fw-semibold mb-2">Atau beli melalui:</p>
-            <div class="d-flex flex-wrap gap-2">
-              <!-- WA -->
-              <a href="https://wa.me/62895381110035?text={{ urlencode('Halo admin, saya tertarik dengan produk '.$p->nama_produk) }}"
-                 target="_blank"
-                 class="btn btn-outline-dark btn-sm border d-flex align-items-center gap-2">
-                <i class="fab fa-whatsapp text-success"></i> WA
-              </a>
-
-              <!-- Shopee -->
-              @if($p->link_shopee)
-              <a href="{{ $p->link_shopee }}" target="_blank" 
-                 class="btn btn-outline-dark btn-sm border d-flex align-items-center gap-2">
-                <i class="fas fa-store text-warning"></i> Shopee
-              </a>
-              @endif
-
-              <!-- TikTok Shop -->
-              @if($p->link_tiktok)
-              <a href="{{ $p->link_tiktok }}" target="_blank" 
-                 class="btn btn-outline-dark btn-sm border d-flex align-items-center gap-2">
-                <i class="fab fa-tiktok"></i> TikTokShop
-              </a>
-              @endif
-            </div>
-
-          </div>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</div>
-@endforeach
 
 @include('inc.footer')

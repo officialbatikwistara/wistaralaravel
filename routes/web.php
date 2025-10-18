@@ -7,8 +7,9 @@ use App\Http\Controllers\UserAuthController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
+use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
-
+use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 
@@ -51,8 +52,10 @@ Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
 Route::middleware('auth')->group(function () {
     Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
     Route::post('/cart/add/{produkId}', [CartController::class, 'add'])->name('cart.add');
+    Route::put('/cart/update/{id}', [CartController::class, 'update'])->name('cart.update');
     Route::delete('/cart/remove/{id}', [CartController::class, 'remove'])->name('cart.remove');
 });
+
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth User
@@ -126,14 +129,31 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
-Route::get('/admin/produk', function () {
-    return view('admin.produk.index');
-})->name('admin.produk');
+// Katalog Admin
+Route::prefix('admin/produk')->group(function () {
+    Route::get('/', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
+    Route::get('/create', [ProdukAdminController::class, 'create'])->name('admin.produk.create');
+    Route::post('/store', [ProdukAdminController::class, 'store'])->name('admin.produk.store');
+    Route::get('/edit/{id_produk}', [ProdukAdminController::class, 'edit'])->name('admin.produk.edit');
+    Route::post('/update/{id_produk}', [ProdukAdminController::class, 'update'])->name('admin.produk.update');
+    Route::delete('/delete/{id_produk}', [ProdukAdminController::class, 'destroy'])->name('admin.produk.delete');
+});
+// Kategori Produk Katalog Admin
+Route::prefix('admin/kategori')->group(function () {
+    Route::get('/', [KategoriAdminController::class, 'index'])->name('admin.kategori.index');
+    Route::get('/create', [KategoriAdminController::class, 'create'])->name('admin.kategori.create');
+    Route::post('/store', [KategoriAdminController::class, 'store'])->name('admin.kategori.store');
+    Route::get('/edit/{id_kategori}', [KategoriAdminController::class, 'edit'])->name('admin.kategori.edit');
+    Route::post('/update/{id_kategori}', [KategoriAdminController::class, 'update'])->name('admin.kategori.update');
+    Route::delete('/delete/{id_kategori}', [KategoriAdminController::class, 'destroy'])->name('admin.kategori.delete');
+});
 
+// Pesanan Admin
 Route::get('/admin/pesanan', function () {
     return view('admin.pesanan.index');
 })->name('admin.pesanan');
 
+// Berita Admin
 Route::prefix('admin/berita')->group(function () {
     Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
     Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');

@@ -20,7 +20,7 @@ class Produk extends Model
         return $this->belongsTo(KategoriProduk::class, 'id_kategori');
     }
 
-    public function carts()
+    public function cart()
     {
     return $this->hasMany(Cart::class, 'produk_id', 'id_produk');
     }

@@ -38,7 +38,7 @@
       @php
           $cartCount = 0;
           if (Auth::check()) {
-              $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('jumlah');
+              $cartCount = \App\Models\Cart::where('user_id', Auth::id())->sum('qty');
           }
       @endphp
 

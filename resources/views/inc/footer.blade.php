@@ -1,7 +1,5 @@
 <!-- Bootstrap Bundle -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
-<footer class="bg-light text-dark pt-5 pb-4 shadow-sm mt-5">
+<footer class="bg-light text-dark pt-5 pb-4 shadow-sm mt-0">
   <div class="container">
     <div class="row gy-4 text-center text-md-start align-items-start">
 
@@ -62,6 +60,7 @@
   </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {

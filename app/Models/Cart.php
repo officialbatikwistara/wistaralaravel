@@ -6,11 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Cart extends Model
 {
-    protected $table = 'carts';
-    protected $fillable = ['user_id', 'produk_id', 'jumlah'];
+    protected $table = 'cart';
+    protected $fillable = ['user_id', 'id_produk', 'qty'];
 
     public function produk()
     {
-        return $this->belongsTo(Produk::class, 'produk_id');
+        // foreign key = id_produk, primary key = id_produk
+        return $this->belongsTo(Produk::class, 'id_produk', 'id_produk');
     }
 }
+
