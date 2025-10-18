@@ -3,12 +3,13 @@
 <section class="cart-section position-relative" 
          style="background: url('{{ asset('img/bghero.svg') }}') center/cover no-repeat; min-height: 100vh; margin-top: -80px; padding-bottom: 60px;">
 
-  <!-- Overlay hitam transparan -->
+  <!-- Overlay -->
   <div class="position-absolute top-0 start-0 w-100 h-100" 
        style="background: rgba(0, 0, 0, 0.65); backdrop-filter: blur(3px); z-index: 1;"></div>
 
-  <!-- Kontainer konten -->
-  <div class="container position-relative" style="z-index: 2; padding-top: 160px;">
+  <div class="container position-relative" style="z-index: 2; padding-top: 140px;">
+
+    <!-- Title -->
     <h2 class="fw-bold mb-4 text-center text-gold">
       Keranjang Belanja Anda
     </h2>
@@ -27,9 +28,9 @@
       </div>
     @endif
 
-    {{-- Jika ada produk --}}
     @if($cartItems->count() > 0)
-      <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+      <!-- Tabel Produk -->
+      <div class="card border-0 shadow-lg rounded-4 overflow-hidden mb-4">
         <div class="table-responsive">
           <table class="table align-middle mb-0">
             <thead style="background-color: #1e1e1e; color: #f8f9fa;">
@@ -74,13 +75,15 @@
                       @csrf
                       @method('PUT')
                       <div class="input-group input-group-sm" style="max-width: 120px;">
-                        <button type="button" class="btn btn-outline-dark" onclick="this.nextElementSibling.stepDown(); this.form.submit();">−</button>
+                        <button type="button" class="btn btn-outline-dark"
+                                onclick="this.nextElementSibling.stepDown(); this.form.submit();">−</button>
                         <input type="number" name="qty" value="{{ $item->qty }}" min="1"
-                              max="{{ $item->produk->stok ?? 1 }}"
-                              class="form-control text-center border-dark"
-                              style="max-width: 70px;"
-                              onchange="this.form.submit()">
-                        <button type="button" class="btn btn-outline-dark" onclick="this.previousElementSibling.stepUp(); this.form.submit();">+</button>
+                               max="{{ $item->produk->stok ?? 1 }}"
+                               class="form-control text-center border-dark"
+                               style="max-width: 70px;"
+                               onchange="this.form.submit()">
+                        <button type="button" class="btn btn-outline-dark"
+                                onclick="this.previousElementSibling.stepUp(); this.form.submit();">+</button>
                       </div>
                     </form>
                   </td>
@@ -107,22 +110,44 @@
         </div>
       </div>
 
-      {{-- Total & Checkout --}}
+      {{-- Total & Metode Pengambilan --}}
       @php
         $totalHarga = $cartItems->sum(fn($item) => $item->qty * (optional($item->produk)->harga ?? 0));
       @endphp
-      <div class="d-flex justify-content-between align-items-center mt-4 flex-wrap gap-2 text-white">
-        <h5 class="fw-bold mb-0">
-          Total:
-          <span class="text-gold">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
-        </h5>
-        <a href="#" class="btn btn-warning btn-lg rounded-pill px-4 fw-semibold text-dark shadow-sm">
-          <i class="fa-solid fa-cash-register me-2"></i> Checkout
-        </a>
-      </div>
 
-    {{-- Jika keranjang kosong --}}
+      <form action="{{ route('checkout.index') }}" method="GET" class="mt-4">
+        <div class="card border-0 shadow-sm p-4 mb-4">
+          <h5 class="fw-bold mb-3">Pilih Metode Pengambilan</h5>
+
+          <div class="form-check">
+            <input class="form-check-input" type="radio" name="tipe_order" value="ambil" id="orderAmbil" checked>
+            <label class="form-check-label fw-semibold" for="orderAmbil">
+              🏬 Ambil di Toko
+            </label>
+          </div>
+
+          <div class="form-check mt-2">
+            <input class="form-check-input" type="radio" name="tipe_order" value="kirim" id="orderKirim" disabled>
+            <label class="form-check-label text-muted" for="orderKirim">
+              🚚 Kirim ke Alamat (Coming Soon)
+            </label>
+          </div>
+        </div>
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+          <h5 class="fw-bold text-white mb-0">
+            Total:
+            <span class="text-gold">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
+          </h5>
+          <button type="submit" 
+                  class="btn btn-warning btn-lg rounded-pill px-4 fw-semibold text-dark shadow-sm">
+            <i class="fa-solid fa-cash-register me-2"></i> Checkout
+          </button>
+        </div>
+      </form>
+
     @else
+      {{-- Jika keranjang kosong --}}
       <div class="text-center py-5 text-white">
         <i class="fa-solid fa-cart-shopping fa-3x mb-3 text-gold"></i>
         <h5 class="fw-semibold mb-2">Keranjang Anda kosong</h5>
