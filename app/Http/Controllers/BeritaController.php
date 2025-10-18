@@ -15,12 +15,12 @@ class BeritaController extends Controller
             ->get();
 
         // Ambil 4 produk terbaru
-        $produk = DB::table('produk')
-            ->join('kategori_produk', 'produk.id_kategori', '=', 'kategori_produk.id_kategori')
-            ->select('produk.*', 'kategori_produk.nama_kategori')
-            ->orderBy('tanggal_upload', 'desc')
-            ->limit(4)
-            ->get();
+        // $produk = DB::table('produk')
+        //     ->join('kategori_produk', 'produk.id_kategori', '=', 'kategori_produk.id_kategori')
+        //     ->select('produk.*', 'kategori_produk.nama_kategori')
+        //     ->orderBy('tanggal_upload', 'desc')
+        //     ->limit(4)
+        //     ->get();
 
         return view('home', compact('berita', 'produk'));
     }
@@ -30,7 +30,7 @@ public function index(Request $request)
     $search = $request->input('search');
     $limit = $request->input('limit', 8);
 
-    $berita = \DB::table('berita')
+    $berita = DB::table('berita')
         ->when($search, function ($query, $search) {
             $query->where('judul', 'like', "%{$search}%")
                   ->orWhere('konten', 'like', "%{$search}%");
