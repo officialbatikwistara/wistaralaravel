@@ -77,7 +77,7 @@
 
                     <!-- Judul & Konten Singkat -->
                     <h3 class="berita-judul mt-3">{{ $b->judul }}</h3>
-                    <p class="berita-deskripsi">{{ Str::limit(strip_tags($b->deskripsi), 150) }}</p>
+                    <p class="berita-deskripsi">{{ Str::limit(strip_tags($b->konten), 150) }}</p>
 
                     <!-- Tanggal -->
                     <p class="berita-tanggal text-muted mb-2">
