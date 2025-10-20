@@ -1,16 +1,37 @@
 @include('admin.header')
 
-<div class="container py-4">
-  <h2 class="mb-4">✏️ Edit Kategori</h2>
-  <form action="{{ route('admin.kategori.update', $kategori->id_kategori) }}" method="POST">
-    @csrf
-    <div class="mb-3">
-      <label>Nama Kategori</label>
-      <input type="text" name="nama_kategori" class="form-control" value="{{ $kategori->nama_kategori }}" required>
+<div class="container py-5">
+  <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 600px;">
+    <div class="card-header bg-dark text-white text-center rounded-top-4 py-3">
+      <h3 class="mb-0">✏️ Edit Kategori Produk</h3>
     </div>
-    <button class="btn btn-dark">Simpan</button>
-    <a href="{{ route('admin.kategori.index') }}" class="btn btn-secondary">Kembali</a>
-  </form>
+
+    <div class="card-body bg-light">
+      <form action="{{ route('admin.kategori.update', $kategori->id_kategori) }}" method="POST">
+        @csrf
+
+        <div class="mb-3">
+          <label class="form-label fw-semibold">Nama Kategori</label>
+          <input
+            type="text"
+            name="nama_kategori"
+            class="form-control border-0 shadow-sm"
+            placeholder="Masukkan nama kategori..."
+            value="{{ $kategori->nama_kategori }}"
+            required>
+        </div>
+
+        <div class="d-flex justify-content-end gap-2 mt-4">
+          <a href="{{ route('admin.kategori.index') }}" class="btn btn-secondary px-4">
+            ← Kembali
+          </a>
+          <button class="btn btn-dark px-4">
+            Simpan Perubahan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
 </div>
 
 @include('admin.footer')
