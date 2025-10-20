@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Panel - @yield('title')</title>
+  <title>@yield('title') - Batik Wistara Admin</title>
 
   <!-- Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -12,131 +12,157 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    /* ===========================
+       ✨ Batik Wistara Admin Header (Full Width)
+       =========================== */
     body {
-      background-color: #f5f7fa;
       font-family: 'Poppins', sans-serif;
+      background-color: #f8f9fa;
+      padding-top: 85px; /* Supaya konten gak ketutup navbar */
     }
 
-    /* Navbar Styling */
     .navbar-admin {
-      background: linear-gradient(90deg, #1c1f24, #343a40);
-      box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-      padding: 0.75rem 1.5rem;
+      background-color: #071739; /* warna biru navy khas wistara */
+      padding: 1rem 2rem;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      width: 100%;
+      z-index: 1030;
     }
 
-    .navbar-admin .navbar-brand {
-      color: #f8f9fa;
-      font-weight: 700;
-      font-size: 1.3rem;
+    .navbar-admin .navbar-brand img {
+      height: 55px;
+    }
+
+    /* MENU NAVBAR */
+    .navbar-admin .nav-link {
+      color: white;
+      font-weight: 600;
       letter-spacing: 0.5px;
       transition: color 0.3s ease;
     }
 
-    .navbar-admin .navbar-brand:hover {
-      color: #ffc107;
+    .navbar-admin .nav-link:hover,
+    .navbar-admin .nav-link.active {
+      color: #f6b400; /* warna kuning wistara */
     }
 
-    .navbar-admin .nav-link {
-      color: #e9ecef;
-      font-weight: 500;
-      transition: color 0.3s ease, transform 0.2s ease;
+    /* IKON TROLI */
+    .icon-btn {
+      color: white;
+      font-size: 1.3rem;
+      margin-right: 1.5rem;
+      transition: color 0.3s ease;
+      position: relative;
     }
 
-    .navbar-admin .nav-link:hover {
-      color: #ffc107;
-      transform: translateY(-2px);
+    .icon-btn:hover {
+      color: #f6b400;
     }
 
-    .navbar-admin .dropdown-toggle::after {
-      display: none;
+    .icon-btn .badge {
+      position: absolute;
+      top: -6px;
+      right: -10px;
+      font-size: 0.7rem;
+      background-color: #f6b400;
+      color: #071739;
     }
 
-    .navbar-admin .dropdown-menu {
+    /* DROPDOWN ADMIN */
+    .dropdown-toggle {
+      color: #071739;
+      background-color: #fff;
+      font-weight: 600;
+      border: none;
       border-radius: 10px;
+      padding: 8px 14px;
+      transition: all 0.3s ease;
+    }
+
+    .dropdown-toggle:hover {
+      background-color: #f6b400;
+      color: #071739;
+    }
+
+    .dropdown-menu {
       border: none;
       box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+      border-radius: 10px;
       padding: 0.5rem;
     }
 
-    .navbar-admin .dropdown-item {
-      border-radius: 8px;
-      transition: background-color 0.3s ease, color 0.3s ease;
+    .dropdown-item:hover {
+      background-color: #f6b400;
+      color: #071739;
     }
 
-    .navbar-admin .dropdown-item:hover {
-      background-color: #212529;
-      color: #ffc107;
+    /* RESPONSIF */
+    @media (max-width: 991px) {
+      .navbar-collapse {
+        background-color: #071739;
+        padding: 1rem;
+        border-radius: 10px;
+      }
+      .dropdown-toggle {
+        background-color: #fff;
+      }
     }
-
-    .navbar-admin .btn-logout {
-      background-color: #dc3545;
-      border: none;
-      border-radius: 10px;
-      padding: 0.4rem 1rem;
-      color: white;
-      font-weight: 500;
-      transition: background 0.3s ease;
-    }
-
-    .navbar-admin .btn-logout:hover {
-      background-color: #bb2d3b;
-    }
-
-    /* Branding Icon */
-    .navbar-brand i {
-      color: #ffc107;
-      font-size: 1.5rem;
-      margin-right: 0.4rem;
-    }
-
-    /* Mobile Toggler */
-    .navbar-toggler {
-      border: none;
-    }
-    .navbar-toggler:focus {
-      box-shadow: none;
-    }
-
   </style>
 </head>
 
 <body>
-<nav class="navbar navbar-expand-lg navbar-admin">
-  <div class="container-fluid">
+  <nav class="navbar navbar-expand-lg navbar-admin">
+    <div class="container-fluid">
 
-    <!-- Brand -->
-    <a class="navbar-brand d-flex align-items-center" href="{{ route('admin.dashboard') }}">
-      <i class="fa-solid fa-chart-line"></i> Admin Panel
-    </a>
+      <!-- LOGO -->
+      <a class="navbar-brand" href="{{ url('/admin/dashboard') }}">
+        <img src="{{ asset('img/logoputih.png') }}" alt="Batik Wistara Logo">
+      </a>
 
-    <!-- Toggle for mobile -->
-    <button class="navbar-toggler text-light" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
-      <i class="fa-solid fa-bars"></i>
-    </button>
+      <!-- TOGGLE MOBILE -->
+      <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar">
+        <i class="fa-solid fa-bars"></i>
+      </button>
 
-    <!-- Menu -->
-    <div class="collapse navbar-collapse justify-content-end" id="adminNavbar">
-      <ul class="navbar-nav align-items-center gap-2">
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('/admin/produk') }}">
-            <i class="fa-solid fa-shirt me-1"></i> Produk
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('/admin/pesanan') }}">
-            <i class="fa-solid fa-box me-1"></i> Pesanan
-          </a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{{ url('/admin/berita') }}">
-            <i class="fa-solid fa-newspaper me-1"></i> Berita
-          </a>
-        </li>
+      <!-- MENU TENGAH -->
+      <div class="collapse navbar-collapse justify-content-center" id="adminNavbar">
+        <ul class="navbar-nav gap-4">
+          <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/kategori') ? 'active' : '' }}" href="{{ url('/admin/kategori') }}">
+              KATEGORI PRODUK
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/produk') ? 'active' : '' }}" href="{{ url('/admin/produk') }}">
+              PRODUK
+            </a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link {{ Request::is('admin/berita') ? 'active' : '' }}" href="{{ url('/admin/berita') }}">
+              BERITA
+            </a>
+          </li>
+        </ul>
+      </div>
 
-        <!-- Dropdown -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
-            <i class="fa-solid fa-user-shield me-1"></i> {{ session('admin_name') ?? 'Super Admin' }}
+      <!-- KANAN -->
+      <div class="d-flex align-items-center">
+
+        <!-- IKON TROLI -->
+        <a href="{{ url('/admin/pesanan') }}" class="icon-btn position-relative">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="badge">{{ $jumlahPesanan ?? 0 }}</span>
+        </a>
+
+        <!-- DROPDOWN ADMIN -->
+        <div class="dropdown">
+          <a class="dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown">
+            <i class="fa-solid fa-user me-2"></i>
+            {{ session('admin_name') ?? 'Super Admin' }}
           </a>
           <ul class="dropdown-menu dropdown-menu-end">
             <li>
@@ -145,9 +171,13 @@
               </a>
             </li>
           </ul>
-        </li>
-      </ul>
-    </div>
+        </div>
 
-  </div>
-</nav>
+      </div>
+
+    </div>
+  </nav>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

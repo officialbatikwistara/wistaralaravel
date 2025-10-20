@@ -160,9 +160,11 @@ Route::prefix('admin/kategori')->group(function () {
 });
 
 // Pesanan Admin
-Route::get('/admin/pesanan', function () {
-    return view('admin.pesanan.index');
-})->name('admin.pesanan');
+Route::prefix('admin/pesanan')->group(function () {
+    Route::get('/', function () {
+        return view('admin.pesanan.index');
+    })->name('admin.pesanan.index');
+});
 
 // Berita Admin
 Route::prefix('admin/berita')->group(function () {
