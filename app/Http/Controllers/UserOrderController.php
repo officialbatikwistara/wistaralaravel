@@ -4,13 +4,14 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Order;
-use App\Models\OrderItem;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class UserOrderController extends Controller
 {
-    // 📄 Halaman detail pesanan user
+    /**
+     * 📄 Detail pesanan user
+     */
     public function show($id)
     {
         $order = Order::where('id', $id)
@@ -21,21 +22,32 @@ class UserOrderController extends Controller
         return view('user.pesanan.show', compact('order'));
     }
 
+    /**
+     * 📤 Upload bukti pembayaran (Bank Transfer)
+     */
     public function uploadBukti(Request $request, $id)
     {
-        $order = \App\Models\Order::where('id', $id)
+        $order = Order::where('id', $id)
             ->where('user_id', Auth::id())
             ->where('metode_pembayaran', 'bank_transfer')
+            ->where('status', 'pending')
+            ->where('status_pembayaran', 'belum_bayar')
             ->firstOrFail();
 
         $request->validate([
             'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048'
         ]);
 
-        // 📸 Upload bukti
+        // 🗂️ Pastikan folder upload tersedia
+        $uploadPath = public_path('uploads/bukti');
+        if (!file_exists($uploadPath)) {
+            mkdir($uploadPath, 0775, true);
+        }
+
+        // 📸 Upload file
         $file = $request->file('bukti_pembayaran');
         $filename = 'bukti_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
-        $file->move(public_path('uploads/bukti'), $filename);
+        $file->move($uploadPath, $filename);
 
         // 📝 Update order
         $order->update([
@@ -43,33 +55,36 @@ class UserOrderController extends Controller
             'status_pembayaran' => 'menunggu_verifikasi'
         ]);
 
-        return back()->with('success', '✅ Bukti pembayaran berhasil diupload, menunggu verifikasi admin.');
+        return back()->with('success', '✅ Bukti pembayaran berhasil diupload. Menunggu verifikasi admin.');
     }
 
-
-    // ❌ Pembatalan pesanan (kembalikan stok)
+    /**
+     * ❌ Batalkan pesanan dan kembalikan stok
+     */
     public function cancel($id)
     {
         $order = Order::where('id', $id)
             ->where('user_id', Auth::id())
-            ->where('status', 'pending') // hanya pesanan pending yang bisa dibatalkan
+            ->where('status', 'pending')
             ->with('items.produk')
             ->firstOrFail();
 
         DB::beginTransaction();
         try {
-            // 🛍️ Kembalikan stok
+            // 🛍️ Kembalikan stok produk
             foreach ($order->items as $item) {
                 $item->produk->increment('stok', $item->qty);
             }
 
-            // ❌ Ubah status jadi batal
+            // ❌ Update status pesanan
             $order->update([
-                'status' => 'batal'
+                'status' => 'batal',
+                'status_pembayaran' => 'gagal' // sekalian tandai gagal jika batal
             ]);
 
             DB::commit();
-            return redirect()->route('user.order.show', $id)->with('success', 'Pesanan berhasil dibatalkan dan stok dikembalikan ✅');
+            return redirect()->route('user.order.show', $id)
+                ->with('success', '❌ Pesanan berhasil dibatalkan dan stok dikembalikan.');
         } catch (\Exception $e) {
             DB::rollBack();
             return back()->with('error', 'Gagal membatalkan pesanan: '.$e->getMessage());

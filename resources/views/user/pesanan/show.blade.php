@@ -3,6 +3,7 @@
 <div class="detailorder-page" style="padding-top: 120px; background: url('{{ asset('img/bghero.svg') }}') center/cover no-repeat;">
     <div class="container py-5" style="max-width: 800px;">
         <div class="card shadow-lg rounded-4 border-0 p-4">
+
             <!-- 🧾 Header Detail -->
             <h3 class="fw-bold mb-3">
                 <i class="fa-solid fa-receipt me-2 text-dark"></i> Detail Pesanan #{{ $order->id }}
@@ -18,6 +19,8 @@
                     @else 💵 COD 
                     @endif
                 </p>
+
+                <!-- Status Pesanan -->
                 <p><strong>Status Pesanan:</strong>
                     @if($order->status == 'pending')
                         <span class="badge bg-warning text-dark">Pending</span>
@@ -29,6 +32,8 @@
                         <span class="badge bg-danger">Batal</span>
                     @endif
                 </p>
+
+                <!-- Status Pembayaran -->
                 <p><strong>Status Pembayaran:</strong>
                     @if($order->status_pembayaran == 'belum_bayar')
                         <span class="badge bg-secondary">Belum Bayar</span>
@@ -99,7 +104,7 @@
                 <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong>
             </div>
 
-            <!-- 📤 Upload Bukti Pembayaran -->
+            <!-- 📤 Upload Bukti Pembayaran (jika Bank Transfer & Belum Bayar) -->
             @if($order->metode_pembayaran === 'bank_transfer' && $order->status_pembayaran === 'belum_bayar' && $order->status == 'pending')
             <hr>
             <h5 class="fw-bold mb-3">📤 Upload Bukti Pembayaran</h5>
@@ -114,7 +119,7 @@
             </form>
             @endif
 
-            <!-- 🧾 Preview Bukti -->
+            <!-- 🧾 Preview Bukti Pembayaran -->
             @if($order->bukti_pembayaran)
             <hr>
             <h5 class="fw-bold mb-2">🧾 Bukti Pembayaran</h5>

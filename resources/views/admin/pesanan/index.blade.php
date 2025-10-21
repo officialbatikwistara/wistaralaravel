@@ -46,7 +46,9 @@
                             <th>Nama</th>
                             <th>Tanggal Order</th>
                             <th>Total</th>
-                            <th>Status</th>
+                            <th>Status Pesanan</th>
+                            <th>Status Pembayaran</th>
+                            <th>Bukti</th>
                             <th>Tipe Order</th>
                             <th>Aksi</th>
                         </tr>
@@ -71,10 +73,48 @@
                                     <span class="badge bg-danger">Batal</span>
                                 @endif
                             </td>
+                            <td>
+                                <form action="{{ route('admin.orders.updatePayment', $order->id) }}" method="POST" class="d-flex justify-content-center">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="status_pembayaran" class="form-select form-select-sm w-auto me-2" onchange="this.form.submit()">
+                                        <option value="belum_bayar" {{ $order->status_pembayaran == 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                                        <option value="menunggu_verifikasi" {{ $order->status_pembayaran == 'menunggu_verifikasi' ? 'selected' : '' }}>Menunggu</option>
+                                        <option value="lunas" {{ $order->status_pembayaran == 'lunas' ? 'selected' : '' }}>Lunas</option>
+                                        <option value="gagal" {{ $order->status_pembayaran == 'gagal' ? 'selected' : '' }}>Gagal</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                @if($order->bukti_pembayaran)
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id }}">
+                                    <i class="fa-solid fa-image me-1"></i> Lihat
+                                </button>
+
+                                <!-- Modal Bukti Pembayaran -->
+                                <div class="modal fade" id="buktiModal{{ $order->id }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content border-0 rounded-4">
+                                            <div class="modal-header bg-dark text-white">
+                                                <h5 class="modal-title" id="buktiModalLabel{{ $order->id }}">
+                                                    🧾 Bukti Pembayaran #{{ $order->id }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded shadow">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td>{{ ucfirst($order->tipe_order) }}</td>
                             <td>
                                 <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-outline-primary btn-sm">
-                                    <i class="fa-solid fa-eye me-1"></i> Lihat
+                                    <i class="fa-solid fa-eye me-1"></i> Detail
                                 </a>
                             </td>
                         </tr>
@@ -82,7 +122,7 @@
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="8" class="text-center py-2">
+                            <td colspan="10" class="text-center py-2">
                                 Total Pesanan: {{ $orders->where('status', $status)->when($status == null, fn($q) => $orders)->count() }}
                             </td>
                         </tr>

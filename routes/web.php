@@ -76,13 +76,13 @@ Route::middleware('auth')->group(function () {
 | Route Order Customer
 |--------------------------------------------------------------------------
 */
+
 Route::middleware(['auth'])->group(function () {
-    Route::get('/user/pesanan/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
-    Route::post('/user/pesanan/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
+    Route::get('/user/orders/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
+    Route::post('/user/orders/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
+    Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
 });
-Route::middleware(['auth'])->group(function () {
-    Route::post('/user/pesanan/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
-});
+
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth User
@@ -182,6 +182,8 @@ Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 });
+Route::patch('/admin/orders/{id}/update-payment', [\App\Http\Controllers\Admin\AdminOrderController::class, 'updatePayment'])
+    ->name('admin.orders.updatePayment');
 
 
 Route::resource('admin/berita', BeritaAdminController::class)->names([

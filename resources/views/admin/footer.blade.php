@@ -13,7 +13,6 @@
           <li><a href="{{ route('admin.kategori.index') }}" class="text-white text-decoration-none d-block">Kategori</a></li>
           <li><a href="{{ route('admin.produk.index') }}" class="text-white text-decoration-none d-block">Produk</a></li>
           <li><a href="{{ route('admin.berita.index') }}" class="text-white text-decoration-none d-block">Berita</a></li>
-          <li><a href="{{ route('admin.pesanan.index') }}" class="text-white text-decoration-none d-block">Pesanan</a></li>
         </ul>
       </div>
 

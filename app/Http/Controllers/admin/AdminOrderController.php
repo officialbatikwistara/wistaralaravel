@@ -38,4 +38,18 @@ class AdminOrderController extends Controller
         $order = Order::with('items.produk')->findOrFail($id);
         return view('admin.pesanan.show', compact('order'));
     }
+
+    public function updatePayment(Request $request, $id)
+    {
+        $request->validate([
+            'status_pembayaran' => 'required|in:belum_bayar,menunggu_verifikasi,lunas,gagal'
+        ]);
+
+        $order = \App\Models\Order::findOrFail($id);
+        $order->status_pembayaran = $request->status_pembayaran;
+        $order->save();
+
+        return back()->with('success', '✅ Status pembayaran berhasil diperbarui.');
+    }
+
 }

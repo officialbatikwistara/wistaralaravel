@@ -104,7 +104,7 @@
                         @endif
                       </td>
                       <td>
-                        <a href="{{ url('/user/pesanan/'.$order->id) }}" class="btn btn-sm btn-outline-dark rounded-pill">
+                        <a href="{{ route('user.order.show', $order->id) }}" class="btn btn-sm btn-outline-dark rounded-pill">
                           <i class="fa-solid fa-eye me-1"></i> Detail
                         </a>
                       </td>
