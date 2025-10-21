@@ -13,6 +13,9 @@ use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Admin\AdminOrderController;
+
+
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -175,14 +178,7 @@ Route::resource('admin/kategori', KategoriAdminController::class)->names([
 
 
 // Pesanan Admin
-Route::prefix('admin/pesanan')->group(function () {
-    Route::get('/', function () {
-        return view('admin.pesanan.index');
-    })->name('admin.pesanan.index');
-});
-use App\Http\Controllers\AdminOrderController;
-
-Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
+Route::prefix('admin')->middleware(['auth'])->group(function () {
     Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
     Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 });
