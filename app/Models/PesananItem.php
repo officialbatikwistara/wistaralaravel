@@ -26,7 +26,7 @@ class PesananItem extends Model
         return $this->belongsTo(Pesanan::class, 'order_id');
     }
 
-    // Relasi ke produk (jika kamu punya model Product)
+    // Relasi ke produk
     public function product()
     {
         return $this->belongsTo(Produk::class, 'id_produk');
