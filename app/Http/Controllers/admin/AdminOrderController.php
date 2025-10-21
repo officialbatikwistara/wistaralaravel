@@ -13,9 +13,26 @@ class AdminOrderController extends Controller
     /**
      * 📝 Tampilkan semua pesanan
      */
-    public function index()
+    public function index(Request $request)
     {
-        $orders = Order::orderBy('created_at', 'desc')->get();
+        $query = \App\Models\Order::query();
+
+        if ($request->filled('start')) {
+            $query->whereDate('created_at', '>=', $request->start);
+        }
+
+        if ($request->filled('end')) {
+            $query->whereDate('created_at', '<=', $request->end);
+        }
+
+        if ($request->filled('keyword')) {
+            $query->where(function($q) use ($request) {
+                $q->where('nama', 'like', "%{$request->keyword}%")
+                ->orWhere('id', $request->keyword);
+            });
+        }
+
+        $orders = $query->orderBy('created_at', 'desc')->get();
         return view('admin.pesanan.index', compact('orders'));
     }
 
