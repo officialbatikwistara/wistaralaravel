@@ -23,7 +23,7 @@ class PesananItem extends Model
     // Relasi: item ini milik satu order
     public function order()
     {
-        return $this->belongsTo(Pesanan::class, 'order_id');
+        return $this->belongsTo(Order::class, 'order_id');
     }
 
     // Relasi ke produk
