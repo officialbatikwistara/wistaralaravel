@@ -77,7 +77,7 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::get('/user/orders/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
     Route::post('/user/orders/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
     Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
@@ -98,13 +98,13 @@ Route::get('/register', [UserAuthController::class, 'showRegister'])->name('user
 Route::post('/register', [UserAuthController::class, 'register'])->name('user.register.post');
 
 // 👤 edit User
-Route::middleware(['auth'])->group(function () {
+Route::middleware('auth')->group(function () {
     Route::put('/user/update-profile', [\App\Http\Controllers\UserAuthController::class, 'updateProfile'])
         ->name('user.update.profile');
 });
 
 // 🛡️ Dashboard User (middleware proteksi)
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware('auth', 'verified')->group(function () {
     Route::get('/user/dashboard', function () {
         return view('user.dashboard');
     });
@@ -175,14 +175,11 @@ Route::resource('admin/kategori', KategoriAdminController::class)->names([
     'destroy' => 'admin.kategori.delete',
 ]);
 
+// 📦 Pesanan Admin
+Route::get('admin/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+Route::get('admin/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+Route::patch('admin/orders/{id}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('admin.orders.updatePayment');
 
-// Pesanan Admin
-Route::prefix('admin')->middleware(['auth'])->group(function () {
-    Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-});
-Route::patch('/admin/orders/{id}/update-payment', [\App\Http\Controllers\Admin\AdminOrderController::class, 'updatePayment'])
-    ->name('admin.orders.updatePayment');
 
 
 Route::resource('admin/berita', BeritaAdminController::class)->names([
