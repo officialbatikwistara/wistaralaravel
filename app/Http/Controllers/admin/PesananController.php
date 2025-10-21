@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
 use App\Models\Pesanan;
 use Illuminate\Http\Request;
 
@@ -13,7 +14,7 @@ class PesananController extends Controller
     public function index(Request $request)
     {
 
-        $pesanan = Pesanan::query();
+        $pesanan = Order::query();
 
         if ($request->search) {
             $pesanan->where('customer', 'like', "%{$request->search}%")
