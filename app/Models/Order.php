@@ -18,10 +18,11 @@ class Order extends Model
         'alamat',
         'catatan',
         'total',
+        'status',
         'tipe_order',
         'metode_pembayaran',
         'tanggal_ambil',
-        'status'
+
     ];
 
     public function items()
