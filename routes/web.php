@@ -8,6 +8,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
@@ -65,6 +66,16 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Route Order Customer
+|--------------------------------------------------------------------------
+*/
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user/pesanan/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
+    Route::post('/user/pesanan/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
 });
 
 /*
@@ -140,16 +151,6 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
-// Katalog Admin
-// Route::prefix('admin/produk')->group(function () {
-//     Route::get('/', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
-//     Route::get('/create', [ProdukAdminController::class, 'create'])->name('admin.produk.create');
-//     Route::post('/store', [ProdukAdminController::class, 'store'])->name('admin.produk.store');
-//     Route::get('/edit/{id_produk}', [ProdukAdminController::class, 'edit'])->name('admin.produk.edit');
-//     Route::post('/update/{id_produk}', [ProdukAdminController::class, 'update'])->name('admin.produk.update');
-//     Route::delete('/delete/{id_produk}', [ProdukAdminController::class, 'destroy'])->name('admin.produk.delete');
-// });
-
 Route::resource('admin/produk', ProdukAdminController::class)->names([
     'index' => 'admin.produk.index',
     'create' => 'admin.produk.create',
@@ -159,17 +160,6 @@ Route::resource('admin/produk', ProdukAdminController::class)->names([
     'update' => 'admin.produk.update',
     'destroy' => 'admin.produk.delete',
 ]);
-
-
-// Kategori Produk Katalog Admin
-// Route::prefix('admin/kategori')->group(function () {
-//     Route::get('/', [KategoriAdminController::class, 'index'])->name('admin.kategori.index');
-//     Route::get('/create', [KategoriAdminController::class, 'create'])->name('admin.kategori.create');
-//     Route::post('/store', [KategoriAdminController::class, 'store'])->name('admin.kategori.store');
-//     Route::get('/edit/{id_kategori}', [KategoriAdminController::class, 'edit'])->name('admin.kategori.edit');
-//     Route::post('/update/{id_kategori}', [KategoriAdminController::class, 'update'])->name('admin.kategori.update');
-//     Route::delete('/delete/{id_kategori}', [KategoriAdminController::class, 'destroy'])->name('admin.kategori.delete');
-// });
 
 Route::resource('admin/kategori', KategoriAdminController::class)->names([
     'index' => 'admin.kategori.index',
@@ -189,15 +179,6 @@ Route::prefix('admin/pesanan')->group(function () {
     })->name('admin.pesanan.index');
 });
 
-// Berita Admin
-// Route::prefix('admin/berita')->group(function () {
-//     Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
-//     Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');
-//     Route::post('/store', [BeritaAdminController::class, 'store'])->name('admin.berita.store');
-//     Route::get('/edit/{id}', [BeritaAdminController::class, 'edit'])->name('admin.berita.edit');
-//     Route::post('/update/{id}', [BeritaAdminController::class, 'update'])->name('admin.berita.update');
-//     Route::delete('/delete/{id}', [BeritaAdminController::class, 'destroy'])->name('admin.berita.delete');
-// });
 
 Route::resource('admin/berita', BeritaAdminController::class)->names([
     'index' => 'admin.berita.index',

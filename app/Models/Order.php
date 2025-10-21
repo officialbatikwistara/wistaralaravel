@@ -23,4 +23,9 @@ class Order extends Model
         'tanggal_ambil',
         'status'
     ];
+
+    public function items()
+    {
+        return $this->hasMany(\App\Models\OrderItem::class, 'order_id', 'id');
+    }
 }

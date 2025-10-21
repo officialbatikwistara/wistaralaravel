@@ -839,6 +839,27 @@ h5 {
     color: #fff;
 }
 
+/* ========================== DASHBOARD USER ========================== */
+/* 🌸 Background penuh */
+.detailorder-page {
+    background: url("../img/bg-batik.jpg") center center/cover no-repeat;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    padding-top: 80px; /* kompensasi navbar */
+    margin-top: -80px; /* supaya konten naik di belakang navbar */
+}
+
+/* 🌿 Overlay gelap transparan */
+.detailorder-page::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(3px);
+}
 /* ========================== KERANJANG ========================== */
 .table-dark {
     color: #1a2247;
