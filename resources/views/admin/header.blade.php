@@ -13,21 +13,18 @@
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
-
     <style>
-        /* ===========================
-       ✨ Batik Wistara Admin Header (Full Width)
-       =========================== */
+        /* ============================
+           ✨ Batik Wistara Admin Header
+        ============================ */
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f8f9fa;
             padding-top: 85px;
-            /* Supaya konten gak ketutup navbar */
         }
 
         .navbar-admin {
             background-color: #071739;
-            /* warna biru navy khas wistara */
             padding: 1rem 2rem;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
             position: fixed;
@@ -53,7 +50,6 @@
         .navbar-admin .nav-link:hover,
         .navbar-admin .nav-link.active {
             color: #f6b400;
-            /* warna kuning wistara */
         }
 
         /* IKON TROLI */
@@ -80,16 +76,18 @@
 
         /* DROPDOWN ADMIN */
         .dropdown-toggle {
-            color: #071739;
             background-color: #fff;
+            color: #071739;
             font-weight: 600;
             border: none;
             border-radius: 10px;
             padding: 8px 14px;
             transition: all 0.3s ease;
+            cursor: pointer;
         }
 
-        .dropdown-toggle:hover {
+        .dropdown-toggle:hover,
+        .dropdown-toggle.show {
             background-color: #f6b400;
             color: #071739;
         }
@@ -132,7 +130,8 @@
 
             <!-- TOGGLE MOBILE -->
             <button class="navbar-toggler text-white" type="button" data-bs-toggle="collapse"
-                data-bs-target="#adminNavbar">
+                data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <i class="fa-solid fa-bars"></i>
             </button>
 
@@ -162,7 +161,6 @@
 
             <!-- KANAN -->
             <div class="d-flex align-items-center">
-
                 <!-- IKON TROLI -->
                 <a href="{{ url('/admin/pesanan') }}" class="icon-btn position-relative">
                     <i class="fa-solid fa-cart-shopping"></i>
@@ -171,26 +169,22 @@
 
                 <!-- DROPDOWN ADMIN -->
                 <div class="dropdown">
-                    <a class="dropdown-toggle d-flex align-items-center" href="#" role="button"
-                        data-bs-toggle="dropdown">
+                    <a class="dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown"
+                        aria-expanded="false">
                         <i class="fa-solid fa-user me-2"></i>
                         {{ session('admin_name') ?? 'Super Admin' }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item text-danger" href="{{ route('admin.logout') }}">
+                            <a class="dropdown-item text-danger d-flex align-items-center" href="{{ route('admin.logout') }}">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                             </a>
                         </li>
                     </ul>
                 </div>
-
             </div>
 
         </div>
     </nav>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-</body>
 
-</html>
