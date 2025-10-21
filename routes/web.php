@@ -180,6 +180,12 @@ Route::prefix('admin/pesanan')->group(function () {
         return view('admin.pesanan.index');
     })->name('admin.pesanan.index');
 });
+use App\Http\Controllers\AdminOrderController;
+
+Route::prefix('admin')->middleware(['auth', 'is_admin'])->group(function () {
+    Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+});
 
 
 Route::resource('admin/berita', BeritaAdminController::class)->names([
