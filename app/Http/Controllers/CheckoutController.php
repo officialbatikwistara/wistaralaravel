@@ -82,7 +82,15 @@ class CheckoutController extends Controller
 
             DB::commit();
 
-            return redirect()->route('checkout.index')->with('success', '✅ Pesanan berhasil dibuat.');
+            if ($request->metode_pembayaran === 'cod') {
+                // COD langsung ke dashboard user
+                return redirect('/user/dashboard')->with('success', '✅ Pesanan COD berhasil dibuat. Silakan ambil di toko.');
+            } elseif ($request->metode_pembayaran === 'bank_transfer') {
+                return redirect()->route('checkout.bank', $order->id);
+            } elseif ($request->metode_pembayaran === 'qris') {
+                return redirect()->route('checkout.qris', $order->id);
+            }
+
         } catch (\Exception $e) {
             DB::rollback();
             return back()->with('error', 'Terjadi kesalahan: '.$e->getMessage());

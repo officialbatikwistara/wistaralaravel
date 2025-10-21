@@ -82,6 +82,22 @@ Route::middleware('auth')->group(function () {
     Route::post('/user/orders/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
     Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
 });
+
+Route::post('/checkout/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])
+    ->name('checkout.uploadBukti');
+
+// 🔸 Halaman transfer bank (setelah order dibuat)
+Route::get('/checkout/bank-transfer/{id}', function($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    return view('checkout.bank-transfer', compact('order'));
+})->name('checkout.bank');
+
+// 🔸 Halaman QRIS (sementara placeholder)
+Route::get('/checkout/qris/{id}', function($id) {
+    $order = \App\Models\Order::findOrFail($id);
+    return view('checkout.qris', compact('order'));
+})->name('checkout.qris');
+
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth User
@@ -176,10 +192,14 @@ Route::resource('admin/kategori', KategoriAdminController::class)->names([
 ]);
 
 // 📦 Pesanan Admin
-Route::get('admin/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-Route::get('admin/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-Route::patch('admin/orders/{id}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('admin.orders.updatePayment');
+Route::prefix('admin')->group(function () {
+    Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::patch('/pesanan/{id}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('admin.orders.updatePayment');
 
+    // 🆕 Tambahkan route untuk update status
+    Route::patch('/pesanan/{id}/update-status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
+});
 
 
 Route::resource('admin/berita', BeritaAdminController::class)->names([

@@ -63,21 +63,22 @@
                             <td>{{ $order->created_at->format('d M Y') }}</td>
                             <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
                             <td>
-                                @if($order->status == 'pending')
-                                    <span class="badge bg-warning text-dark">Pending</span>
-                                @elseif($order->status == 'proses')
-                                    <span class="badge bg-primary">Proses</span>
-                                @elseif($order->status == 'selesai')
-                                    <span class="badge bg-success">Selesai</span>
-                                @else
-                                    <span class="badge bg-danger">Batal</span>
-                                @endif
-                            </td>
-                            <td>
-                                <form action="{{ route('admin.orders.updatePayment', $order->id) }}" method="POST" class="d-flex justify-content-center">
+                                <form action="{{ route('admin.orders.updateStatus', $order->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
-                                    <select name="status_pembayaran" class="form-select form-select-sm w-auto me-2" onchange="this.form.submit()">
+                                    <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                                        <option value="pending" {{ $order->status == 'pending' ? 'selected' : '' }}>Pending</option>
+                                        <option value="proses" {{ $order->status == 'proses' ? 'selected' : '' }}>Proses</option>
+                                        <option value="selesai" {{ $order->status == 'selesai' ? 'selected' : '' }}>Selesai</option>
+                                        <option value="batal" {{ $order->status == 'batal' ? 'selected' : '' }}>Batal</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                <form action="{{ route('admin.orders.updatePayment', $order->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="status_pembayaran" class="form-select form-select-sm" onchange="this.form.submit()">
                                         <option value="belum_bayar" {{ $order->status_pembayaran == 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
                                         <option value="menunggu_verifikasi" {{ $order->status_pembayaran == 'menunggu_verifikasi' ? 'selected' : '' }}>Menunggu</option>
                                         <option value="lunas" {{ $order->status_pembayaran == 'lunas' ? 'selected' : '' }}>Lunas</option>
