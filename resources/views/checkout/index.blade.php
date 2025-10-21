@@ -136,6 +136,44 @@
         <span class="fw-bold text-gold fs-5">Rp {{ number_format($total, 0, ',', '.') }}</span>
       </div>
 
+      <!-- 💳 Metode Pembayaran -->
+      <div class="mb-4 pb-3 border-bottom">
+        <h5 class="fw-bold mb-3">Metode Pembayaran</h5>
+
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="radio" name="metode_pembayaran" id="bayarBank" value="bank_transfer" required>
+          <label class="form-check-label fw-semibold" for="bayarBank">
+            🏦 Transfer Bank
+          </label>
+          <div class="mt-2 ms-4 d-none" id="bankInfo">
+            <div class="p-3 bg-light rounded-3 border">
+              <p class="mb-1">Bank BCA</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="radio" name="metode_pembayaran" id="bayarQris" value="qris">
+          <label class="form-check-label fw-semibold" for="bayarQris">
+            📱 QRIS
+          </label>
+          <div class="mt-2 ms-4 d-none" id="qrisInfo">
+            <div class="p-3 bg-light rounded-3 border text-center">
+              <img src="{{ asset('img/qris.png') }}" alt="QRIS Batik Wistara" 
+                  style="max-width: 200px; border-radius: 10px;">
+              <p class="mt-2 mb-0"><small>Scan QRIS di atas untuk pembayaran</small></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-check mb-2">
+          <input class="form-check-input" type="radio" name="metode_pembayaran" id="bayarCod" value="cod">
+          <label class="form-check-label fw-semibold" for="bayarCod">
+            💵 Bayar di Tempat (COD)
+          </label>
+        </div>
+      </div>
+
       <!-- ✅ Tombol Submit -->
       <div class="text-end">
         <button type="submit" class="btn btn-warning btn-lg rounded-pill px-4 fw-semibold text-dark shadow-sm">
@@ -168,6 +206,32 @@
     alamatToko.classList.add('d-none');
     tanggalAmbilSection.classList.add('d-none');
   });
+
+  const bayarBank = document.getElementById('bayarBank');
+  const bayarQris = document.getElementById('bayarQris');
+  const bayarCod = document.getElementById('bayarCod');
+  const bankInfo = document.getElementById('bankInfo');
+  const qrisInfo = document.getElementById('qrisInfo');
+
+  function hideAllPaymentInfo() {
+    bankInfo.classList.add('d-none');
+    qrisInfo.classList.add('d-none');
+  }
+
+  bayarBank.addEventListener('change', () => {
+    hideAllPaymentInfo();
+    bankInfo.classList.remove('d-none');
+  });
+
+  bayarQris.addEventListener('change', () => {
+    hideAllPaymentInfo();
+    qrisInfo.classList.remove('d-none');
+  });
+
+  bayarCod.addEventListener('change', () => {
+    hideAllPaymentInfo();
+  });
 </script>
+
 
 @include('inc.footer')

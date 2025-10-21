@@ -1,126 +1,137 @@
 @include('admin.header')
 
-<style>
-  /* Warna tabel navy */
-  .table-navy thead {
-    background-color: #001f3f !important;
-    color: white !important;
-  }
-
-  .table-navy th {
-    font-weight: 600;
-  }
-
-  .table-navy tbody tr:nth-child(odd) {
-    background-color: #ffffff !important;
-  }
-
-  .table-navy tbody tr:nth-child(even) {
-    background-color: #f8f9fa !important;
-  }
-
-  .table-navy tfoot {
-    background-color: #001f3f !important;
-    color: white !important;
-  }
-</style>
-
 <div class="container py-4">
-
-  <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h2 class="fw-bold text-dark">📦 Kelola Pesanan</h2>
-  </div>
-
-  {{-- Notifikasi --}}
-  @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
-  @endif
-  @if($errors->any())
-    <div class="alert alert-danger">
-      <ul class="mb-0">
-        @foreach($errors->all() as $error)
-          <li>{{ $error }}</li>
-        @endforeach
-      </ul>
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+        <h2 class="fw-bold text-dark border-bottom pb-2">📦 Kelola Pesanan</h2>
     </div>
-  @endif
 
-  <div class="d-flex mb-3 justify-content-between">
-    <form class="d-flex align-items-center gap-2">
-      <input type="date" class="form-control w-auto" value="2025-10-01">
-      -
-      <input type="date" class="form-control w-auto" value="2025-10-20">
-      <input type="text" class="form-control w-auto" placeholder="Cari order...">
-      <button type="submit" class="btn btn-dark">Cari</button>
+    <!-- Filter Form -->
+    <form class="row g-2 mb-3" method="GET" action="{{ route('admin.orders.index') }}">
+        <div class="col-md-auto">
+            <input type="date" class="form-control" name="start" value="{{ request('start') }}">
+        </div>
+        <div class="col-md-auto">
+            <input type="date" class="form-control" name="end" value="{{ request('end') }}">
+        </div>
+        <div class="col-md">
+            <input type="text" class="form-control" name="keyword" placeholder="Cari order..." value="{{ request('keyword') }}">
+        </div>
+        <div class="col-md-auto">
+            <button type="submit" class="btn btn-dark w-100">Cari</button>
+        </div>
     </form>
-  </div>
 
-  <div class="card shadow border-0 rounded-3 overflow-hidden">
-    <table class="table table-navy align-middle text-center m-0">
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>ID User</th>
-          <th>Nama</th>
-          <th>No. Telp</th>
-          <th>Alamat</th>
-          <th>Catatan</th>
-          <th>Total</th>
-          <th>Status</th>
-          <th>Tipe Order</th>
-          <th>Ambil</th>
-          <th>Kirim</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>U001</td>
-          <td>Hanna</td>
-          <td>08123456789</td>
-          <td>Jl. Merdeka No. 10</td>
-          <td>Tambahkan pita</td>
-          <td>Rp 300.000</td>
-          <td><span class="badge bg-success">Selesai</span></td>
-          <td>Delivery</td>
-          <td>2025-10-20 10:00</td>
-          <td>2025-10-20 13:00</td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>U002</td>
-          <td>Budi</td>
-          <td>08129876543</td>
-          <td>Jl. Sudirman No. 5</td>
-          <td>-</td>
-          <td>Rp 250.000</td>
-          <td><span class="badge bg-warning text-dark">Proses</span></td>
-          <td>Pickup</td>
-          <td>2025-10-19 09:00</td>
-          <td>-</td>
-        </tr>
-        <tr>
-          <td>3</td>
-          <td>U003</td>
-          <td>Sinta</td>
-          <td>081377788899</td>
-          <td>Jl. Melati No. 23</td>
-          <td>Cat warna pastel</td>
-          <td>Rp 450.000</td>
-          <td><span class="badge bg-danger">Batal</span></td>
-          <td>Delivery</td>
-          <td>2025-10-18 11:00</td>
-          <td>-</td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="11" class="text-center py-2">Total Pesanan: 3</td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+    <!-- Tabs -->
+    <div class="card shadow border-0 rounded-3 overflow-hidden">
+        <ul class="nav nav-tabs mb-3" id="orderTabs" role="tablist">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#Semua" type="button">📋 Semua</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#pending" type="button">🕒 Pending</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#proses" type="button">⏳ Proses</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#selesai" type="button">✅ Selesai</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#batal" type="button">❌ Batal</button></li>
+        </ul>
 
+        <div class="tab-content p-3">
+            @php
+                $statusList = ['Semua' => null, 'pending' => 'pending', 'proses' => 'proses', 'selesai' => 'selesai', 'batal' => 'batal'];
+            @endphp
+
+            @foreach ($statusList as $key => $status)
+            <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="{{ $key }}">
+                <table class="table table-striped align-middle text-center m-0">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>No</th>
+                            <th>ID</th>
+                            <th>Nama</th>
+                            <th>Tanggal Order</th>
+                            <th>Total</th>
+                            <th>Status Pesanan</th>
+                            <th>Status Pembayaran</th>
+                            <th>Bukti</th>
+                            <th>Tipe Order</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @php $no = 1; @endphp
+                        @foreach($orders->where('status', $status)->when($status == null, fn($q) => $orders) as $order)
+                        <tr>
+                            <td>{{ $no++ }}</td>
+                            <td>#{{ $order->id }}</td>
+                            <td>{{ $order->nama }}</td>
+                            <td>{{ $order->created_at->format('d M Y') }}</td>
+                            <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                            <td>
+                                @if($order->status == 'pending')
+                                    <span class="badge bg-warning text-dark">Pending</span>
+                                @elseif($order->status == 'proses')
+                                    <span class="badge bg-primary">Proses</span>
+                                @elseif($order->status == 'selesai')
+                                    <span class="badge bg-success">Selesai</span>
+                                @else
+                                    <span class="badge bg-danger">Batal</span>
+                                @endif
+                            </td>
+                            <td>
+                                <form action="{{ route('admin.orders.updatePayment', $order->id) }}" method="POST" class="d-flex justify-content-center">
+                                    @csrf
+                                    @method('PATCH')
+                                    <select name="status_pembayaran" class="form-select form-select-sm w-auto me-2" onchange="this.form.submit()">
+                                        <option value="belum_bayar" {{ $order->status_pembayaran == 'belum_bayar' ? 'selected' : '' }}>Belum Bayar</option>
+                                        <option value="menunggu_verifikasi" {{ $order->status_pembayaran == 'menunggu_verifikasi' ? 'selected' : '' }}>Menunggu</option>
+                                        <option value="lunas" {{ $order->status_pembayaran == 'lunas' ? 'selected' : '' }}>Lunas</option>
+                                        <option value="gagal" {{ $order->status_pembayaran == 'gagal' ? 'selected' : '' }}>Gagal</option>
+                                    </select>
+                                </form>
+                            </td>
+                            <td>
+                                @if($order->bukti_pembayaran)
+                                <button class="btn btn-sm btn-outline-info" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id }}">
+                                    <i class="fa-solid fa-image me-1"></i> Lihat
+                                </button>
+
+                                <!-- Modal Bukti Pembayaran -->
+                                <div class="modal fade" id="buktiModal{{ $order->id }}" tabindex="-1" aria-labelledby="buktiModalLabel{{ $order->id }}" aria-hidden="true">
+                                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                                        <div class="modal-content border-0 rounded-4">
+                                            <div class="modal-header bg-dark text-white">
+                                                <h5 class="modal-title" id="buktiModalLabel{{ $order->id }}">
+                                                    🧾 Bukti Pembayaran #{{ $order->id }}
+                                                </h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body text-center">
+                                                <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded shadow">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                @else
+                                <span class="text-muted">-</span>
+                                @endif
+                            </td>
+                            <td>{{ ucfirst($order->tipe_order) }}</td>
+                            <td>
+                                <a href="{{ route('admin.orders.show', $order->id) }}" class="btn btn-outline-primary btn-sm">
+                                    <i class="fa-solid fa-eye me-1"></i> Detail
+                                </a>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="10" class="text-center py-2">
+                                Total Pesanan: {{ $orders->where('status', $status)->when($status == null, fn($q) => $orders)->count() }}
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            @endforeach
+        </div>
+    </div>
 </div>
 
 @include('admin.footer')

@@ -8,10 +8,14 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\Admin\AdminOrderController;
+
+
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -65,6 +69,18 @@ Route::middleware('auth')->group(function () {
 Route::middleware('auth')->group(function () {
     Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
     Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Route Order Customer
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/user/orders/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
+    Route::post('/user/orders/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
+    Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
 });
 
 /*
@@ -140,41 +156,45 @@ Route::get('/admin/dashboard', function () {
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
-// Katalog Admin
-Route::prefix('admin/produk')->group(function () {
-    Route::get('/', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
-    Route::get('/create', [ProdukAdminController::class, 'create'])->name('admin.produk.create');
-    Route::post('/store', [ProdukAdminController::class, 'store'])->name('admin.produk.store');
-    Route::get('/edit/{id_produk}', [ProdukAdminController::class, 'edit'])->name('admin.produk.edit');
-    Route::post('/update/{id_produk}', [ProdukAdminController::class, 'update'])->name('admin.produk.update');
-    Route::delete('/delete/{id_produk}', [ProdukAdminController::class, 'destroy'])->name('admin.produk.delete');
-});
-// Kategori Produk Katalog Admin
-Route::prefix('admin/kategori')->group(function () {
-    Route::get('/', [KategoriAdminController::class, 'index'])->name('admin.kategori.index');
-    Route::get('/create', [KategoriAdminController::class, 'create'])->name('admin.kategori.create');
-    Route::post('/store', [KategoriAdminController::class, 'store'])->name('admin.kategori.store');
-    Route::get('/edit/{id_kategori}', [KategoriAdminController::class, 'edit'])->name('admin.kategori.edit');
-    Route::post('/update/{id_kategori}', [KategoriAdminController::class, 'update'])->name('admin.kategori.update');
-    Route::delete('/delete/{id_kategori}', [KategoriAdminController::class, 'destroy'])->name('admin.kategori.delete');
-});
+Route::resource('admin/produk', ProdukAdminController::class)->names([
+    'index' => 'admin.produk.index',
+    'create' => 'admin.produk.create',
+    'store' => 'admin.produk.store',
+    'show' => 'admin.produk.show',
+    'edit' => 'admin.produk.edit',
+    'update' => 'admin.produk.update',
+    'destroy' => 'admin.produk.delete',
+]);
+
+Route::resource('admin/kategori', KategoriAdminController::class)->names([
+    'index' => 'admin.kategori.index',
+    'create' => 'admin.kategori.create',
+    'store' => 'admin.kategori.store',
+    'show' => 'admin.kategori.show',
+    'edit' => 'admin.kategori.edit',
+    'update' => 'admin.kategori.update',
+    'destroy' => 'admin.kategori.delete',
+]);
+
 
 // Pesanan Admin
-Route::prefix('admin/pesanan')->group(function () {
-    Route::get('/', function () {
-        return view('admin.pesanan.index');
-    })->name('admin.pesanan.index');
+Route::prefix('admin')->middleware(['auth'])->group(function () {
+    Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
 });
+Route::patch('/admin/orders/{id}/update-payment', [\App\Http\Controllers\Admin\AdminOrderController::class, 'updatePayment'])
+    ->name('admin.orders.updatePayment');
 
-// Berita Admin
-Route::prefix('admin/berita')->group(function () {
-    Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
-    Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');
-    Route::post('/store', [BeritaAdminController::class, 'store'])->name('admin.berita.store');
-    Route::get('/edit/{id}', [BeritaAdminController::class, 'edit'])->name('admin.berita.edit');
-    Route::post('/update/{id}', [BeritaAdminController::class, 'update'])->name('admin.berita.update');
-    Route::delete('/delete/{id}', [BeritaAdminController::class, 'destroy'])->name('admin.berita.delete');
-});
+
+Route::resource('admin/berita', BeritaAdminController::class)->names([
+    'index' => 'admin.berita.index',
+    'create' => 'admin.berita.create',
+    'store' => 'admin.berita.store',
+    'show' => 'admin.berita.show',
+    'edit' => 'admin.berita.edit',
+    'update' => 'admin.berita.update',
+    'destroy' => 'admin.berita.delete',
+]);
 
 
 

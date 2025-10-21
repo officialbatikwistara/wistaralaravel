@@ -4,7 +4,7 @@
   <div class="container py-5">
     <div class="row justify-content-center">
       <div class="col-md-10 col-lg-8">
-        <div class="card shadow-lg rounded-4 p-4 text-center border-0">
+        <div class="card shadow-lg rounded-4 p-4 text-center border-0 mb-4">
           <i class="fa-solid fa-user-circle fa-4x text-dark mb-3"></i>
           <h2 class="fw-bold mb-2 text-dark">{{ Auth::user()->name }}</h2>
           <p class="text-muted mb-4">
@@ -37,6 +37,83 @@
               <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
             </a>
           </div>
+        </div>
+
+        <!-- 🧾 PESANAN SAYA -->
+        <div class="card shadow-lg rounded-4 p-4 border-0">
+          <h4 class="fw-bold text-start mb-3">
+            <i class="fa-solid fa-receipt me-2 text-dark"></i> Pesanan Saya
+          </h4>
+
+          @php
+            $orders = \App\Models\Order::where('user_id', Auth::id())->orderBy('created_at','desc')->get();
+          @endphp
+
+          @if($orders->isEmpty())
+            <p class="text-muted text-center py-3 mb-0">
+              Belum ada pesanan 😄
+            </p>
+          @else
+            <div class="table-responsive">
+              <table class="table align-middle">
+                <thead class="bg-dark text-white">
+                  <tr>
+                    <th>ID</th>
+                    <th>Tanggal Ambil</th>
+                    <th>Metode</th>
+                    <th>Total</th>
+                    <th>Status</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($orders as $order)
+                    <tr>
+                      <td>#{{ $order->id }}</td>
+                      <td>{{ \Carbon\Carbon::parse($order->tanggal_ambil)->format('d M Y') }}</td>
+                      <td>
+                        @if($order->metode_pembayaran === 'bank_transfer')
+                          🏦 Bank Transfer
+                        @elseif($order->metode_pembayaran === 'qris')
+                          📱 QRIS
+                        @else
+                          💵 COD
+                        @endif
+                      </td>
+                      <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>
+                      <td>
+                        @if($order->status == 'pending')
+                          <span class="badge bg-warning text-dark">Pending</span>
+                        @elseif($order->status == 'proses')
+                          <span class="badge bg-primary">Diproses</span>
+                        @elseif($order->status == 'selesai')
+                          <span class="badge bg-success">Selesai</span>
+                        @else
+                          <span class="badge bg-danger">Batal</span>
+                        @endif
+                      </td>
+                      <td>
+                        @if($order->status_pembayaran == 'belum_bayar')
+                          <span class="badge bg-secondary">Belum Bayar</span>
+                        @elseif($order->status_pembayaran == 'menunggu_verifikasi')
+                          <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
+                        @elseif($order->status_pembayaran == 'lunas')
+                          <span class="badge bg-success">Lunas</span>
+                        @else
+                          <span class="badge bg-danger">Gagal</span>
+                        @endif
+                      </td>
+                      <td>
+                        <a href="{{ route('user.order.show', $order->id) }}" class="btn btn-sm btn-outline-dark rounded-pill">
+                          <i class="fa-solid fa-eye me-1"></i> Detail
+                        </a>
+                      </td>
+                    </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
+          @endif
         </div>
       </div>
     </div>

@@ -25,17 +25,21 @@ class CheckoutController extends Controller
     {
         $request->validate([
             'tipe_order' => 'required|in:ambil,kirim',
+            'metode_pembayaran' => 'required|in:bank_transfer,qris,cod',
             'nama' => 'required|string|max:100',
             'telepon' => 'required|string|max:20',
             'alamat' => 'required_if:tipe_order,kirim|string|nullable',
             'catatan' => 'nullable|string',
+            'tanggal_ambil' => 'required|date',
         ]);
 
+        // 🚧 Fitur kirim belum aktif
         if ($request->tipe_order === 'kirim') {
             return back()->with('error', 'Fitur pengiriman sedang dalam pengembangan 🚚✨');
         }
 
-        $cartItems = \App\Models\Cart::where('user_id', auth()->id())->with('produk')->get();
+        // Ambil data keranjang
+        $cartItems = Cart::where('user_id', auth()->id())->with('produk')->get();
         if ($cartItems->isEmpty()) {
             return redirect()->route('checkout.index')->with('error', 'Keranjang belanja Anda kosong.');
         }
@@ -44,7 +48,8 @@ class CheckoutController extends Controller
 
         DB::beginTransaction();
         try {
-            $order = \App\Models\Order::create([
+            // 📝 Buat pesanan
+            $order = Order::create([
                 'user_id' => auth()->id(),
                 'nama' => $request->nama,
                 'telepon' => $request->telepon,
@@ -52,10 +57,15 @@ class CheckoutController extends Controller
                 'catatan' => $request->catatan,
                 'total' => $total,
                 'tipe_order' => $request->tipe_order,
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'tanggal_ambil' => $request->tanggal_ambil,
+                'status' => 'pending',
+                'status_pembayaran' => 'belum_bayar'
             ]);
 
+            // 💼 Simpan detail item pesanan
             foreach ($cartItems as $item) {
-                \App\Models\OrderItem::create([
+                OrderItem::create([
                     'order_id' => $order->id,
                     'id_produk' => $item->produk->id_produk,
                     'qty' => $item->qty,
@@ -63,12 +73,15 @@ class CheckoutController extends Controller
                     'subtotal' => $item->qty * $item->produk->harga
                 ]);
 
+                // Kurangi stok produk
                 $item->produk->decrement('stok', $item->qty);
             }
 
-            \App\Models\Cart::where('user_id', auth()->id())->delete();
+            // 🧹 Hapus keranjang setelah checkout
+            Cart::where('user_id', auth()->id())->delete();
 
             DB::commit();
+
             return redirect()->route('checkout.index')->with('success', '✅ Pesanan berhasil dibuat.');
         } catch (\Exception $e) {
             DB::rollback();
