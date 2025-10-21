@@ -12,27 +12,32 @@ class PesananController extends Controller
      * Display a listing of the resource.
      */
     public function index(Request $request)
-    {
+{
+    $pesanan = Order::query();
 
-        $pesanan = Order::query();
+    if ($request->search) {
+        $pesanan->where('nama', 'like', "%{$request->search}%")
+            ->orWhere('id', 'like', "%{$request->search}%");
+    }
 
-        if ($request->search) {
-            $pesanan->where('customer', 'like', "%{$request->search}%")
-                ->orWhere('id', 'like', "%{$request->search}%");
-        }
-
-        if ($request->start_date && $request->end_date) {
-            $pesanan->where('created_at', '>=', $request->start_date)
-                ->where('created_at', '<=', $request->end_date . ' 23:59:59');
-        }
-
-        $orders = $pesanan->orderBy('created_at', 'desc')
-            ->paginate(10);
-
-        return view('admin.pesanan.index', [
-            'orders' => $orders,
+    if ($request->start_date && $request->end_date) {
+        $pesanan->whereBetween('created_at', [
+            $request->start_date,
+            $request->end_date . ' 23:59:59',
         ]);
     }
+
+    $orders = $pesanan->orderBy('created_at', 'desc')->paginate(10);
+
+    // kalau ada parameter detail_id, ambil datanya
+    $detail = null;
+    if ($request->has('detail_id')) {
+        $detail = Order::with('items.product')->find($request->detail_id);
+    }
+
+    return view('admin.pesanan.index', compact('orders', 'detail'));
+}
+
 
     /**
      * Show the form for creating a new resource.
@@ -56,6 +61,9 @@ class PesananController extends Controller
     public function show(string $id)
     {
         //
+        $order = Order::with('items.product')->findOrFail($id);
+
+    return view('admin.pesanan.show', compact('order'));
     }
 
     /**
