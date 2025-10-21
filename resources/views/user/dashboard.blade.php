@@ -93,6 +93,17 @@
                         @endif
                       </td>
                       <td>
+                        @if($order->status_pembayaran == 'belum_bayar')
+                          <span class="badge bg-secondary">Belum Bayar</span>
+                        @elseif($order->status_pembayaran == 'menunggu_verifikasi')
+                          <span class="badge bg-warning text-dark">Menunggu Verifikasi</span>
+                        @elseif($order->status_pembayaran == 'lunas')
+                          <span class="badge bg-success">Lunas</span>
+                        @else
+                          <span class="badge bg-danger">Gagal</span>
+                        @endif
+                      </td>
+                      <td>
                         <a href="{{ url('/user/pesanan/'.$order->id) }}" class="btn btn-sm btn-outline-dark rounded-pill">
                           <i class="fa-solid fa-eye me-1"></i> Detail
                         </a>

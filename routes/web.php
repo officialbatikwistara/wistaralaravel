@@ -77,7 +77,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/user/pesanan/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
     Route::post('/user/pesanan/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
 });
-
+Route::middleware(['auth'])->group(function () {
+    Route::post('/user/pesanan/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
+});
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth User

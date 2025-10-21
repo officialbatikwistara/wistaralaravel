@@ -147,8 +147,7 @@
           </label>
           <div class="mt-2 ms-4 d-none" id="bankInfo">
             <div class="p-3 bg-light rounded-3 border">
-              <p class="mb-1"><strong>Bank BCA</strong> — 1234567890</p>
-              <p class="mb-0"><small>a.n. <strong>Batik Wistara</strong></small></p>
+              <p class="mb-1">Bank BCA</p>
             </div>
           </div>
         </div>

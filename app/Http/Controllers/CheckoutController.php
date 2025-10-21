@@ -60,6 +60,7 @@ class CheckoutController extends Controller
                 'metode_pembayaran' => $request->metode_pembayaran,
                 'tanggal_ambil' => $request->tanggal_ambil,
                 'status' => 'pending',
+                'status_pembayaran' => 'belum_bayar'
             ]);
 
             // 💼 Simpan detail item pesanan

@@ -21,7 +21,8 @@ class Order extends Model
         'tipe_order',
         'metode_pembayaran',
         'tanggal_ambil',
-        'status'
+        'status',
+        'status_pembayaran'
     ];
 
     public function items()

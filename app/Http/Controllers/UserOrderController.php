@@ -21,6 +21,32 @@ class UserOrderController extends Controller
         return view('user.pesanan.show', compact('order'));
     }
 
+    public function uploadBukti(Request $request, $id)
+    {
+        $order = \App\Models\Order::where('id', $id)
+            ->where('user_id', Auth::id())
+            ->where('metode_pembayaran', 'bank_transfer')
+            ->firstOrFail();
+
+        $request->validate([
+            'bukti_pembayaran' => 'required|image|mimes:jpg,jpeg,png|max:2048'
+        ]);
+
+        // 📸 Upload bukti
+        $file = $request->file('bukti_pembayaran');
+        $filename = 'bukti_' . $order->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+        $file->move(public_path('uploads/bukti'), $filename);
+
+        // 📝 Update order
+        $order->update([
+            'bukti_pembayaran' => $filename,
+            'status_pembayaran' => 'menunggu_verifikasi'
+        ]);
+
+        return back()->with('success', '✅ Bukti pembayaran berhasil diupload, menunggu verifikasi admin.');
+    }
+
+
     // ❌ Pembatalan pesanan (kembalikan stok)
     public function cancel($id)
     {
