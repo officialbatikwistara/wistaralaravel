@@ -141,23 +141,46 @@ Route::get('/admin/dashboard', function () {
 })->name('admin.dashboard');
 
 // Katalog Admin
-Route::prefix('admin/produk')->group(function () {
-    Route::get('/', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
-    Route::get('/create', [ProdukAdminController::class, 'create'])->name('admin.produk.create');
-    Route::post('/store', [ProdukAdminController::class, 'store'])->name('admin.produk.store');
-    Route::get('/edit/{id_produk}', [ProdukAdminController::class, 'edit'])->name('admin.produk.edit');
-    Route::post('/update/{id_produk}', [ProdukAdminController::class, 'update'])->name('admin.produk.update');
-    Route::delete('/delete/{id_produk}', [ProdukAdminController::class, 'destroy'])->name('admin.produk.delete');
-});
+// Route::prefix('admin/produk')->group(function () {
+//     Route::get('/', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
+//     Route::get('/create', [ProdukAdminController::class, 'create'])->name('admin.produk.create');
+//     Route::post('/store', [ProdukAdminController::class, 'store'])->name('admin.produk.store');
+//     Route::get('/edit/{id_produk}', [ProdukAdminController::class, 'edit'])->name('admin.produk.edit');
+//     Route::post('/update/{id_produk}', [ProdukAdminController::class, 'update'])->name('admin.produk.update');
+//     Route::delete('/delete/{id_produk}', [ProdukAdminController::class, 'destroy'])->name('admin.produk.delete');
+// });
+
+Route::resource('admin/produk', ProdukAdminController::class)->names([
+    'index' => 'admin.produk.index',
+    'create' => 'admin.produk.create',
+    'store' => 'admin.produk.store',
+    'show' => 'admin.produk.show',
+    'edit' => 'admin.produk.edit',
+    'update' => 'admin.produk.update',
+    'destroy' => 'admin.produk.delete',
+]);
+
+
 // Kategori Produk Katalog Admin
-Route::prefix('admin/kategori')->group(function () {
-    Route::get('/', [KategoriAdminController::class, 'index'])->name('admin.kategori.index');
-    Route::get('/create', [KategoriAdminController::class, 'create'])->name('admin.kategori.create');
-    Route::post('/store', [KategoriAdminController::class, 'store'])->name('admin.kategori.store');
-    Route::get('/edit/{id_kategori}', [KategoriAdminController::class, 'edit'])->name('admin.kategori.edit');
-    Route::post('/update/{id_kategori}', [KategoriAdminController::class, 'update'])->name('admin.kategori.update');
-    Route::delete('/delete/{id_kategori}', [KategoriAdminController::class, 'destroy'])->name('admin.kategori.delete');
-});
+// Route::prefix('admin/kategori')->group(function () {
+//     Route::get('/', [KategoriAdminController::class, 'index'])->name('admin.kategori.index');
+//     Route::get('/create', [KategoriAdminController::class, 'create'])->name('admin.kategori.create');
+//     Route::post('/store', [KategoriAdminController::class, 'store'])->name('admin.kategori.store');
+//     Route::get('/edit/{id_kategori}', [KategoriAdminController::class, 'edit'])->name('admin.kategori.edit');
+//     Route::post('/update/{id_kategori}', [KategoriAdminController::class, 'update'])->name('admin.kategori.update');
+//     Route::delete('/delete/{id_kategori}', [KategoriAdminController::class, 'destroy'])->name('admin.kategori.delete');
+// });
+
+Route::resource('admin/kategori', KategoriAdminController::class)->names([
+    'index' => 'admin.kategori.index',
+    'create' => 'admin.kategori.create',
+    'store' => 'admin.kategori.store',
+    'show' => 'admin.kategori.show',
+    'edit' => 'admin.kategori.edit',
+    'update' => 'admin.kategori.update',
+    'destroy' => 'admin.kategori.delete',
+]);
+
 
 // Pesanan Admin
 Route::prefix('admin/pesanan')->group(function () {
@@ -167,14 +190,24 @@ Route::prefix('admin/pesanan')->group(function () {
 });
 
 // Berita Admin
-Route::prefix('admin/berita')->group(function () {
-    Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
-    Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');
-    Route::post('/store', [BeritaAdminController::class, 'store'])->name('admin.berita.store');
-    Route::get('/edit/{id}', [BeritaAdminController::class, 'edit'])->name('admin.berita.edit');
-    Route::post('/update/{id}', [BeritaAdminController::class, 'update'])->name('admin.berita.update');
-    Route::delete('/delete/{id}', [BeritaAdminController::class, 'destroy'])->name('admin.berita.delete');
-});
+// Route::prefix('admin/berita')->group(function () {
+//     Route::get('/', [BeritaAdminController::class, 'index'])->name('admin.berita.index');
+//     Route::get('/create', [BeritaAdminController::class, 'create'])->name('admin.berita.create');
+//     Route::post('/store', [BeritaAdminController::class, 'store'])->name('admin.berita.store');
+//     Route::get('/edit/{id}', [BeritaAdminController::class, 'edit'])->name('admin.berita.edit');
+//     Route::post('/update/{id}', [BeritaAdminController::class, 'update'])->name('admin.berita.update');
+//     Route::delete('/delete/{id}', [BeritaAdminController::class, 'destroy'])->name('admin.berita.delete');
+// });
+
+Route::resource('admin/berita', BeritaAdminController::class)->names([
+    'index' => 'admin.berita.index',
+    'create' => 'admin.berita.create',
+    'store' => 'admin.berita.store',
+    'show' => 'admin.berita.show',
+    'edit' => 'admin.berita.edit',
+    'update' => 'admin.berita.update',
+    'destroy' => 'admin.berita.delete',
+]);
 
 
 
