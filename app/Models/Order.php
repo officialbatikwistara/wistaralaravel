@@ -20,9 +20,10 @@ class Order extends Model
         'total',
         'tipe_order',
         'metode_pembayaran',
+        'bukti_pembayaran',
+        'status_pembayaran',
         'tanggal_ambil',
         'status',
-        'status_pembayaran'
     ];
 
     public function items()
