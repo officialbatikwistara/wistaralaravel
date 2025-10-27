@@ -128,7 +128,7 @@ h2 {
    ========================= --}}
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2>📰 Kelola Berita</h2>
+    <h2> Kelola Berita</h2>
     <a href="{{ route('admin.berita.create') }}" class="btn btn-dark shadow-sm">
       <i class="fa-solid fa-plus me-2"></i> Tambah Berita
     </a>
