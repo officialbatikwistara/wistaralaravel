@@ -44,43 +44,60 @@
     </div>
 
     <hr class="border-secondary my-3 opacity-50">
+
+    <!-- Bagian bawah footer -->
+    <div class="text-center small text-white-50 mt-3">
+      Dibuat dengan <i class="bi bi-heart-fill text-danger"></i> oleh <strong>Batik Wistara Team</strong>
+    </div>
+  </div>
+</footer>
+
+<!-- Tambahkan link Bootstrap Icons di dalam <head> atau sebelum penutup </body> -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
 <style>
-  .footer-admin {
-    background: linear-gradient(135deg, #071739, #1b2a4a);
-    color: #ffffff;
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -2px 10px rgb(255, 255, 255);
-  }
+.footer-admin {
+  background: linear-gradient(135deg, #071739, #1b2a4a);
+  color: #ffffff;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  box-shadow: 0 -2px 10px rgba(255, 255, 255, 0.1);
+}
 
-  .footer-admin a:hover {
-    color: #f6b400 !important; /* emas saat hover */
-  }
+.footer-admin a:hover {
+  color: #f6b400 !important; /* Warna emas saat hover */
+}
 
-  /* 🌙 Bagian Kontak Kami & Navigasi */
-  .footer-admin h5,
-  .footer-admin strong,
-  .footer-admin .footer-contact-link {
-    color: #ffffff !important;
-    text-decoration: none;
-    transition: color 0.3s ease;
-  }
+/* 🌙 Bagian Kontak Kami & Navigasi */
+.footer-admin h5,
+.footer-admin strong,
+.footer-admin .footer-contact-link {
+  color: #ffffff !important;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
 
-  .footer-admin .footer-contact-link:hover,
-  .footer-admin .footer-contact-link:focus,
-  .footer-admin .footer-contact-link:active {
-    color: #f6b400 !important; /* emas saat hover */
-  }
+.footer-admin .footer-contact-link:hover,
+.footer-admin .footer-contact-link:focus,
+.footer-admin .footer-contact-link:active {
+  color: #f6b400 !important; /* Warna emas saat hover */
+}
 
-  /* Efek animasi hati ❤️ */
-  .footer-admin i {
-    animation: pulse 1.5s infinite;
-  }
+/* Efek animasi hati ❤️ */
+.footer-admin i.bi-heart-fill {
+  display: inline-block; /* penting agar transform berfungsi */
+  animation: pulse 1.5s infinite;
+  transform-origin: center;
+}
 
-  @keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 0.8; }
-    50% { transform: scale(1.2); opacity: 1; }
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
   }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+}
 </style>
-</body>
-</html>
