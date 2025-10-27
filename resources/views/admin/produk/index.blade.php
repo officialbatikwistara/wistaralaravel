@@ -239,7 +239,7 @@
           {{-- 🖼️ Gambar Produk --}}
           <td class="produk-cell text-center">
            @if($p->gambar)
-                <img src="{{ asset('storage/' . $p->gambar) }}" alt="Gambar produk" class="produk-img">
+               <img src="{{ asset('storage/produk/' . $p->gambar) }}" alt="Gambar produk" class="produk-img">
             @else
                 <span class="text-muted fst-italic">Tidak ada</span>
             @endif
