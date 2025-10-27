@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <footer class="footer-admin text-center text-md-start py-4 mt-5">
   <div class="container">
     <div class="row gy-3 align-items-start">
@@ -44,6 +45,9 @@
     </div>
 
     <hr class="border-secondary my-3 opacity-50">
+=======
+<footer class="footer-admin text-center py-4 mt-5">
+>>>>>>> origin/main
 
     <div class="text-center">
       <p class="mb-1 fw-semibold text-white small">

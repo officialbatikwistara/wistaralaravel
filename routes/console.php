@@ -2,6 +2,12 @@
 
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
+
+Schedule::command('orders:cancel-stale')
+    ->everyTenMinutes()
+    ->withoutOverlapping()
+    ->appendOutputTo(storage_path('logs/cancel-stale.log'));
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
