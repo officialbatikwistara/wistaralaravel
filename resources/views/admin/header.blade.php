@@ -11,11 +11,12 @@
     <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 
     <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
     <style>
         /* ============================
-           ✨ Batik Wistara Admin Header
+           🌸 Batik Wistara Admin Header
         ============================ */
         body {
             font-family: 'Poppins', sans-serif;
@@ -24,9 +25,9 @@
         }
 
         .navbar-admin {
-            background-color: #071739;
+            background-color: #0a1b40; /* NAVY */
             padding: 1rem 2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
             position: fixed;
             top: 0;
             left: 0;
@@ -41,9 +42,9 @@
 
         /* MENU NAVBAR */
         .navbar-admin .nav-link {
-            color: white;
+            color: #ffffff;
             font-weight: 600;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.4px;
             transition: color 0.3s ease;
         }
 
@@ -52,9 +53,9 @@
             color: #f6b400;
         }
 
-        /* IKON TROLI */
+        /* TROLI */
         .icon-btn {
-            color: white;
+            color: #ffffff;
             font-size: 1.3rem;
             margin-right: 1.5rem;
             transition: color 0.3s ease;
@@ -67,17 +68,19 @@
 
         .icon-btn .badge {
             position: absolute;
-            top: -6px;
+            top: -7px;
             right: -10px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             background-color: #f6b400;
-            color: #071739;
+            color: #0a1b40;
+            border-radius: 50px;
+            font-weight: bold;
         }
 
         /* DROPDOWN ADMIN */
         .dropdown-toggle {
-            background-color: #fff;
-            color: #071739;
+            background-color: #ffffff;
+            color: #0a1b40;
             font-weight: 600;
             border: none;
             border-radius: 10px;
@@ -89,7 +92,7 @@
         .dropdown-toggle:hover,
         .dropdown-toggle.show {
             background-color: #f6b400;
-            color: #071739;
+            color: #0a1b40;
         }
 
         .dropdown-menu {
@@ -101,19 +104,19 @@
 
         .dropdown-item:hover {
             background-color: #f6b400;
-            color: #071739;
+            color: #0a1b40;
         }
 
         /* RESPONSIF */
         @media (max-width: 991px) {
             .navbar-collapse {
-                background-color: #071739;
+                background-color: #0a1b40;
                 padding: 1rem;
                 border-radius: 10px;
             }
 
             .dropdown-toggle {
-                background-color: #fff;
+                background-color: #ffffff;
             }
         }
     </style>
@@ -167,7 +170,7 @@
 
             <!-- KANAN -->
             <div class="d-flex align-items-center">
-                <!-- IKON TROLI -->
+                <!-- TROLI -->
                 <a href="{{ url('/admin/pesanan') }}" class="icon-btn position-relative">
                     <i class="fa-solid fa-cart-shopping"></i>
                     <span class="badge">{{ $jumlahPesanan ?? 0 }}</span>
@@ -175,14 +178,15 @@
 
                 <!-- DROPDOWN ADMIN -->
                 <div class="dropdown">
-                    <a class="dropdown-toggle d-flex align-items-center" href="#" role="button" data-bs-toggle="dropdown"
-                        aria-expanded="false">
+                    <a class="dropdown-toggle d-flex align-items-center" href="#" role="button"
+                        data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-user me-2"></i>
                         {{ session('admin_name') ?? 'Super Admin' }}
                     </a>
                     <ul class="dropdown-menu dropdown-menu-end">
                         <li>
-                            <a class="dropdown-item text-danger d-flex align-items-center" href="{{ route('admin.logout') }}">
+                            <a class="dropdown-item text-danger d-flex align-items-center"
+                                href="{{ route('admin.logout') }}">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                             </a>
                         </li>
@@ -193,8 +197,8 @@
         </div>
     </nav>
 
-    <!-- Script Bootstrap -->
+    <!-- Bootstrap Script -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 </body>
+
 </html>
