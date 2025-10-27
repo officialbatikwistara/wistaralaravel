@@ -1,9 +1,9 @@
 @include('admin.header')
 
 <style>
-  /* 🌙 Warna utama & font */
+  /* 🌙 Warna dasar & font */
   body {
-    background-color: #f3f6fa;
+    background-color: #f5f8fb !important;
     font-family: 'Poppins', sans-serif;
     color: #0b1841;
   }
@@ -13,144 +13,194 @@
     color: #0b1841;
   }
 
-  /* 🌟 Tombol Tambah Produk */
+  /* 🌟 Tombol utama */
   .btn-dark {
-    background-color: #0b1841 !important;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 10px;
-    font-weight: 500;
+    background-color: #081738 !important;
+    border: none !important;
+    padding: 10px 20px !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
   }
 
   .btn-dark:hover {
-    background-color: #1c2755 !important;
+    background-color: #152a6e !important;
   }
 
-  /* 📦 Tabel container */
+  /* 📦 Container tabel */
   .table-container {
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-    overflow: hidden;
+    background: #ffffff !important;
+    border-radius: 20px !important;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden !important;
+    margin-top: 25px !important;
   }
 
   /* 🧭 Header tabel */
   .table-header {
-    background-color: #0b1841;
-    color: #fff;
-    font-weight: 600;
+    background-color: #0b1841 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 16px !important;
+    letter-spacing: 0.3px;
     text-transform: capitalize;
   }
 
   .table-header th {
-    padding: 16px;
-    font-size: 15px;
+    padding: 18px !important;
+    border: none !important;
   }
 
-  /* 🪶 Baris isi */
+  /* 🪶 Baris isi tabel */
   .produk-row {
-    background-color: #fff;
-    border-bottom: 1px solid #e5e7eb;
+    border-bottom: 1px solid #e6e9ef !important;
     transition: all 0.25s ease;
   }
 
   .produk-row:hover {
-    background-color: #f8fafc;
-    transform: scale(1.005);
+    background-color: #f9fbff !important;
+    transform: scale(1.002);
   }
 
   .produk-cell {
-    padding: 18px 16px;
-    vertical-align: middle;
+    padding: 20px 16px !important;
+    vertical-align: middle !important;
   }
 
+  /* 🖼️ Gambar produk */
   .produk-img {
-    width: 90px;
-    height: 90px;
-    object-fit: cover;
-    border-radius: 10px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    width: 110px !important;
+    height: 110px !important;
+    object-fit: cover !important;
+    border-radius: 14px !important;
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1) !important;
   }
 
+  /* 🏷️ Nama & deskripsi produk */
   .produk-name {
-    font-weight: 600;
-    color: #0f172a;
+    font-weight: 700 !important;
+    color: #0b1841 !important;
+    font-size: 16px !important;
   }
 
   .produk-desc {
-    font-size: 13px;
-    color: #6b7280;
+    font-size: 13px !important;
+    color: #6b7280 !important;
+    margin-top: 3px !important;
   }
 
-  /* 💡 Tombol Aksi */
+  /* 💡 Tombol aksi */
   .btn-action {
-    border: none;
-    padding: 9px 11px;
-    border-radius: 8px;
-    color: white;
-    transition: all 0.3s ease;
+    border: none !important;
+    padding: 10px 12px !important;
+    border-radius: 10px !important;
+    color: white !important;
+    transition: all 0.3s ease !important;
   }
 
   .btn-edit {
-    background-color: #fbbf24;
+    background-color: #fbbf24 !important;
   }
 
   .btn-edit:hover {
-    background-color: #d4af37;
+    background-color: #eab308 !important;
   }
 
   .btn-delete {
-    background-color: #dc2626;
+    background-color: #ef4444 !important;
   }
 
   .btn-delete:hover {
-    background-color: #b91c1c;
+    background-color: #dc2626 !important;
   }
 
-  /* 🛍️ Link marketplace */
-  .btn-shop, .btn-tiktok {
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 13px;
-    text-decoration: none;
-    display: inline-block;
+  /* 🛍️ Tombol marketplace */
+  .btn-shop,
+  .btn-tiktok {
+    border-radius: 8px !important;
+    padding: 6px 14px !important;
+    font-size: 13px !important;
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    display: inline-block !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08) !important;
   }
 
   .btn-shop {
-    background-color: #f59e0b;
-    color: #fff;
+    background-color: #f59e0b !important;
+    color: #fff !important;
+  }
+
+  .btn-shop:hover {
+    background-color: #d97706 !important;
   }
 
   .btn-tiktok {
-    background-color: #000;
-    color: #fff;
+    background-color: #000 !important;
+    color: #fff !important;
   }
 
-  /* 🔍 Input cari */
+  .btn-tiktok:hover {
+    background-color: #1c1c1c !important;
+  }
+
+  /* 🔍 Input pencarian */
   .form-control {
-    border-radius: 8px;
-    border: 1px solid #d1d5db;
-    background-color: #f9fafb;
+    border-radius: 12px !important;
+    border: 1px solid #d1d5db !important;
+    background-color: #f9fafb !important;
+    padding: 10px 16px !important;
   }
 
   .form-control:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
   }
 
   /* 📄 Pagination */
   .pagination {
-    justify-content: center;
+    justify-content: center !important;
   }
 
   .pagination .page-link {
-    color: #0b1841;
-    border-radius: 6px;
+    color: #0b1841 !important;
+    border-radius: 6px !important;
   }
 
   .pagination .page-item.active .page-link {
-    background-color: #0b1841;
-    border-color: #0b1841;
+    background-color: #0b1841 !important;
+    border-color: #0b1841 !important;
+  }
+
+  /* 🧩 Tombol reset */
+  .btn-secondary {
+    background-color: #6b7280 !important;
+    border: none !important;
+    font-weight: 600 !important;
+    border-radius: 12px !important;
+    padding: 10px 20px !important;
+  }
+
+  .btn-secondary:hover {
+    background-color: #4b5563 !important;
+  }
+
+  /* 📏 Header tabel lebih rapat & rata */
+  table {
+    width: 100% !important;
+  }
+
+  th,
+  td {
+    vertical-align: middle !important;
+  }
+
+  /* 🧭 Rounded header */
+  .table-container thead tr:first-child th:first-child {
+    border-top-left-radius: 20px !important;
+  }
+
+  .table-container thead tr:first-child th:last-child {
+    border-top-right-radius: 20px !important;
   }
 </style>
 
@@ -182,10 +232,10 @@
         <tr>
           <th style="width:6%">No</th>
           <th style="width:12%">Gambar</th>
-          <th style="width:22%">Nama Produk</th>
-          <th style="width:13%">Harga</th>
+          <th style="width:25%">Nama Produk</th>
+          <th style="width:12%">Harga</th>
           <th style="width:13%">Kategori</th>
-          <th style="width:20%">Marketplace</th>
+          <th style="width:18%">Marketplace</th>
           <th style="width:10%">Aksi</th>
         </tr>
       </thead>
