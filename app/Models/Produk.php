@@ -2,27 +2,25 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Produk extends Model
 {
+    use HasFactory;
+
     protected $table = 'produk';
     protected $primaryKey = 'id_produk';
     public $timestamps = false;
 
     protected $fillable = [
-        'nama_produk', 'deskripsi', 'gambar', 'harga', 'tanggal_upload',
-        'id_kategori', 'link_shopee', 'link_tiktok'
+        'nama_produk', 'slug', 'deskripsi', 'harga', 'stok', 'gambar',
+        'id_kategori', 'link_shopee', 'link_tiktok', 'status',
+        'tanggal_upload', 'tanggal_update'
     ];
 
     public function kategori()
     {
-        return $this->belongsTo(KategoriProduk::class, 'id_kategori');
+        return $this->belongsTo(KategoriProduk::class, 'id_kategori', 'id_kategori');
     }
-
-    public function cart()
-    {
-    return $this->hasMany(Cart::class, 'produk_id', 'id_produk');
-    }
-
 }

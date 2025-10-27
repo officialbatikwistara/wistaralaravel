@@ -4,25 +4,29 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Models\Produk;
+use App\Models\KategoriProduk;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class ProdukAdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $produk = DB::table('produk')
-            ->join('kategori_produk', 'produk.id_kategori', '=', 'kategori_produk.id_kategori')
-            ->select('produk.*', 'kategori_produk.nama_kategori')
-            ->orderBy('tanggal_upload', 'desc')
-            ->get();
+        $query = Produk::with('kategori')->orderByDesc('tanggal_upload');
+
+        if ($request->filled('cari')) {
+            $query->where('nama_produk', 'like', '%' . $request->cari . '%');
+        }
+
+        $produk = $query->paginate(10);
 
         return view('admin.produk.index', compact('produk'));
     }
 
     public function create()
     {
-        $kategori = DB::table('kategori_produk')->get();
+        $kategori = KategoriProduk::all();
         return view('admin.produk.create', compact('kategori'));
     }
 
@@ -30,84 +34,97 @@ class ProdukAdminController extends Controller
     {
         $request->validate([
             'nama_produk' => 'required|string|max:255',
-            'harga' => 'required|numeric',
-            'id_kategori' => 'required|integer'
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+            'id_kategori' => 'required|exists:kategori_produk,id_kategori',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Upload gambar jika ada
         $gambarPath = null;
+
         if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/produk'), $filename);
-            $gambarPath = 'uploads/produk/'.$filename;
+            // simpan ke storage/app/public/produk
+            $gambarPath = $request->file('gambar')->store('produk', 'public');
         }
 
-        \DB::table('produk')->insert([
+        Produk::create([
             'nama_produk' => $request->nama_produk,
-            'slug' => \Str::slug($request->nama_produk),
+            'slug' => Str::slug($request->nama_produk),
             'deskripsi' => $request->deskripsi,
             'harga' => $request->harga,
             'stok' => $request->stok,
             'id_kategori' => $request->id_kategori,
-            'gambar' => $gambarPath,
+            'gambar' => $gambarPath, // contoh: "produk/namafile.jpg"
             'link_shopee' => $request->link_shopee,
             'link_tiktok' => $request->link_tiktok,
+            'status' => $request->status ?? 'aktif',
             'tanggal_upload' => now(),
         ]);
 
         return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil ditambahkan!');
     }
 
-    public function edit($id_produk)
+    public function edit($id)
     {
-        $produk = DB::table('produk')->where('id_produk', $id_produk)->first();
-        $kategori = DB::table('kategori_produk')->get();
+        $produk = Produk::findOrFail($id);
+        $kategori = KategoriProduk::all();
+
         return view('admin.produk.edit', compact('produk', 'kategori'));
     }
 
-    public function update(Request $request, $id_produk)
+    public function update(Request $request, $id)
     {
-        $produk = DB::table('produk')->where('id_produk', $id_produk)->first();
+        $produk = Produk::findOrFail($id);
+
+        $request->validate([
+            'nama_produk' => 'required|string|max:255',
+            'harga' => 'required|numeric|min:0',
+            'stok' => 'required|integer|min:0',
+            'id_kategori' => 'required|exists:kategori_produk,id_kategori',
+            'deskripsi' => 'nullable|string',
+            'gambar' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
         $gambarPath = $produk->gambar;
 
-        // Jika ada gambar baru
         if ($request->hasFile('gambar')) {
-            $file = $request->file('gambar');
-            $filename = time().'_'.$file->getClientOriginalName();
-            $file->move(public_path('uploads/produk'), $filename);
-            $gambarPath = 'uploads/produk/'.$filename;
-
-            // Hapus gambar lama jika ada
-            if ($produk->gambar && file_exists(public_path($produk->gambar))) {
-                unlink(public_path($produk->gambar));
+            // hapus gambar lama jika ada
+            if ($produk->gambar && Storage::disk('public')->exists($produk->gambar)) {
+                Storage::disk('public')->delete($produk->gambar);
             }
+
+            // upload gambar baru
+            $gambarPath = $request->file('gambar')->store('produk', 'public');
         }
 
-        DB::table('produk')->where('id_produk', $id_produk)->update([
+        $produk->update([
             'nama_produk' => $request->nama_produk,
-            'slug' => \Str::slug($request->nama_produk),
+            'slug' => Str::slug($request->nama_produk),
             'deskripsi' => $request->deskripsi,
             'harga' => $request->harga,
             'stok' => $request->stok,
-            'gambar' => $gambarPath,
             'id_kategori' => $request->id_kategori,
+            'gambar' => $gambarPath,
             'link_shopee' => $request->link_shopee,
             'link_tiktok' => $request->link_tiktok,
+            'status' => $request->status ?? 'aktif',
             'tanggal_update' => now(),
         ]);
 
         return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil diperbarui!');
     }
 
-    public function destroy($id_produk)
+    public function destroy($id)
     {
-        $produk = DB::table('produk')->where('id_produk', $id_produk)->first();
-        if ($produk && $produk->gambar && file_exists(public_path($produk->gambar))) {
-            unlink(public_path($produk->gambar));
+        $produk = Produk::findOrFail($id);
+
+        if ($produk->gambar && Storage::disk('public')->exists($produk->gambar)) {
+            Storage::disk('public')->delete($produk->gambar);
         }
 
-        DB::table('produk')->where('id_produk', $id_produk)->delete();
+        $produk->delete();
+
         return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil dihapus!');
     }
 }
