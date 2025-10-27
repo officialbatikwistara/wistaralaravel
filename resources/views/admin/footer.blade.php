@@ -1,4 +1,3 @@
-
 <footer class="footer-admin text-center text-md-start py-4 mt-5">
   <div class="container">
     <div class="row gy-3 align-items-start">
@@ -45,24 +44,6 @@
     </div>
 
     <hr class="border-secondary my-3 opacity-50">
-=======
-<footer class="footer-admin text-center py-4 mt-5">
->>>>>>> origin/main
-
-    <div class="text-center">
-      <p class="mb-1 fw-semibold text-white small">
-        © {{ date('Y') }} Admin Batik Wistara
-      </p>
-      <small class="text-white-50">
-        Dibuat dengan <i class="fa-solid fa-heart text-danger"></i> oleh Tim Developer Batik Wistara
-      </small>
-    </div>
-  </div>
-</footer>
-
-<!-- Script Bootstrap -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-
 <style>
   .footer-admin {
     background: linear-gradient(135deg, #071739, #1b2a4a);
