@@ -1,13 +1,17 @@
 @include('admin.header')
 
 <div class="container py-5">
-  <div class="card shadow-sm border-0">
-    <div class="card-body">
-      <h2 class="fw-bold mb-4 text-dark">✏️ Edit Produk</h2>
+  <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 900px;">
+    {{-- Header biru tua --}}
+    <div class="card-header text-white text-center rounded-top-4 py-4" style="background-color: #081738;">
+      <h3 class="mb-0 fw-bold"> Edit Produk</h3>
+    </div>
 
-      {{-- Alert untuk error validasi --}}
+    {{-- Body --}}
+    <div class="card-body bg-white p-4">
+      {{-- Alert Error --}}
       @if ($errors->any())
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3" role="alert">
           <strong>Terjadi kesalahan:</strong>
           <ul class="mb-0 mt-1">
             @foreach ($errors->all() as $error)
@@ -20,30 +24,41 @@
 
       <form action="{{ route('admin.produk.update', $produk->id_produk) }}" method="POST" enctype="multipart/form-data">
         @csrf
-        <div class="row g-3">
+        @method('PUT')
+
+        <div class="row g-4">
+          {{-- Nama Produk --}}
           <div class="col-md-6">
-            <label class="form-label fw-semibold">Nama Produk</label>
-            <input type="text" name="nama_produk" class="form-control" value="{{ $produk->nama_produk }}" required>
+            <label class="form-label fw-semibold text-dark">Nama Produk</label>
+            <input type="text" name="nama_produk" class="form-control border-0 shadow-sm"
+                   value="{{ $produk->nama_produk }}" placeholder="Masukkan nama produk..." required>
           </div>
 
+          {{-- Harga --}}
           <div class="col-md-6">
-            <label class="form-label fw-semibold">Harga (Rp)</label>
-            <input type="number" name="harga" class="form-control" value="{{ $produk->harga }}" required>
+            <label class="form-label fw-semibold text-dark">Harga (Rp)</label>
+            <input type="number" name="harga" class="form-control border-0 shadow-sm"
+                   value="{{ $produk->harga }}" placeholder="Masukkan harga..." required>
           </div>
 
+          {{-- Deskripsi --}}
           <div class="col-md-12">
-            <label class="form-label fw-semibold">Deskripsi</label>
-            <textarea name="deskripsi" class="form-control" rows="4">{{ $produk->deskripsi }}</textarea>
+            <label class="form-label fw-semibold text-dark">Deskripsi</label>
+            <textarea name="deskripsi" rows="4" class="form-control border-0 shadow-sm"
+                      placeholder="Tulis deskripsi produk di sini...">{{ $produk->deskripsi }}</textarea>
           </div>
 
+          {{-- Stok --}}
           <div class="col-md-4">
-            <label class="form-label fw-semibold">Stok</label>
-            <input type="number" name="stok" class="form-control" value="{{ $produk->stok }}">
+            <label class="form-label fw-semibold text-dark">Stok</label>
+            <input type="number" name="stok" class="form-control border-0 shadow-sm"
+                   value="{{ $produk->stok }}" placeholder="Jumlah stok tersedia">
           </div>
 
+          {{-- Kategori --}}
           <div class="col-md-8">
-            <label class="form-label fw-semibold">Kategori</label>
-            <select name="id_kategori" class="form-select" required>
+            <label class="form-label fw-semibold text-dark">Kategori</label>
+            <select name="id_kategori" class="form-select border-0 shadow-sm" required>
               <option value="">-- Pilih Kategori --</option>
               @foreach($kategori as $k)
                 <option value="{{ $k->id_kategori }}" {{ $produk->id_kategori == $k->id_kategori ? 'selected' : '' }}>
@@ -53,27 +68,37 @@
             </select>
           </div>
 
+          {{-- Gambar --}}
           <div class="col-md-6">
-            <label class="form-label fw-semibold">Gambar Produk</label>
+            <label class="form-label fw-semibold text-dark">Gambar Produk</label>
             @if($produk->gambar)
               <div class="mb-2">
-                <img src="{{ asset($produk->gambar) }}" alt="Gambar produk" class="rounded shadow-sm" style="max-width: 150px;">
+                <img src="{{ asset($produk->gambar) }}" alt="Gambar produk"
+                     class="rounded shadow-sm" style="max-width: 150px;">
               </div>
             @endif
-            <input type="file" name="gambar" class="form-control">
+            <input type="file" name="gambar" class="form-control border-0 shadow-sm">
             <small class="text-muted">Kosongkan jika tidak ingin mengganti gambar.</small>
           </div>
 
+          {{-- Link e-commerce --}}
           <div class="col-md-6">
-            <label class="form-label fw-semibold">Tautan E-Commerce</label>
-            <input type="url" name="link_shopee" class="form-control mb-2" value="{{ $produk->link_shopee }}" placeholder="Link Shopee (opsional)">
-            <input type="url" name="link_tiktok" class="form-control" value="{{ $produk->link_tiktok }}" placeholder="Link TikTok (opsional)">
+            <label class="form-label fw-semibold text-dark">Tautan E-Commerce</label>
+            <input type="url" name="link_shopee" class="form-control border-0 shadow-sm mb-2"
+                   value="{{ $produk->link_shopee }}" placeholder="Link Shopee (opsional)">
+            <input type="url" name="link_tiktok" class="form-control border-0 shadow-sm"
+                   value="{{ $produk->link_tiktok }}" placeholder="Link TikTok (opsional)">
           </div>
         </div>
 
-        <div class="mt-4 d-flex justify-content-end gap-2">
-          <a href="{{ route('admin.produk.index') }}" class="btn btn-secondary px-4">Kembali</a>
-          <button type="submit" class="btn btn-dark px-4">💾 Simpan Perubahan</button>
+        {{-- Tombol --}}
+        <div class="d-flex justify-content-end gap-2 mt-5">
+          <a href="{{ route('admin.produk.index') }}" class="btn btn-secondary px-4 py-2 rounded-pill shadow-sm">
+            Kembali
+          </a>
+          <button type="submit" class="btn btn-dark px-4 py-2 rounded-pill shadow-sm">
+            Simpan Perubahan
+          </button>
         </div>
       </form>
     </div>
@@ -81,3 +106,64 @@
 </div>
 
 @include('admin.footer')
+
+{{-- 🌸 Style selaras dengan seluruh halaman admin --}}
+<style>
+body {
+  background-color: #f7f9fc;
+  font-family: 'Poppins', sans-serif;
+  color: #0b1841;
+}
+
+.card {
+  border-radius: 24px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card-header {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  background-color: #081738 !important;
+}
+
+h3 {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* Input & Select */
+.form-control, .form-select {
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: #1e3a8a !important;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15) !important;
+}
+
+/* Tombol */
+.btn-dark {
+  background-color: #081738 !important;
+  border: none !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+}
+
+.btn-dark:hover {
+  background-color: #132a73 !important;
+}
+
+.btn-secondary {
+  background-color: #6b7280 !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-weight: 600 !important;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563 !important;
+}
+</style>

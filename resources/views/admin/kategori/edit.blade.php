@@ -1,31 +1,36 @@
 @include('admin.header')
 
 <div class="container py-5">
-  <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 600px;">
-    <div class="card-header bg-dark text-white text-center rounded-top-4 py-3">
-      <h3 class="mb-0">✏️ Edit Kategori Produk</h3>
+  <div class="card shadow-lg border-0 rounded-4 mx-auto" style="max-width: 700px;">
+    {{-- Header biru tua elegan --}}
+    <div class="card-header text-white text-center rounded-top-4 py-4" style="background-color: #081738;">
+      <h3 class="mb-0 fw-bold"> Edit Kategori Produk</h3>
     </div>
 
-    <div class="card-body bg-light">
+    {{-- Body putih bersih --}}
+    <div class="card-body bg-white p-4">
       <form action="{{ route('admin.kategori.update', $kategori->id_kategori) }}" method="POST">
         @csrf
+        @method('PUT')
 
-        <div class="mb-3">
-          <label class="form-label fw-semibold">Nama Kategori</label>
+        {{-- Input Nama Kategori --}}
+        <div class="mb-4">
+          <label class="form-label fw-semibold text-dark" style="color: #0b1841;">Nama Kategori</label>
           <input
             type="text"
             name="nama_kategori"
-            class="form-control border-0 shadow-sm"
+            class="form-control shadow-sm border-0"
             placeholder="Masukkan nama kategori..."
             value="{{ $kategori->nama_kategori }}"
             required>
         </div>
 
+        {{-- Tombol Aksi --}}
         <div class="d-flex justify-content-end gap-2 mt-4">
-          <a href="{{ route('admin.kategori.index') }}" class="btn btn-secondary px-4">
-            ← Kembali
+          <a href="{{ route('admin.kategori.index') }}" class="btn btn-secondary px-4 py-2 rounded-pill shadow-sm">
+            Kembali
           </a>
-          <button class="btn btn-dark px-4">
+          <button type="submit" class="btn btn-dark px-4 py-2 rounded-pill shadow-sm">
             Simpan Perubahan
           </button>
         </div>
@@ -35,3 +40,64 @@
 </div>
 
 @include('admin.footer')
+
+{{-- 🌸 Style selaras dengan form Tambah Kategori & Tambah Berita --}}
+<style>
+body {
+  background-color: #f7f9fc;
+  font-family: 'Poppins', sans-serif;
+  color: #0b1841;
+}
+
+.card {
+  border-radius: 24px !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+}
+
+.card-header {
+  border-top-left-radius: 24px !important;
+  border-top-right-radius: 24px !important;
+  background-color: #081738 !important;
+}
+
+h3 {
+  font-weight: 700;
+  color: #ffffff;
+}
+
+/* 🧾 Input */
+.form-control {
+  border-radius: 14px !important;
+  padding: 12px 16px !important;
+  border: 1px solid #e5e7eb !important;
+  transition: all 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #1e3a8a !important;
+  box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.15) !important;
+}
+
+/* 🎨 Tombol */
+.btn-dark {
+  background-color: #081738 !important;
+  border: none !important;
+  font-weight: 600 !important;
+  border-radius: 14px !important;
+}
+
+.btn-dark:hover {
+  background-color: #132a73 !important;
+}
+
+.btn-secondary {
+  background-color: #6b7280 !important;
+  border: none !important;
+  border-radius: 14px !important;
+  font-weight: 600 !important;
+}
+
+.btn-secondary:hover {
+  background-color: #4b5563 !important;
+}
+</style>
