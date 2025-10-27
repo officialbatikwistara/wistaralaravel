@@ -113,6 +113,7 @@
     padding: 4px 10px;
     font-size: 13px;
     text-decoration: none;
+    display: inline-block;
   }
 
   .btn-shop {
@@ -179,17 +180,20 @@
     <table class="table align-middle mb-0">
       <thead class="table-header text-center">
         <tr>
+          <th style="width:6%">No</th>
           <th style="width:12%">Gambar</th>
-          <th>Nama Produk</th>
-          <th style="width:15%">Harga</th>
-          <th style="width:15%">Kategori</th>
-          <th style="width:15%">Marketplace</th>
-          <th style="width:12%">Aksi</th>
+          <th style="width:22%">Nama Produk</th>
+          <th style="width:13%">Harga</th>
+          <th style="width:13%">Kategori</th>
+          <th style="width:20%">Marketplace</th>
+          <th style="width:10%">Aksi</th>
         </tr>
       </thead>
       <tbody>
-        @forelse($produk as $p)
+        @forelse($produk as $index => $p)
         <tr class="produk-row">
+          <td class="produk-cell text-center">{{ $loop->iteration }}</td>
+
           <td class="produk-cell text-center">
             @if($p->gambar)
               <img src="{{ asset($p->gambar) }}" alt="Gambar produk" class="produk-img">
@@ -213,7 +217,7 @@
 
           <td class="produk-cell text-center">
             @if($p->link_shopee)
-              <a href="{{ $p->link_shopee }}" target="_blank" class="btn-shop">Shopee</a>
+              <a href="{{ $p->link_shopee }}" target="_blank" class="btn-shop me-1">Shopee</a>
             @endif
             @if($p->link_tiktok)
               <a href="{{ $p->link_tiktok }}" target="_blank" class="btn-tiktok">TikTok</a>
@@ -225,13 +229,13 @@
 
           <td class="produk-cell text-center">
             <div class="d-flex justify-content-center gap-2">
-              <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn-action btn-edit">
+              <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn-action btn-edit" title="Edit">
                 <i class="bi bi-pencil-fill"></i>
               </a>
               <form action="{{ route('admin.produk.delete', $p->id_produk) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="d-inline">
                 @csrf
                 @method('DELETE')
-                <button type="submit" class="btn-action btn-delete">
+                <button type="submit" class="btn-action btn-delete" title="Hapus">
                   <i class="bi bi-trash-fill"></i>
                 </button>
               </form>
@@ -240,7 +244,7 @@
         </tr>
         @empty
         <tr>
-          <td colspan="6" class="text-center text-muted py-3">
+          <td colspan="7" class="text-center text-muted py-3">
             Belum ada produk yang tersedia.
           </td>
         </tr>

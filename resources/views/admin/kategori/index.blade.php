@@ -3,7 +3,7 @@
 <div class="container py-5">
   <div class="card shadow-lg border-0 rounded-4 p-4 bg-light">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold mb-0">📂 Daftar Kategori Produk</h2>
+      <h2 class="fw-bold mb-0">Daftar Kategori Produk</h2>
       <a href="{{ route('admin.kategori.create') }}" class="btn btn-dark px-4 py-2 rounded-pill shadow-sm">
         <i class="fa-solid fa-plus me-1"></i> Tambah Kategori
       </a>
@@ -17,7 +17,7 @@
       <table class="table table-hover align-middle mb-0">
         <thead class="table-dark text-center">
           <tr>
-            <th style="width: 5%">#</th>
+            <th style="width: 5%">No</th>
             <th style="width: 35%">Nama Kategori</th>
             <th style="width: 35%">Slug</th>
             <th style="width: 25%">Aksi</th>
