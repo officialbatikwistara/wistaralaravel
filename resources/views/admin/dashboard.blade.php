@@ -10,14 +10,36 @@
   /* ===== HERO SECTION ===== */
   .hero-admin {
     position: relative;
-    background: url('{{ asset("img/background1.svg") }}') no-repeat center/cover;
-    height: 70vh;
+    height: 100vh; /* full layar */
+    width: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
     color: #fff;
     overflow: hidden;
+    background: #071739; /* fallback warna */
+  }
+
+  .hero-admin video.background-video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: cover;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+    opacity: 0;
+    animation: fadeInVideo 1.2s ease forwards;
+  }
+
+  @keyframes fadeInVideo {
+    to {
+      opacity: 1;
+    }
   }
 
   .hero-admin::before {
@@ -25,7 +47,7 @@
     position: absolute;
     inset: 0;
     background: rgba(7, 23, 57, 0.65);
-    z-index: 0;
+    z-index: 1;
   }
 
   .hero-content {
@@ -115,6 +137,12 @@
 
 <!-- ===== HERO SECTION ===== -->
 <section class="hero-admin">
+  <!-- Background Video -->
+  <video autoplay muted loop playsinline class="background-video">
+    <source src="{{ asset('img/vidbatik.mp4') }}" type="video/mp4">
+    Your browser does not support HTML5 video.
+  </video>
+
   <div class="hero-content">
     <h1><i class="fa-solid fa-chart-line me-2 text-warning"></i> Dashboard Admin</h1>
     <p>Selamat datang Admin <span class="text-warning">Batik Wistara</span></p>
