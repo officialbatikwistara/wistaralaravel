@@ -1,114 +1,173 @@
 @include('admin.header')
 
 <style>
+  /* 🌙 Warna utama & font */
   body {
-    background-color: #ffffff; /* background putih */
-    color: #000000; /* teks utama hitam */
+    background-color: #f3f6fa;
+    font-family: 'Poppins', sans-serif;
+    color: #0b1841;
   }
 
   h2 {
-    color: #000000;
+    font-weight: 700;
+    color: #0b1841;
   }
 
-  /* Tabel */
-  .table {
-    border: 1px solid #dee2e6;
-  }
-
-  .table thead {
-    background-color: #1e3a8a; /* navy gelap */
-    color: white; /* teks putih */
-  }
-
-  .table tbody tr {
-    background-color: #ffffff; /* baris putih */
-    color: #000000;
-  }
-
-  .table tbody tr:hover {
-    background-color: #f1f5f9; /* efek hover lembut */
-  }
-
-  .table th, .table td {
-    vertical-align: middle;
-  }
-
-  /* Tombol */
+  /* 🌟 Tombol Tambah Produk */
   .btn-dark {
-    background-color: #1e3a8a;
+    background-color: #0b1841 !important;
     border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    font-weight: 500;
   }
 
   .btn-dark:hover {
-    background-color: #172554;
+    background-color: #1c2755 !important;
   }
 
-  .btn-secondary {
-    background-color: #6b7280;
-    border: none;
+  /* 📦 Tabel container */
+  .table-container {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    overflow: hidden;
   }
 
-  .btn-secondary:hover {
-    background-color: #4b5563;
+  /* 🧭 Header tabel */
+  .table-header {
+    background-color: #0b1841;
+    color: #fff;
+    font-weight: 600;
+    text-transform: capitalize;
   }
 
-  .btn-primary {
-    background-color: #2563eb;
-    border: none;
+  .table-header th {
+    padding: 16px;
+    font-size: 15px;
   }
 
-  .btn-primary:hover {
-    background-color: #1d4ed8;
+  /* 🪶 Baris isi */
+  .produk-row {
+    background-color: #fff;
+    border-bottom: 1px solid #e5e7eb;
+    transition: all 0.25s ease;
   }
 
-  .btn-danger {
-    background-color: #dc2626;
-    border: none;
+  .produk-row:hover {
+    background-color: #f8fafc;
+    transform: scale(1.005);
   }
 
-  .btn-danger:hover {
-    background-color: #b91c1c;
+  .produk-cell {
+    padding: 18px 16px;
+    vertical-align: middle;
   }
 
-  /* Form input */
-  .form-control, .form-select {
-    background-color: #f9fafb;
-    color: #000000;
-    border: 1px solid #d1d5db;
+  .produk-img {
+    width: 90px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
 
-  .form-control::placeholder {
+  .produk-name {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  .produk-desc {
+    font-size: 13px;
     color: #6b7280;
   }
 
-  /* Card bayangan */
-  .table-responsive {
-    border-radius: 0.5rem;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  /* 💡 Tombol Aksi */
+  .btn-action {
+    border: none;
+    padding: 9px 11px;
+    border-radius: 8px;
+    color: white;
+    transition: all 0.3s ease;
+  }
+
+  .btn-edit {
+    background-color: #fbbf24;
+  }
+
+  .btn-edit:hover {
+    background-color: #d4af37;
+  }
+
+  .btn-delete {
+    background-color: #dc2626;
+  }
+
+  .btn-delete:hover {
+    background-color: #b91c1c;
+  }
+
+  /* 🛍️ Link marketplace */
+  .btn-shop, .btn-tiktok {
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 13px;
+    text-decoration: none;
+  }
+
+  .btn-shop {
+    background-color: #f59e0b;
+    color: #fff;
+  }
+
+  .btn-tiktok {
+    background-color: #000;
+    color: #fff;
+  }
+
+  /* 🔍 Input cari */
+  .form-control {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    background-color: #f9fafb;
+  }
+
+  .form-control:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,0.2);
+  }
+
+  /* 📄 Pagination */
+  .pagination {
+    justify-content: center;
+  }
+
+  .pagination .page-link {
+    color: #0b1841;
+    border-radius: 6px;
+  }
+
+  .pagination .page-item.active .page-link {
+    background-color: #0b1841;
+    border-color: #0b1841;
   }
 </style>
 
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
-    <h2>📦 Kelola Produk</h2>
-    <a href="{{ route('admin.produk.create') }}" class="btn btn-dark">+ Tambah Produk</a>
+    <h2>Kelola Produk</h2>
+    <a href="{{ route('admin.produk.create') }}" class="btn btn-dark shadow-sm">
+      + Tambah Produk
+    </a>
   </div>
 
-  {{-- Notifikasi sukses --}}
   @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
   @endif
 
-  {{-- Form pencarian --}}
   <form method="GET" action="{{ route('admin.produk.index') }}" class="row g-2 mb-4">
     <div class="col-md-8">
-      <input
-        type="text"
-        name="cari"
-        value="{{ request('cari') }}"
-        class="form-control"
-        placeholder="🔍 Cari nama produk..."
-      >
+      <input type="text" name="cari" value="{{ request('cari') }}" class="form-control" placeholder="🔍 Cari nama produk...">
     </div>
     <div class="col-md-4 d-flex gap-2">
       <button type="submit" class="btn btn-dark w-50">Terapkan</button>
@@ -116,73 +175,80 @@
     </div>
   </form>
 
-  {{-- Tabel produk --}}
-  <div class="table-responsive shadow-sm rounded">
-    <table class="table table-bordered align-middle mb-0">
-      <thead>
+  <div class="table-container">
+    <table class="table align-middle mb-0">
+      <thead class="table-header text-center">
         <tr>
-          <th style="width:5%">#</th>
-          <th style="width:10%">Gambar</th>
+          <th style="width:12%">Gambar</th>
           <th>Nama Produk</th>
           <th style="width:15%">Harga</th>
           <th style="width:15%">Kategori</th>
-          <th style="width:10%">Shopee</th>
-          <th style="width:10%">TikTok</th>
-          <th style="width:15%">Aksi</th>
+          <th style="width:15%">Marketplace</th>
+          <th style="width:12%">Aksi</th>
         </tr>
       </thead>
       <tbody>
         @forelse($produk as $p)
-          <tr>
-            <td>{{ $loop->iteration }}</td>
-            <td>
-              @if($p->gambar)
-                <img src="{{ asset($p->gambar) }}" alt="Gambar produk" width="60" class="rounded shadow-sm">
-              @else
-                <span class="text-muted fst-italic">Tidak ada</span>
-              @endif
-            </td>
-            <td>
-              <strong>{{ $p->nama_produk }}</strong><br>
-              <small class="text-muted">{{ Str::limit($p->deskripsi, 60) }}</small>
-            </td>
-            <td>Rp {{ number_format($p->harga, 0, ',', '.') }}</td>
-            <td>{{ $p->nama_kategori ?? '-' }}</td>
-            <td class="text-center">
-              @if($p->link_shopee)
-                <a href="{{ $p->link_shopee }}" target="_blank" class="btn btn-warning btn-sm">Shopee</a>
-              @else
-                <span class="text-muted">-</span>
-              @endif
-            </td>
-            <td class="text-center">
-              @if($p->link_tiktok)
-                <a href="{{ $p->link_tiktok }}" target="_blank" class="btn btn-dark btn-sm">TikTok</a>
-              @else
-                <span class="text-muted">-</span>
-              @endif
-            </td>
-            <td class="text-center">
-              <div class="d-flex justify-content-center gap-2">
-                <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn btn-primary btn-sm">Edit</a>
-                <form action="{{ route('admin.produk.delete', $p->id_produk) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="d-inline">
-                  @csrf
-                  @method('DELETE')
-                  <button type="submit" class="btn btn-danger btn-sm">Hapus</button>
-                </form>
-              </div>
-            </td>
-          </tr>
+        <tr class="produk-row">
+          <td class="produk-cell text-center">
+            @if($p->gambar)
+              <img src="{{ asset($p->gambar) }}" alt="Gambar produk" class="produk-img">
+            @else
+              <span class="text-muted fst-italic">Tidak ada</span>
+            @endif
+          </td>
+
+          <td class="produk-cell">
+            <div class="produk-name">{{ $p->nama_produk }}</div>
+            <div class="produk-desc">{{ Str::limit($p->deskripsi, 70) }}</div>
+          </td>
+
+          <td class="produk-cell text-center">
+            Rp {{ number_format($p->harga, 0, ',', '.') }}
+          </td>
+
+          <td class="produk-cell text-center">
+            {{ $p->nama_kategori ?? '-' }}
+          </td>
+
+          <td class="produk-cell text-center">
+            @if($p->link_shopee)
+              <a href="{{ $p->link_shopee }}" target="_blank" class="btn-shop">Shopee</a>
+            @endif
+            @if($p->link_tiktok)
+              <a href="{{ $p->link_tiktok }}" target="_blank" class="btn-tiktok">TikTok</a>
+            @endif
+            @if(!$p->link_shopee && !$p->link_tiktok)
+              <span class="text-muted">-</span>
+            @endif
+          </td>
+
+          <td class="produk-cell text-center">
+            <div class="d-flex justify-content-center gap-2">
+              <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn-action btn-edit">
+                <i class="bi bi-pencil-fill"></i>
+              </a>
+              <form action="{{ route('admin.produk.delete', $p->id_produk) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="d-inline">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="btn-action btn-delete">
+                  <i class="bi bi-trash-fill"></i>
+                </button>
+              </form>
+            </div>
+          </td>
+        </tr>
         @empty
-          <tr>
-            <td colspan="8" class="text-center text-muted py-3">Belum ada produk yang tersedia.</td>
-          </tr>
+        <tr>
+          <td colspan="6" class="text-center text-muted py-3">
+            Belum ada produk yang tersedia.
+          </td>
+        </tr>
         @endforelse
       </tbody>
     </table>
   </div>
 
-  {{-- Pagination --}}
   @if(method_exists($produk, 'links'))
     <div class="mt-3 d-flex justify-content-center">
       {{ $produk->links('pagination::bootstrap-5') }}
