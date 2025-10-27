@@ -117,7 +117,7 @@
 <section class="hero-admin">
   <div class="hero-content">
     <h1><i class="fa-solid fa-chart-line me-2 text-warning"></i> Dashboard Admin</h1>
-    <p>Selamat datang Admin Batik Wistara <span class="text-warning">Batik Wistara</span></p>
+    <p>Selamat datang Admin<span class="text-warning">Batik Wistara</span></p>
   </div>
 </section>
 
