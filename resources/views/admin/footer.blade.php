@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 <footer class="footer-admin text-center text-md-start py-4 mt-5">
   <div class="container">
     <div class="row gy-3 align-items-start">
