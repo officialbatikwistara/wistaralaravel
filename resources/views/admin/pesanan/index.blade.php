@@ -2,7 +2,7 @@
 
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center flex-wrap mb-4">
-    <h2 class="fw-bold text-dark border-bottom pb-2">📦 Kelola Pesanan</h2>
+    <h2 class="fw-bold text-dark border-bottom pb-2"> Kelola Pesanan</h2>
   </div>
 
   <!-- 🔍 Filter Form -->
@@ -19,13 +19,7 @@
         </div>
         <div class="col-md">
           <label class="form-label mb-1 fw-semibold text-secondary">Kata Kunci</label>
-          <input
-            type="text"
-            name="keyword"
-            placeholder="Cari nama atau ID pesanan..."
-            value="{{ request('keyword') }}"
-            class="form-control border-0 shadow-sm"
-            onkeypress="if(event.key === 'Enter'){ this.form.submit(); }">
+          <input type="text" name="keyword" placeholder="Cari nama atau ID pesanan..." value="{{ request('keyword') }}" class="form-control border-0 shadow-sm" onkeypress="if(event.key === 'Enter'){ this.form.submit(); }">
         </div>
       </form>
     </div>
@@ -33,13 +27,23 @@
 
   <!-- 🗂️ Tabs -->
   <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
-    <div class="card-header text-white py-3" style="background-color: #001f3f;">
+    <div class="card-header py-3" style="background-color: #001f3f;">
       <ul class="nav nav-tabs card-header-tabs justify-content-center border-0" id="orderTabs" role="tablist">
-        <li class="nav-item"><button class="nav-link active text-white fw-semibold" data-bs-toggle="tab" data-bs-target="#Semua" type="button">📋 Semua</button></li>
-        <li class="nav-item"><button class="nav-link text-white fw-semibold" data-bs-toggle="tab" data-bs-target="#pending" type="button">🕒 Pending</button></li>
-        <li class="nav-item"><button class="nav-link text-white fw-semibold" data-bs-toggle="tab" data-bs-target="#proses" type="button">⏳ Proses</button></li>
-        <li class="nav-item"><button class="nav-link text-white fw-semibold" data-bs-toggle="tab" data-bs-target="#selesai" type="button">✅ Selesai</button></li>
-        <li class="nav-item"><button class="nav-link text-white fw-semibold" data-bs-toggle="tab" data-bs-target="#batal" type="button">❌ Batal</button></li>
+        <li class="nav-item">
+          <button class="nav-link active fw-semibold" data-bs-toggle="tab" data-bs-target="#Semua" type="button">📋 Semua</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#pending" type="button">🕒 Pending</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#proses" type="button">⏳ Proses</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#selesai" type="button">✅ Selesai</button>
+        </li>
+        <li class="nav-item">
+          <button class="nav-link fw-semibold" data-bs-toggle="tab" data-bs-target="#batal" type="button">❌ Batal</button>
+        </li>
       </ul>
     </div>
 
@@ -52,19 +56,19 @@
       <div class="tab-pane fade {{ $loop->first ? 'show active' : '' }}" id="{{ $key }}">
         <div class="table-responsive">
           <table class="table table-striped align-middle text-center m-0 shadow-sm border">
-            <thead style="background-color: #001f3f; color: white;">
-              <tr>
-                <th>No</th>
-                <th>ID</th>
-                <th>Nama</th>
-                <th>Tanggal</th>
-                <th>Total</th>
-                <th>Status Pesanan</th>
-                <th>Status Pembayaran</th>
-                <th>Bukti</th>
-                <th>Tipe</th>
-                <th>Aksi</th>
-              </tr>
+            <thead class="table-header-navy">
+                <tr>
+                    <th>No</th>
+                    <th>ID</th>
+                    <th>Nama</th>
+                    <th>Tanggal</th>
+                    <th>Total</th>
+                    <th>Status Pesanan</th>
+                    <th>Status Pembayaran</th>
+                    <th>Bukti</th>
+                    <th>Tipe</th>
+                    <th>Aksi</th>
+                </tr>
             </thead>
             <tbody>
               @php $no = 1; @endphp
@@ -157,3 +161,44 @@
 </div>
 
 @include('admin.footer')
+
+<!-- 🌈 STYLE -->
+<style>
+  /* NAV TABS */
+  .nav-tabs .nav-link {
+    color: white;
+    background-color: #001f3f;
+    border: none;
+    border-radius: 10px 10px 0 0;
+    padding: 8px 20px;
+    margin: 0 5px;
+    transition: all 0.3s ease;
+  }
+
+  .nav-tabs .nav-link.active {
+    background-color: #ffffff;
+    color: #001f3f;
+  }
+
+  .nav-tabs .nav-link:hover {
+    opacity: 0.85;
+  }
+
+  /* 🔵 HEADER TABEL NAVY PUTIH */
+  .table-header-navy {
+    background-color: #001f3f !important;
+    color: #ffffff !important;
+  }
+
+  .table-header-navy th {
+    font-weight: 600;
+    text-transform: capitalize;
+    padding: 12px;
+    vertical-align: middle;
+    border-bottom: 2px solid #ffffff44;
+  }
+
+  .table thead th {
+    border: none !important;
+  }
+</style>
