@@ -15,7 +15,6 @@ use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\AdminOrderController;
 
-
 use Illuminate\Http\Request;
 
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -155,64 +154,114 @@ Route::post('/reset-password', [ResetPasswordController::class, 'reset'])->name(
 | Route Login & Auth Admin
 |--------------------------------------------------------------------------
 */
-// 🔐 Login Admin
 Route::get('/admin/login', [AuthController::class, 'showAdminLogin'])->name('admin.login');
 Route::post('/admin/login', [AuthController::class, 'adminLogin'])->name('admin.login.post');
-
-// 🚪 Logout Admin
 Route::get('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
 
-// 📊 Dashboard Admin
+/*
+|--------------------------------------------------------------------------
+| Dashboard Admin
+|--------------------------------------------------------------------------
+*/
 Route::get('/admin/dashboard', function () {
     if (!session()->has('admin_logged_in')) {
-        return redirect()->route('admin.login')->with('error', 'Silakan login sebagai admin.');
+        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
     }
-
     return view('admin.dashboard');
 })->name('admin.dashboard');
 
-Route::resource('admin/produk', ProdukAdminController::class)->names([
-    'index' => 'admin.produk.index',
-    'create' => 'admin.produk.create',
-    'store' => 'admin.produk.store',
-    'show' => 'admin.produk.show',
-    'edit' => 'admin.produk.edit',
-    'update' => 'admin.produk.update',
-    'destroy' => 'admin.produk.delete',
-]);
-Route::patch('/admin/produk/{id}/nonaktif', [ProdukController::class, 'nonaktif'])->name('admin.produk.nonaktif');
-Route::patch('/admin/produk/{id}/aktifkan', [ProdukController::class, 'aktifkan'])->name('admin.produk.aktifkan');
+/*
+|--------------------------------------------------------------------------
+| Produk Admin
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/produk', function () {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
+    }
+    return app(ProdukAdminController::class)->index();
+})->name('admin.produk.index');
 
-Route::resource('admin/kategori', KategoriAdminController::class)->names([
-    'index' => 'admin.kategori.index',
-    'create' => 'admin.kategori.create',
-    'store' => 'admin.kategori.store',
-    'show' => 'admin.kategori.show',
-    'edit' => 'admin.kategori.edit',
-    'update' => 'admin.kategori.update',
-    'destroy' => 'admin.kategori.delete',
-]);
+Route::get('/admin/produk/create', function () {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukAdminController::class)->create();
+})->name('admin.produk.create');
 
-// 📦 Pesanan Admin
-Route::prefix('admin')->group(function () {
-    Route::get('/pesanan', [AdminOrderController::class, 'index'])->name('admin.orders.index');
-    Route::get('/pesanan/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
-    Route::patch('/pesanan/{id}/update-payment', [AdminOrderController::class, 'updatePayment'])->name('admin.orders.updatePayment');
+Route::post('/admin/produk', function () {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukAdminController::class)->store(request());
+})->name('admin.produk.store');
 
-    // 🆕 Tambahkan route untuk update status
-    Route::patch('/pesanan/{id}/update-status', [AdminOrderController::class, 'updateStatus'])->name('admin.orders.updateStatus');
-});
+Route::get('/admin/produk/{id}/edit', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukAdminController::class)->edit($id);
+})->name('admin.produk.edit');
 
+Route::put('/admin/produk/{id}', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukAdminController::class)->update(request(), $id);
+})->name('admin.produk.update');
 
-Route::resource('admin/berita', BeritaAdminController::class)->names([
-    'index' => 'admin.berita.index',
-    'create' => 'admin.berita.create',
-    'store' => 'admin.berita.store',
-    'show' => 'admin.berita.show',
-    'edit' => 'admin.berita.edit',
-    'update' => 'admin.berita.update',
-    'destroy' => 'admin.berita.delete',
-]);
+Route::delete('/admin/produk/{id}', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukAdminController::class)->destroy($id);
+})->name('admin.produk.delete');
 
+Route::patch('/admin/produk/{id}/nonaktif', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukController::class)->nonaktif($id);
+})->name('admin.produk.nonaktif');
 
+Route::patch('/admin/produk/{id}/aktifkan', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(ProdukController::class)->aktifkan($id);
+})->name('admin.produk.aktifkan');
 
+/*
+|--------------------------------------------------------------------------
+| Kategori Admin
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/kategori', function () {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(KategoriAdminController::class)->index();
+})->name('admin.kategori.index');
+
+Route::resource('admin/kategori', KategoriAdminController::class)->except(['index']);
+
+/*
+|--------------------------------------------------------------------------
+| Pesanan Admin
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/pesanan', function () {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(AdminOrderController::class)->index();
+})->name('admin.orders.index');
+
+Route::get('/admin/pesanan/{id}', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(AdminOrderController::class)->show($id);
+})->name('admin.orders.show');
+
+Route::patch('/admin/pesanan/{id}/update-payment', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(AdminOrderController::class)->updatePayment($id);
+})->name('admin.orders.updatePayment');
+
+Route::patch('/admin/pesanan/{id}/update-status', function ($id) {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(AdminOrderController::class)->updateStatus($id);
+})->name('admin.orders.updateStatus');
+
+/*
+|--------------------------------------------------------------------------
+| Berita Admin
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/berita', function () {
+    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+    return app(BeritaAdminController::class)->index();
+})->name('admin.berita.index');
+
+Route::resource('admin/berita', BeritaAdminController::class)->except(['index']);
