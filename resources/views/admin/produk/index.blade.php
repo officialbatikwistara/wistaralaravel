@@ -232,14 +232,21 @@
         </tr>
       </thead>
       <tbody>
-        @forelse($produk as $index => $p)
+        @forelse($produk as $p)
         <tr class="produk-row">
           <td class="produk-cell text-center">{{ $loop->iteration }}</td>
 
           {{-- 🖼️ Gambar Produk --}}
+          @php
+          $fileName = basename($p->gambar);
+          $gambarPath = public_path('uploads/produk/'.$fileName);
+          $gambarUrl = (file_exists($gambarPath) && $fileName)
+              ? asset('uploads/produk/'.$fileName)
+              : asset('img/no-image.jpg');
+        @endphp
           <td class="produk-cell text-center">
            @if($p->gambar)
-               <img src="{{ asset('storage/produk/' . $p->gambar) }}" alt="Gambar produk" class="produk-img">
+               <img src="{{ $gambarUrl }}" alt={{ $p->nama_produk }} class="produk-img">
             @else
                 <span class="text-muted fst-italic">Tidak ada</span>
             @endif
