@@ -1,106 +1,161 @@
 @include('admin.header')
 
 <style>
-  /* 🌄 Background Fullscreen */
-  body {
-    background: url('{{ asset('img/background1.svg') }}') no-repeat center center fixed;
-    background-size: cover;
-    min-height: 100vh;
-    font-family: 'Poppins', sans-serif;
-    color: #0b1841;
-    position: relative;
-  }
+/* 🌸 Background Fullscreen */
+body {
+  font-family: 'Poppins', sans-serif;
+  color: #0b1841;
+  margin: 0;
+  min-height: 100vh;
+  background: url("{{ asset('img/background1.svg') }}") no-repeat center center fixed;
+  background-size: cover; /* Fullscreen */
+  background-color: #ffffff; /* fallback kalau SVG gagal load */
+}
 
-  /* Overlay agar teks tetap terbaca tapi tidak terlalu transparan */
-  body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: rgba(255, 255, 255, 0.97); /* 0.97 = hampir solid, tapi masih ada efek lembut */
-    z-index: -1;
-  }
+/* ✨ Container solid (area konten utama) */
+.container {
+  background: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  padding: 40px;
+  z-index: 1;
+  position: relative;
+}
 
-  h2 { font-weight: 700; color: #0b1841; }
+/* 🌈 Footer transparan supaya background gambar tetap kelihatan */
+footer {
+  background: rgba(7, 23, 57, 0.0); /* Transparan total (ubah 0.0 jadi 0.8 kalau mau semi transparan) */
+  color: #fff;
+  text-align: center;
+  padding: 25px 0;
+  margin-top: 50px;
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
+  z-index: 0;
+}
 
-  .table-container {
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    margin-top: 25px;
-  }
+/* 🧭 Judul halaman */
+h2 {
+  font-weight: 700;
+  color: #0b1841;
+}
 
-  .table thead.table-header th {
-    background-color: #081738;
-    color: #ffffff;
-    font-weight: 600;
-    font-size: 15px;
-    border: none;
-    padding: 16px;
-    text-align: center;
-  }
+/* 🌈 Tabel produk */
+.table-container {
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  margin-top: 25px;
+}
 
-  .produk-row { border-bottom: 1px solid #e5e7eb; transition: 0.25s ease; }
-  .produk-row:hover { background-color: #f9fafb; transform: scale(1.001); }
+.table thead.table-header th {
+  background-color: #081738;
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 15px;
+  border: none;
+  padding: 16px;
+  text-align: center;
+}
 
-  .produk-cell { padding: 20px 16px; vertical-align: middle; }
+.produk-row {
+  border-bottom: 1px solid #e5e7eb;
+  transition: 0.25s ease;
+}
+.produk-row:hover {
+  background-color: #f9fafb;
+  transform: scale(1.001);
+}
 
-  .produk-img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.1);
-  }
+.produk-cell {
+  padding: 20px 16px;
+  vertical-align: middle;
+}
 
-  .produk-name { font-weight: 600; font-size: 16px; color: #0b1841; }
-  .produk-desc { font-size: 13px; color: #6b7280; margin-top: 3px; }
+.produk-img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 16px;
+  box-shadow: 0 3px 12px rgba(0,0,0,0.1);
+}
 
-  /* 🎨 Tombol Aksi */
-  .btn-action { border: none; padding: 10px 12px; border-radius: 8px; color: white; transition: 0.3s ease; }
-  .btn-edit { background-color: #fbbf24; } .btn-edit:hover { background-color: #d1a106; }
-  .btn-delete { background-color: #dc2626; } .btn-delete:hover { background-color: #b91c1c; }
-  .btn-arsip { background-color: #4b5563; } .btn-arsip:hover { background-color: #374151; }
-  .btn-restore { background-color: #2563eb; } .btn-restore:hover { background-color: #1e40af; }
+.produk-name {
+  font-weight: 600;
+  font-size: 16px;
+  color: #0b1841;
+}
+.produk-desc {
+  font-size: 13px;
+  color: #6b7280;
+  margin-top: 3px;
+}
 
-  .btn-shop, .btn-tiktok {
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    text-decoration: none;
-    font-weight: 500;
-    display: inline-block;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.08);
-  }
+/* 🎨 Tombol Aksi */
+.btn-action {
+  border: none;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: white;
+  transition: 0.3s ease;
+}
+.btn-edit { background-color: #fbbf24; }
+.btn-edit:hover { background-color: #d1a106; }
+.btn-delete { background-color: #dc2626; }
+.btn-delete:hover { background-color: #b91c1c; }
+.btn-arsip { background-color: #4b5563; }
+.btn-arsip:hover { background-color: #374151; }
+.btn-restore { background-color: #2563eb; }
+.btn-restore:hover { background-color: #1e40af; }
 
-  .btn-shop { background-color: #f59e0b; color: #fff; }
-  .btn-shop:hover { background-color: #d97706; }
-  .btn-tiktok { background-color: #000; color: #fff; }
-  .btn-tiktok:hover { background-color: #1c1c1c; }
+.btn-shop, .btn-tiktok {
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
 
-  .pagination { justify-content: center; }
-  .pagination .page-link { color: #0b1841; border-radius: 6px; }
-  .pagination .page-item.active .page-link {
-    background-color: #0b1841;
-    border-color: #0b1841;
-  }
+.btn-shop { background-color: #f59e0b; color: #fff; }
+.btn-shop:hover { background-color: #d97706; }
+.btn-tiktok { background-color: #000; color: #fff; }
+.btn-tiktok:hover { background-color: #1c1c1c; }
 
-  .form-control {
-    border-radius: 10px;
-    border: 1px solid #cbd5e1;
-    transition: all 0.3s ease;
-  }
+.pagination { justify-content: center; }
+.pagination .page-link { color: #0b1841; border-radius: 6px; }
+.pagination .page-item.active .page-link {
+  background-color: #0b1841;
+  border-color: #0b1841;
+}
 
-  .form-control:focus {
-    border-color: #081738;
-    box-shadow: 0 0 0 0.15rem rgba(8,23,56,0.25);
-  }
+.form-control {
+  border-radius: 10px;
+  border: 1px solid #cbd5e1;
+  transition: all 0.3s ease;
+}
 
-  .btn-dark { background-color: #081738; border: none; }
-  .btn-dark:hover { background-color: #001b66; }
+.form-control:focus {
+  border-color: #081738;
+  box-shadow: 0 0 0 0.15rem rgba(8,23,56,0.25);
+}
+
+.btn-dark {
+  background-color: #081738;
+  border: none;
+  font-weight: 500;
+  border-radius: 12px;
+  padding: 10px 18px;
+}
+.btn-dark:hover {
+  background-color: #001b66;
+}
 </style>
 
-<div class="container py-5">
+<div class="container my-5">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
     <h2>Kelola Produk</h2>
     <a href="{{ route('admin.produk.create') }}" class="btn btn-dark shadow-sm">
