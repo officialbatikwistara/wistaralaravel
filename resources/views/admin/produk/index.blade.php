@@ -6,194 +6,30 @@
     font-family: 'Poppins', sans-serif;
     color: #0b1841;
   }
+  h2 { font-weight: 700; color: #0b1841; }
+  .table-container { background: #ffffff; border-radius: 18px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); overflow: hidden; margin-top: 20px; }
+  .table thead.table-header th { background-color: #081738; color: #ffffff; font-weight: 600; font-size: 15px; border: none; padding: 16px; text-align: center; }
+  .produk-row { border-bottom: 1px solid #e5e7eb; transition: 0.25s ease; }
+  .produk-row:hover { background-color: #f9fafb; transform: scale(1.001); }
+  .produk-cell { padding: 20px 16px; vertical-align: middle; }
+  .produk-img { width: 120px; height: 120px; object-fit: cover; border-radius: 16px; box-shadow: 0 3px 12px rgba(0,0,0,0.1); }
+  .produk-name { font-weight: 600; font-size: 16px; color: #0b1841; }
+  .produk-desc { font-size: 13px; color: #6b7280; margin-top: 3px; }
 
-  h2 {
-    font-weight: 700;
-    color: #0b1841;
-  }
+  .btn-action { border: none; padding: 10px 12px; border-radius: 8px; color: white; transition: 0.3s ease; }
+  .btn-edit { background-color: #fbbf24; } .btn-edit:hover { background-color: #d1a106; }
+  .btn-delete { background-color: #dc2626; } .btn-delete:hover { background-color: #b91c1c; }
+  .btn-arsip { background-color: #4b5563; } .btn-arsip:hover { background-color: #374151; }
+  .btn-restore { background-color: #2563eb; } .btn-restore:hover { background-color: #1e40af; }
 
-  /* 🌟 Container tabel */
-  .table-container {
-    background: #ffffff;
-    border-radius: 18px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    margin-top: 20px;
-  }
+  .btn-shop,.btn-tiktok { border-radius: 6px; padding: 6px 12px; font-size: 13px; text-decoration: none; font-weight: 500; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.08);}
+  .btn-shop { background-color: #f59e0b; color: #fff;} .btn-shop:hover { background-color: #d97706;}
+  .btn-tiktok { background-color: #000; color: #fff;} .btn-tiktok:hover { background-color: #1c1c1c;}
 
-  /* 🧭 Header tabel */
-  .table thead.table-header th {
-    background-color: #081738 !important;
-    color: #ffffff !important;
-    font-weight: 600 !important;
-    font-size: 15px !important;
-    border: none !important;
-    padding: 16px !important;
-    text-align: center !important;
-  }
-
-  /* Buat header membulat di pojok atas */
-  .table-container table {
-    border-collapse: separate !important;
-    border-spacing: 0 !important;
-    border-radius: 18px !important;
-    overflow: hidden !important;
-  }
-
-  .table-container thead th:first-child {
-    border-top-left-radius: 18px !important;
-  }
-
-  .table-container thead th:last-child {
-    border-top-right-radius: 18px !important;
-  }
-
-  /* 📦 Baris produk */
-  .produk-row {
-    border-bottom: 1px solid #e5e7eb;
-    transition: 0.25s ease;
-  }
-
-  .produk-row:hover {
-    background-color: #f9fafb;
-    transform: scale(1.001);
-  }
-
-  /* 📋 Isi tabel */
-  .produk-cell {
-    padding: 20px 16px;
-    vertical-align: middle;
-  }
-
-  /* 🖼️ Gambar produk */
-  .produk-img {
-    width: 120px;
-    height: 120px;
-    object-fit: cover;
-    border-radius: 16px;
-    box-shadow: 0 3px 12px rgba(0, 0, 0, 0.1);
-  }
-
-  /* 🏷️ Nama produk */
-  .produk-name {
-    font-weight: 600;
-    font-size: 16px;
-    color: #0b1841;
-  }
-
-  .produk-desc {
-    font-size: 13px;
-    color: #6b7280;
-    margin-top: 3px;
-  }
-
-  /* ✏️ Tombol aksi */
-  .btn-action {
-    border: none;
-    padding: 10px 12px;
-    border-radius: 8px;
-    color: white;
-    transition: 0.3s ease;
-  }
-
-  .btn-edit {
-    background-color: #fbbf24;
-  }
-
-  .btn-edit:hover {
-    background-color: #d1a106;
-  }
-
-  .btn-delete {
-    background-color: #dc2626;
-  }
-
-  .btn-delete:hover {
-    background-color: #b91c1c;
-  }
-
-  /* 🛍️ Tombol marketplace */
-  .btn-shop,
-  .btn-tiktok {
-    border-radius: 6px;
-    padding: 6px 12px;
-    font-size: 13px;
-    text-decoration: none;
-    font-weight: 500;
-    display: inline-block;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
-  }
-
-  .btn-shop {
-    background-color: #f59e0b;
-    color: #fff;
-  }
-
-  .btn-shop:hover {
-    background-color: #d97706;
-  }
-
-  .btn-tiktok {
-    background-color: #000;
-    color: #fff;
-  }
-
-  .btn-tiktok:hover {
-    background-color: #1c1c1c;
-  }
-
-  /* 📄 Pagination */
-  .pagination {
-    justify-content: center;
-  }
-
-  .pagination .page-link {
-    color: #0b1841;
-    border-radius: 6px;
-  }
-
-  .pagination .page-item.active .page-link {
-    background-color: #0b1841;
-    border-color: #0b1841;
-  }
-
-  /* 🧩 Tombol Reset dan Terapkan */
-  .btn-dark {
-    background-color: #081738 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-  }
-
-  .btn-dark:hover {
-    background-color: #152a6e !important;
-  }
-
-  .btn-secondary {
-    background-color: #6b7280 !important;
-    border: none !important;
-    border-radius: 12px !important;
-    font-weight: 600 !important;
-  }
-
-  .btn-secondary:hover {
-    background-color: #4b5563 !important;
-  }
-
-  /* 🔍 Input search */
-  .form-control {
-    border-radius: 10px !important;
-    border: 1px solid #cbd5e1 !important;
-    padding: 10px 16px !important;
-  }
-
-  .form-control:focus {
-    border-color: #2563eb !important;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
-  }
+  .pagination { justify-content: center; }
+  .pagination .page-link { color: #0b1841; border-radius: 6px; }
+  .pagination .page-item.active .page-link { background-color: #0b1841; border-color: #0b1841; }
 </style>
-
-@include('admin.header')
 
 <div class="container py-4">
   <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
@@ -222,47 +58,33 @@
     <table class="table align-middle mb-0">
       <thead class="table-header">
         <tr>
-          <th style="width:6%">No</th>
-          <th style="width:12%">Gambar</th>
-          <th style="width:25%">Nama Produk</th>
-          <th style="width:12%">Harga</th>
-          <th style="width:13%">Kategori</th>
-          <th style="width:18%">Marketplace</th>
-          <th style="width:10%">Aksi</th>
+          <th>No</th>
+          <th>Gambar</th>
+          <th>Nama Produk</th>
+          <th>Harga</th>
+          <th>Kategori</th>
+          <th>Marketplace</th>
+          <th>Status</th>
+          <th>Aksi</th>
         </tr>
       </thead>
       <tbody>
-        @forelse($produk as $index => $p)
+        @forelse($produk as $p)
         <tr class="produk-row">
           <td class="produk-cell text-center">{{ $loop->iteration }}</td>
-
-          {{-- 🖼️ Gambar Produk --}}
           <td class="produk-cell text-center">
-           @if($p->gambar)
-               <img src="{{ asset('storage/produk/' . $p->gambar) }}" alt="Gambar produk" class="produk-img">
+            @if($p->gambar)
+              <img src="{{ asset('storage/produk/' . $p->gambar) }}" alt="Gambar produk" class="produk-img">
             @else
-                <span class="text-muted fst-italic">Tidak ada</span>
+              <span class="text-muted fst-italic">Tidak ada</span>
             @endif
-
           </td>
-
-          {{-- 🏷️ Nama dan Deskripsi Produk --}}
           <td class="produk-cell">
             <div class="produk-name">{{ $p->nama_produk }}</div>
             <div class="produk-desc">{{ Str::limit($p->deskripsi, 70) }}</div>
           </td>
-
-          {{-- 💰 Harga --}}
-          <td class="produk-cell text-center">
-            Rp {{ number_format($p->harga, 0, ',', '.') }}
-          </td>
-
-          {{-- 🧭 Kategori --}}
-          <td class="produk-cell text-center">
-            {{ $p->kategori->nama_kategori ?? '-' }}
-          </td>
-
-          {{-- 🛍️ Link Marketplace --}}
+          <td class="produk-cell text-center">Rp {{ number_format($p->harga, 0, ',', '.') }}</td>
+          <td class="produk-cell text-center">{{ $p->kategori->nama_kategori ?? '-' }}</td>
           <td class="produk-cell text-center">
             @if($p->link_shopee)
               <a href="{{ $p->link_shopee }}" target="_blank" class="btn-shop me-1">Shopee</a>
@@ -274,35 +96,57 @@
               <span class="text-muted">-</span>
             @endif
           </td>
+            <td class="produk-cell text-center">
+              @if($p->status == 'nonaktif')
+                <span class="badge bg-secondary">Nonaktif</span>
+              @else
+                <span class="badge bg-success">Aktif</span>
+              @endif
+            </td>
 
-          {{-- ⚙️ Tombol Aksi --}}
-          <td class="produk-cell text-center">
-            <div class="d-flex justify-content-center gap-2">
-              <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn-action btn-edit" title="Edit">
-                <i class="bi bi-pencil-fill"></i>
-              </a>
-              <form action="{{ route('admin.produk.delete', $p->id_produk) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="d-inline">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="btn-action btn-delete" title="Hapus">
-                  <i class="bi bi-trash-fill"></i>
-                </button>
-              </form>
-            </div>
-          </td>
+            <td class="produk-cell text-center">
+              <div class="d-flex justify-content-center gap-2">
+                <a href="{{ route('admin.produk.edit', $p->id_produk) }}" class="btn-action btn-edit" title="Edit">
+                  <i class="bi bi-pencil-fill"></i>
+                </a>
+
+                @if($p->status != 'nonaktif')
+                {{-- Tombol Nonaktifkan --}}
+                <form action="{{ route('admin.produk.nonaktif', $p->id_produk) }}" method="POST" onsubmit="return confirm('Nonaktifkan produk ini?')">
+                  @csrf @method('PATCH')
+                  <button type="submit" class="btn-action btn-arsip" title="Nonaktifkan">
+                    <i class="bi bi-slash-circle"></i>
+                  </button>
+                </form>
+                @else
+                {{-- Tombol Aktifkan --}}
+                <form action="{{ route('admin.produk.aktifkan', $p->id_produk) }}" method="POST" onsubmit="return confirm('Aktifkan kembali produk ini?')">
+                  @csrf @method('PATCH')
+                  <button type="submit" class="btn-action btn-restore" title="Aktifkan">
+                    <i class="bi bi-check-circle"></i>
+                  </button>
+                </form>
+                @endif
+
+                {{-- Tombol Hapus --}}
+                <form action="{{ route('admin.produk.delete', $p->id_produk) }}" method="POST" onsubmit="return confirm('Hapus produk ini?')" class="d-inline">
+                  @csrf @method('DELETE')
+                  <button type="submit" class="btn-action btn-delete" title="Hapus">
+                    <i class="bi bi-trash-fill"></i>
+                  </button>
+                </form>
+              </div>
+            </td>
         </tr>
         @empty
         <tr>
-          <td colspan="7" class="text-center text-muted py-3">
-            Belum ada produk yang tersedia.
-          </td>
+          <td colspan="8" class="text-center text-muted py-3">Belum ada produk yang tersedia.</td>
         </tr>
         @endforelse
       </tbody>
     </table>
   </div>
 
-  {{-- 📄 Pagination --}}
   @if(method_exists($produk, 'links'))
     <div class="mt-3 d-flex justify-content-center">
       {{ $produk->links('pagination::bootstrap-5') }}
