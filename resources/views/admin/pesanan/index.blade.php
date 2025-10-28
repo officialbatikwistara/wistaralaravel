@@ -211,21 +211,31 @@ select.form-select {
 
                 <!-- 🧾 Bukti -->
                 <td>
-                  @if($order->bukti_pembayaran)
-                    <button class="btn btn-sm btn-primary-navy rounded-pill" data-bs-toggle="modal" data-bs-target="#buktiModal{{ $order->id }}">
+                  @if($order->bukti_pembayaran && file_exists(public_path('uploads/bukti/'.$order->bukti_pembayaran)))
+                    <button class="btn btn-sm btn-primary-navy rounded-pill" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#buktiModal{{ $order->id }}">
                       <i class="fa-solid fa-image me-1"></i> Lihat
                     </button>
 
-                    <!-- Modal Bukti Pembayaran -->
-                    <div class="modal fade" id="buktiModal{{ $order->id }}" tabindex="-1" aria-hidden="true">
+                    <!-- Modal Bukti Pembayaran TANPA OVERLAY -->
+                    <div class="modal fade" 
+                        id="buktiModal{{ $order->id }}" 
+                        tabindex="-1" 
+                        aria-hidden="true"
+                        data-bs-backdrop="false"     {{-- ❌ overlay dimatikan --}}
+                        data-bs-keyboard="true">    {{-- ✅ ESC bisa menutup modal --}}
                       <div class="modal-dialog modal-dialog-centered modal-lg">
                         <div class="modal-content shadow-lg border-0">
                           <div class="modal-header">
                             <h5 class="modal-title">Bukti Pembayaran #{{ $order->id }}</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                           </div>
                           <div class="modal-body text-center">
-                            <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}" alt="Bukti Pembayaran" class="img-fluid rounded shadow-sm">
+                            <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}" 
+                                alt="Bukti Pembayaran {{ $order->id }}" 
+                                class="img-fluid rounded shadow-sm" 
+                                style="max-height: 80vh; object-fit: contain;">
                           </div>
                         </div>
                       </div>
@@ -260,5 +270,14 @@ select.form-select {
     </div>
   </div>
 </div>
+<script>
+document.addEventListener('click', function (e) {
+  const modal = document.querySelector('.modal.show');
+  if (modal && !modal.querySelector('.modal-content').contains(e.target)) {
+    const modalInstance = bootstrap.Modal.getInstance(modal);
+    modalInstance.hide();
+  }
+});
+</script>
 
 @include('admin.footer')
