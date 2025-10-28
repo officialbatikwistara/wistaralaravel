@@ -3,7 +3,7 @@
 <div class="container py-5">
   <div class="table-container p-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
-      <h2 class="fw-bold mb-0"> Daftar Kategori Produk</h2>
+      <h2 class="fw-bold mb-0">Daftar Kategori Produk</h2>
       <a href="{{ route('admin.kategori.create') }}" class="btn btn-dark shadow-sm px-4 py-2 rounded-pill">
         <i class="fa-solid fa-plus me-2"></i> Tambah Kategori
       </a>
@@ -62,18 +62,25 @@
 @include('admin.footer')
 
 <style>
+/* 🌄 Background Fullscreen & Solid */
 body {
-  background-color: #edf2f7;
   font-family: 'Poppins', sans-serif;
   color: #0b1841;
+  margin: 0;
+  min-height: 100vh;
+  background:
+    linear-gradient(rgba(255, 255, 255, 0.25), rgba(245, 247, 255, 0.25)),
+    url('{{ asset('img/background1.svg') }}') no-repeat center center fixed;
+  background-size: cover;
 }
 
 /* 🌟 Container tabel */
 .table-container {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.97); /* Lebih solid */
   border-radius: 18px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   overflow: hidden;
+  backdrop-filter: blur(6px);
 }
 
 /* 🧭 Header tabel */
@@ -87,7 +94,7 @@ body {
   text-align: center !important;
 }
 
-/* Membulatkan header */
+/* Membulatkan header tabel */
 .table-container table {
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -108,7 +115,7 @@ body {
 }
 .produk-row:hover {
   background-color: #f9fafb;
-  transform: scale(1.001);
+  transform: scale(1.002);
 }
 
 /* 📋 Isi tabel */
