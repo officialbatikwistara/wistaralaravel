@@ -175,11 +175,11 @@ Route::get('/admin/dashboard', function () {
 | Produk Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/produk', function () {
+Route::get('/admin/produk', function (Request $request) {
     if (!session()->has('admin_logged_in')) {
         return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
     }
-    return app(ProdukAdminController::class)->index();
+    return app(\App\Http\Controllers\Admin\ProdukAdminController::class)->index($request);
 })->name('admin.produk.index');
 
 Route::get('/admin/produk/create', function () {
@@ -222,46 +222,61 @@ Route::patch('/admin/produk/{id}/aktifkan', function ($id) {
 | Kategori Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/kategori', function () {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(KategoriAdminController::class)->index();
-})->name('admin.kategori.index');
+Route::prefix('admin')->group(function () {
 
-Route::resource('admin/kategori', KategoriAdminController::class)->except(['index']);
+    // Index kategori dengan proteksi login
+    Route::get('/kategori', function () {
+        if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+        return app(\App\Http\Controllers\Admin\KategoriAdminController::class)->index();
+    })->name('admin.kategori.index');
+
+    // Resource route kategori
+    Route::resource('kategori', \App\Http\Controllers\Admin\KategoriAdminController::class)
+        ->except(['index'])
+        ->names([
+            'create' => 'admin.kategori.create',
+            'store' => 'admin.kategori.store',
+            'show' => 'admin.kategori.show',
+            'edit' => 'admin.kategori.edit',
+            'update' => 'admin.kategori.update',
+            'destroy' => 'admin.kategori.delete',
+        ]);
+});
 
 /*
 |--------------------------------------------------------------------------
 | Pesanan Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/pesanan', function () {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(AdminOrderController::class)->index();
-})->name('admin.orders.index');
-
-Route::get('/admin/pesanan/{id}', function ($id) {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(AdminOrderController::class)->show($id);
-})->name('admin.orders.show');
-
-Route::patch('/admin/pesanan/{id}/update-payment', function ($id) {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(AdminOrderController::class)->updatePayment($id);
-})->name('admin.orders.updatePayment');
-
-Route::patch('/admin/pesanan/{id}/update-status', function ($id) {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(AdminOrderController::class)->updateStatus($id);
-})->name('admin.orders.updateStatus');
+Route::get('/admin/pesanan', [AdminOrderController::class, 'index'])
+    ->name('admin.orders.index');
+Route::get('/admin/pesanan/{id}', [AdminOrderController::class, 'show'])
+    ->name('admin.orders.show');
+Route::patch('/admin/pesanan/{id}/update-payment', [AdminOrderController::class, 'updatePayment'])
+    ->name('admin.orders.updatePayment');
+Route::patch('/admin/pesanan/{id}/update-status', [AdminOrderController::class, 'updateStatus'])
+    ->name('admin.orders.updateStatus');
 
 /*
 |--------------------------------------------------------------------------
 | Berita Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/berita', function () {
-    if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
-    return app(BeritaAdminController::class)->index();
-})->name('admin.berita.index');
+Route::prefix('admin')->group(function () {
 
-Route::resource('admin/berita', BeritaAdminController::class)->except(['index']);
+    Route::get('/berita', function () {
+        if (!session()->has('admin_logged_in')) return redirect()->route('admin.login');
+        return app(\App\Http\Controllers\Admin\BeritaAdminController::class)->index();
+    })->name('admin.berita.index');
+
+    Route::resource('berita', \App\Http\Controllers\Admin\BeritaAdminController::class)
+        ->except(['index'])
+        ->names([
+            'create' => 'admin.berita.create',
+            'store' => 'admin.berita.store',
+            'show' => 'admin.berita.show',
+            'edit' => 'admin.berita.edit',
+            'update' => 'admin.berita.update',
+            'destroy' => 'admin.berita.delete',
+        ]);
+});
