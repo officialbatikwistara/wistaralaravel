@@ -7,37 +7,44 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 
   <style>
+    /* 🌄 Background fullscreen tanpa transparansi */
     body {
-      background: url("https://batikwistara.com/assets/img/background-batik.jpg") center/cover no-repeat;
+      background: url("{{ asset('img/background1.svg') }}") no-repeat center center fixed;
+      background-size: cover; /* Fullscreen */
       font-family: 'Poppins', sans-serif;
       color: #333;
       height: 100vh;
+      margin: 0;
       display: flex;
       align-items: center;
       justify-content: center;
+      position: relative;
     }
 
+    /* 🌫️ Optional overlay tipis (bisa dihapus kalau mau gambar full jelas) */
     .overlay {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(255, 255, 255, 0.1); /* tipis aja */
       z-index: 1;
     }
 
+    /* 💎 Kartu login */
     .login-card {
       position: relative;
       z-index: 2;
       width: 400px;
-      background: #fff;
-      border-radius: 15px;
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+      background: rgba(255, 255, 255, 0.95); /* sedikit transparan, biar lembut */
+      border-radius: 20px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
       padding: 40px 35px;
+      backdrop-filter: blur(6px);
     }
 
     .login-card h3 {
       font-weight: 700;
-      color: #222;
+      color: #081738;
       text-align: center;
       margin-bottom: 25px;
     }
@@ -45,26 +52,28 @@
     .form-control {
       border-radius: 10px;
       padding: 10px;
-      border: 1px solid #ccc;
-      background-color: #f5f7ff;
+      border: 1px solid #cbd5e1;
+      background-color: #f8f9ff;
+      transition: all 0.3s ease;
     }
 
     .form-control:focus {
-      border-color: #000;
-      box-shadow: none;
+      border-color: #081738;
+      box-shadow: 0 0 0 0.15rem rgba(8, 23, 56, 0.25);
     }
 
     .btn-login {
-      background-color: #000;
+      background-color: #081738;
       color: #fff;
       font-weight: 600;
       border-radius: 10px;
       transition: 0.3s;
       width: 100%;
+      padding: 10px;
     }
 
     .btn-login:hover {
-      background-color: #333;
+      background-color: #001b66;
     }
   </style>
 </head>
@@ -92,7 +101,7 @@
         <label class="form-label">Password</label>
         <input type="password" name="password" class="form-control" placeholder="Masukkan password" required>
       </div>
-      <button class="btn btn-login py-2">
+      <button class="btn btn-login">
         <i class="fa-solid fa-right-to-bracket me-1"></i> Sign In
       </button>
     </form>
