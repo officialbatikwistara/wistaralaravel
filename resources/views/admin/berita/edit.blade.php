@@ -11,6 +11,7 @@
     <div class="card-body px-5 py-4" style="background-color: #fdfdfd;">
       <form action="{{ route('admin.berita.update', $berita->id) }}" method="POST" enctype="multipart/form-data">
         @csrf
+        @method('PUT') {{-- ✅ WAJIB ditambahkan agar form dianggap PUT oleh Laravel --}}
 
         <!-- Judul -->
         <div class="mb-4">
@@ -80,7 +81,7 @@
           <a href="{{ route('admin.berita.index') }}" class="btn btn-custom-secondary px-4 py-2 rounded-3 fw-semibold">
             Kembali
           </a>
-          <button class="btn btn-custom-primary px-4 py-2 rounded-3 fw-semibold">
+          <button type="submit" class="btn btn-custom-primary px-4 py-2 rounded-3 fw-semibold">
             Update
           </button>
         </div>
@@ -115,7 +116,6 @@
     box-shadow: 0 0 0 3px rgba(7, 23, 57, 0.2);
   }
 
-  /* Tombol utama */
   .btn-custom-primary {
     background-color: var(--dark-navy);
     color: #fff;
@@ -134,7 +134,6 @@
     transform: scale(0.98);
   }
 
-  /* Tombol sekunder */
   .btn-custom-secondary {
     background-color: var(--blue-gray);
     color: #fff;
