@@ -5,12 +5,17 @@
 @section('content')
 
 <style>
+/* 🌄 Background fullscreen solid */
 body {
-  background-color: #edf2f7;
   font-family: 'Poppins', sans-serif;
   color: #0b1841;
+  margin: 0;
+  min-height: 100vh;
+  background: url('{{ asset('img/background1.svg') }}') no-repeat center center fixed;
+  background-size: cover;
 }
 
+/* Judul Halaman */
 h2 {
   font-weight: 700;
   color: #0b1841;
@@ -18,11 +23,12 @@ h2 {
 
 /* 🌟 Container tabel */
 .table-container {
-  background: #ffffff;
+  background: rgba(255, 255, 255, 0.97); /* lebih solid tapi tetap elegan */
   border-radius: 18px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   margin-top: 20px;
+  backdrop-filter: blur(6px);
 }
 
 /* 🧭 Header tabel */
@@ -36,7 +42,7 @@ h2 {
   text-align: center !important;
 }
 
-/* Buat header membulat di pojok atas */
+/* Membulatkan header */
 .table-container table {
   border-collapse: separate !important;
   border-spacing: 0 !important;
@@ -52,7 +58,7 @@ h2 {
   border-top-right-radius: 18px !important;
 }
 
-/* 📦 Baris produk */
+/* 📦 Baris berita */
 .produk-row {
   border-bottom: 1px solid #e5e7eb;
   transition: 0.25s ease;
@@ -60,7 +66,7 @@ h2 {
 
 .produk-row:hover {
   background-color: #f9fafb;
-  transform: scale(1.001);
+  transform: scale(1.002);
 }
 
 /* 📋 Isi tabel */
@@ -125,11 +131,11 @@ h2 {
 
 {{-- =========================
     🌸 MAIN CONTENT
-   ========================= --}}
+========================= --}}
 <div class="container py-5">
   <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2> Kelola Berita</h2>
-    <a href="{{ route('admin.berita.create') }}" class="btn btn-dark shadow-sm">
+    <h2>Kelola Berita</h2>
+    <a href="{{ route('admin.berita.create') }}" class="btn btn-dark shadow-sm px-4 py-2 rounded-pill">
       <i class="fa-solid fa-plus me-2"></i> Tambah Berita
     </a>
   </div>
@@ -144,7 +150,7 @@ h2 {
 
   {{-- TABLE --}}
   <div class="table-container">
-    <table class="table align-middle">
+    <table class="table align-middle text-center">
       <thead class="table-header">
         <tr>
           <th>No</th>
@@ -158,29 +164,31 @@ h2 {
       <tbody>
         @forelse($berita as $index => $b)
         <tr class="produk-row">
-          <td class="produk-cell text-center">{{ $index + 1 }}</td>
-          <td class="produk-cell text-center">
+          <td class="produk-cell">{{ $index + 1 }}</td>
+          <td class="produk-cell">
             @if($b->gambar)
-            <img src="{{ asset($b->gambar) }}" alt="Gambar Berita" class="produk-img">
+              <img src="{{ asset($b->gambar) }}" alt="Gambar Berita" class="produk-img">
             @else
-            <span class="text-muted">Tidak ada</span>
+              <span class="text-muted">Tidak ada</span>
             @endif
           </td>
           <td class="produk-cell produk-name">{{ $b->judul }}</td>
           <td class="produk-cell">
             @if($b->sumber)
-            @if($b->tautan_sumber)
-            <a href="{{ $b->tautan_sumber }}" target="_blank" class="text-decoration-none text-primary fw-semibold">
-              {{ $b->sumber }}
-            </a>
+              @if($b->tautan_sumber)
+                <a href="{{ $b->tautan_sumber }}" target="_blank" class="text-decoration-none text-primary fw-semibold">
+                  {{ $b->sumber }}
+                </a>
+              @else
+                {{ $b->sumber }}
+              @endif
             @else
-            {{ $b->sumber }}
-            @endif
-            @else
-            <span class="text-muted">-</span>
+              <span class="text-muted">-</span>
             @endif
           </td>
-          <td class="produk-cell fw-semibold">{{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}</td>
+          <td class="produk-cell fw-semibold">
+            {{ \Carbon\Carbon::parse($b->tanggal)->format('d M Y') }}
+          </td>
           <td class="produk-cell text-center">
             <div class="d-flex justify-content-center gap-2">
               <a href="{{ route('admin.berita.edit', $b->id) }}" class="btn btn-action btn-edit">
@@ -189,7 +197,7 @@ h2 {
               <form action="{{ route('admin.berita.delete', $b->id) }}" method="POST" class="d-inline">
                 @csrf
                 @method('DELETE')
-                <button class="btn btn-action btn-delete"
+                <button type="submit" class="btn btn-action btn-delete"
                   onclick="return confirm('Yakin ingin menghapus berita ini?')">
                   <i class="fa-solid fa-trash"></i>
                 </button>
@@ -199,7 +207,10 @@ h2 {
         </tr>
         @empty
         <tr>
-          <td colspan="6" class="text-center text-muted py-4">Belum ada berita</td>
+          <td colspan="6" class="text-center text-muted py-4">
+            <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
+            Belum ada berita
+          </td>
         </tr>
         @endforelse
       </tbody>
