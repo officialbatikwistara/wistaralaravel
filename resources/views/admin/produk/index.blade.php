@@ -12,28 +12,6 @@ body {
   background-color: #ffffff; /* fallback kalau SVG gagal load */
 }
 
-/* ✨ Container solid (area konten utama) */
-.container {
-  border-radius: 25px;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-  padding: 40px;
-  z-index: 1;
-  position: relative;
-}
-
-/* 🌈 Footer transparan supaya background gambar tetap kelihatan */
-footer {
-  background: rgba(7, 23, 57, 0.0); /* Transparan total (ubah 0.0 jadi 0.8 kalau mau semi transparan) */
-  color: #fff;
-  text-align: center;
-  padding: 25px 0;
-  margin-top: 50px;
-  border: none;
-  font-weight: 500;
-  font-size: 14px;
-  z-index: 0;
-}
-
 /* 🧭 Judul halaman */
 h2 {
   font-weight: 700;
