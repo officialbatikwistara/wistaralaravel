@@ -27,23 +27,6 @@
         </div>
     @endif
 
-    <!-- Form Upload Bukti Pembayaran -->
-    @if($order->metode_pembayaran === 'bank_transfer' &&
-        $order->status_pembayaran === 'belum_bayar' &&
-        $order->status === 'pending')
-        <div class="mb-4 border-top pt-3">
-            <h5 class="fw-bold mb-3">📤 Upload Bukti Pembayaran (Bank Transfer)</h5>
-            <form action="{{ route('user.order.uploadBukti', $order->id) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="mb-3">
-                    <input type="file" name="bukti_pembayaran" accept="image/*" class="form-control" required>
-                </div>
-                <button type="submit" class="btn btn-warning rounded-pill px-4">
-                    <i class="fa-solid fa-upload me-2"></i> Upload Bukti
-                </button>
-            </form>
-        </div>
-    @endif
 
     <!-- Detail Produk -->
     <div class="card shadow border-0 rounded-3 overflow-hidden">
