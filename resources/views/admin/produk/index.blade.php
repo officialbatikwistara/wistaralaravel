@@ -8,11 +8,10 @@ body {
   margin: 0;
   min-height: 100vh;
   background: url("{{ asset('img/background1.svg') }}") no-repeat center center fixed;
-  background-size: cover; /* Fullscreen */
-  background-color: #ffffff; /* fallback kalau SVG gagal load */
+  background-size: cover;
+  background-color: #ffffff;
 }
 
-/* 🧭 Judul halaman */
 h2 {
   font-weight: 700;
   color: #0b1841;
@@ -165,7 +164,7 @@ h2 {
           <th>Harga</th>
           <th>Kategori</th>
           <th>Marketplace</th>
-          <th>Status</th>
+          <th>Status</th> <!-- ✅ Kolom status -->
           <th>Aksi</th>
         </tr>
       </thead>
@@ -210,11 +209,12 @@ h2 {
             @endif
           </td>
 
+          <!-- ✅ Status tampil di sini -->
           <td class="produk-cell text-center">
             @if($p->status == 'nonaktif')
-              <span class="badge bg-secondary">Nonaktif</span>
+              <span class="badge bg-secondary px-3 py-2">Nonaktif</span>
             @else
-              <span class="badge bg-success">Aktif</span>
+              <span class="badge bg-success px-3 py-2">Aktif</span>
             @endif
           </td>
 
