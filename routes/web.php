@@ -180,6 +180,8 @@ Route::resource('admin/produk', ProdukAdminController::class)->names([
     'update' => 'admin.produk.update',
     'destroy' => 'admin.produk.delete',
 ]);
+Route::patch('/admin/produk/{id}/nonaktif', [ProdukController::class, 'nonaktif'])->name('admin.produk.nonaktif');
+Route::patch('/admin/produk/{id}/aktifkan', [ProdukController::class, 'aktifkan'])->name('admin.produk.aktifkan');
 
 Route::resource('admin/kategori', KategoriAdminController::class)->names([
     'index' => 'admin.kategori.index',

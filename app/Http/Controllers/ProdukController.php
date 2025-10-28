@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -27,6 +27,24 @@ class ProdukController extends Controller
 
         return view('katalog', compact('kategori', 'produk', 'filter'));
     }
+    public function nonaktif($id)
+    {
+        $produk = Produk::findOrFail($id);
+        $produk->status = 'nonaktif';   // ✅ pakai string
+        $produk->save();
+
+        return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil dinonaktifkan.');
+    }
+
+    public function aktifkan($id)
+    {
+        $produk = Produk::findOrFail($id);
+        $produk->status = 'aktif';   // ✅ pakai string
+        $produk->save();
+
+        return redirect()->route('admin.produk.index')->with('success', 'Produk berhasil diaktifkan kembali.');
+    }
+
 }
 
 /* 📌 Penjelasan:
