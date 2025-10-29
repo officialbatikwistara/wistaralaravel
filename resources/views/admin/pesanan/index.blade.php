@@ -1,5 +1,7 @@
 @include('admin.header')
 
+<link rel="stylesheet" href="{{ asset('css/admin/order.css') }}">
+
 <style>
     /* 🌄 Background fullscreen */
     body {
@@ -9,105 +11,6 @@
         min-height: 100vh;
         background: url('{{ asset('img/background1.svg') }}') no-repeat center center fixed;
         background-size: cover;
-    }
-
-    /* 🏷️ Judul halaman */
-    h2 {
-        font-weight: 700;
-        color: #0b1841;
-    }
-
-    /* 🌸 Card umum */
-    .card {
-        background: rgba(255, 255, 255, 0.97);
-        border-radius: 18px !important;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08) !important;
-        backdrop-filter: blur(6px);
-        border: none !important;
-    }
-
-    /* 🔵 Tabs */
-    .nav-tabs {
-        border: none !important;
-    }
-
-    .nav-tabs .nav-link {
-        color: #ffffff !important;
-        background-color: #001f3f !important;
-        border: none !important;
-        border-radius: 10px 10px 0 0 !important;
-        padding: 10px 20px !important;
-        margin: 0 5px !important;
-        transition: all 0.3s ease;
-    }
-
-    .nav-tabs .nav-link.active {
-        background-color: #ffffff !important;
-        color: #001f3f !important;
-        font-weight: 600;
-    }
-
-    .nav-tabs .nav-link:hover {
-        opacity: 0.9;
-    }
-
-    /* 🧾 Header tabel */
-    .table-header-navy {
-        background-color: #001f3f !important;
-        color: #ffffff !important;
-    }
-
-    .table-header-navy th {
-        font-weight: 600;
-        text-transform: capitalize;
-        padding: 12px;
-        vertical-align: middle;
-        border: none !important;
-    }
-
-    /* 🧭 Table layout */
-    .table {
-        border-collapse: separate !important;
-        border-spacing: 0;
-        border-radius: 18px !important;
-        overflow: hidden !important;
-    }
-
-    .table tbody tr:hover {
-        background-color: #f8fafc !important;
-        transition: 0.2s ease;
-    }
-
-    /* 🔘 Select style */
-    select.form-select {
-        background-color: #f8fafc;
-        border-radius: 8px;
-        cursor: pointer;
-    }
-
-    /* 🧿 Tombol utama */
-    .btn-primary-navy {
-        background-color: #001f3f !important;
-        color: white !important;
-        border: none !important;
-        border-radius: 8px !important;
-        font-weight: 500 !important;
-        transition: 0.3s ease;
-    }
-
-    .btn-primary-navy:hover {
-        background-color: #102b6d !important;
-    }
-
-    /* Modal */
-    .modal-content {
-        border-radius: 18px !important;
-        overflow: hidden !important;
-    }
-
-    .modal-header {
-        background-color: #001f3f !important;
-        color: #ffffff !important;
     }
 </style>
 
@@ -272,7 +175,8 @@
                                                 <div class="dropdown">
                                                     <button id="paymentBadge{{ $order->id }}"
                                                         class="badge dropdown-toggle {{ getPaymentClass($order->status_pembayaran) }}"
-                                                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                        type="button" data-bs-toggle="dropdown"
+                                                        aria-expanded="false">
                                                         {{ ucwords(str_replace('_', ' ', $order->status_pembayaran)) }}
                                                     </button>
                                                     <ul class="dropdown-menu">
