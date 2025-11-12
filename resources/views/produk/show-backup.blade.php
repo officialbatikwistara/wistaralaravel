@@ -18,7 +18,7 @@
                 $gambarPath = public_path('uploads/produk/'.$fileName);
                 $gambarUrl = (file_exists($gambarPath) && $fileName)
                     ? asset('uploads/produk/'.$fileName)
-                    : asset('img/no-image.jpg');
+                    : asset('img/logo.png');
             @endphp
             <img src="{{ $gambarUrl }}" alt="{{ $product->nama_produk }}" class="img-fluid rounded">
         </div>

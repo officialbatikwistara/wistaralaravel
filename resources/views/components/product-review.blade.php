@@ -119,9 +119,12 @@
 
                 <p class="mb-2 text-secondary">{{ $review->comment }}</p>
 
-                @if ($review->photos && count($review->photos) > 0)
+                @php
+                    $photos = is_array($review->photos) ? $review->photos : (is_string($review->photos) ? json_decode($review->photos, true) : []);
+                @endphp
+                @if ($photos && count($photos) > 0)
                     <div class="row g-2 mt-3">
-                        @foreach ($review->photos as $photo)
+                        @foreach ($photos as $photo)
                             <div class="col-auto">
                                 @php
                                     $photoPath = storage_path('app/public/' . $photo);
