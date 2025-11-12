@@ -32,8 +32,9 @@ class ReviewSeeder extends Seeder
                     'id_produk' => $product->id_produk,
                     'rating' => rand(4, 5),
                     'komentar' => $this->getRandomComment(),
-                    'foto' => null,
-                    'video' => null
+                    'photos' => null,
+                    'video' => null,
+                    'status' => 'approved'
                 ]);
             }
         }
