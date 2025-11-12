@@ -8,8 +8,8 @@
         <div>
           <label class="block text-gray-700 mb-2">Rating</label>
           <div class="flex space-x-2">
-            <button 
-              v-for="star in 5" 
+            <button
+              v-for="star in 5"
               :key="star"
               @click="newReview.rating = star"
               class="text-2xl focus:outline-none"
@@ -22,7 +22,7 @@
 
         <div>
           <label class="block text-gray-700 mb-2">Komentar</label>
-          <textarea 
+          <textarea
             v-model="newReview.comment"
             class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
             rows="4"
@@ -31,10 +31,10 @@
 
         <div>
           <label class="block text-gray-700 mb-2">Foto Produk (Opsional)</label>
-          <input 
-            type="file" 
-            @change="handlePhotoUpload" 
-            multiple 
+          <input
+            type="file"
+            @change="handlePhotoUpload"
+            multiple
             accept="image/*"
             class="w-full p-2 border rounded-lg"
           >
@@ -42,15 +42,15 @@
 
         <div>
           <label class="block text-gray-700 mb-2">Video Review (Opsional)</label>
-          <input 
-            type="file" 
-            @change="handleVideoUpload" 
+          <input
+            type="file"
+            @change="handleVideoUpload"
             accept="video/*"
             class="w-full p-2 border rounded-lg"
           >
         </div>
 
-        <button 
+        <button
           @click="submitReview"
           class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
           :disabled="isSubmitting"
@@ -91,8 +91,8 @@
 
           <!-- Review Photos -->
           <div v-if="review.photos && review.photos.length" class="mt-4 flex space-x-2 overflow-x-auto">
-            <img 
-              v-for="(photo, index) in review.photos" 
+            <img
+              v-for="(photo, index) in review.photos"
               :key="index"
               :src="getPhotoUrl(photo)"
               class="w-24 h-24 object-cover rounded"
@@ -102,8 +102,8 @@
 
           <!-- Review Video -->
           <div v-if="review.video" class="mt-4">
-            <video 
-              :src="getVideoUrl(review.video)" 
+            <video
+              :src="getVideoUrl(review.video)"
               controls
               class="max-w-full h-auto rounded"
             ></video>
@@ -144,8 +144,10 @@ export default {
     const fetchReviews = async () => {
       try {
         const response = await axios.get(`/api/reviews?product_id=${props.productId}`);
-        reviews.value = response.data;
+        // Perbaiki akses data
+        reviews.value = response.data.data || response.data;
       } catch (error) {
+        console.error('Error fetching reviews:', error);
         toast.error('Gagal memuat review');
       }
     };
@@ -169,7 +171,7 @@ export default {
       formData.append('id_produk', props.productId);
       formData.append('rating', newReview.value.rating);
       formData.append('comment', newReview.value.comment);
-      
+
       newReview.value.photos.forEach(photo => {
         formData.append('photos[]', photo);
       });
@@ -184,7 +186,7 @@ export default {
             'Content-Type': 'multipart/form-data'
           }
         });
-        
+
         toast.success('Review berhasil ditambahkan');
         newReview.value = { rating: 0, comment: '', photos: [], video: null };
         await fetchReviews();

@@ -1,222 +1,336 @@
-<!-- resources/views/components/product-review.blade.php -->
-<style>
-    .review-section {
-        background: white;
-        padding: 1.5rem;
-        border-radius: 0.5rem;
-        box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
-    }
+<!-- Product Review Component -->
+@if(!isset($product))
+    <div class="alert alert-danger">Error: Product data not found</div>
+@else
+<div class="bg-white rounded-3 p-4 shadow-sm">
+    <h2 class="h4 mb-4 text-dark">Ulasan Produk</h2>
 
-    .star-rating {
-        color: #FCD34D; /* text-yellow-400 */
-        font-size: 1.5rem;
-    }
-
-    .star-rating.inactive {
-        color: #D1D5DB; /* text-gray-300 */
-    }
-
-    .review-form textarea {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #D1D5DB;
-        border-radius: 0.375rem;
-        margin-bottom: 1rem;
-    }
-
-    .review-form input[type="file"] {
-        width: 100%;
-        padding: 0.5rem;
-        border: 1px solid #D1D5DB;
-        border-radius: 0.375rem;
-        margin-bottom: 1rem;
-    }
-
-    .submit-button {
-        background: #2563EB;
-        color: white;
-        padding: 0.5rem 1.5rem;
-        border-radius: 0.375rem;
-        cursor: pointer;
-    }
-
-    .submit-button:hover {
-        background: #1D4ED8;
-    }
-
-    .review-item {
-        border-bottom: 1px solid #E5E7EB;
-        padding-bottom: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .user-avatar {
-        width: 3rem;
-        height: 3rem;
-        background: #E5E7EB;
-        border-radius: 9999px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-
-    .review-photos {
-        display: flex;
-        gap: 0.5rem;
-        overflow-x: auto;
-        padding: 0.5rem 0;
-    }
-
-    .review-photo {
-        width: 6rem;
-        height: 6rem;
-        object-fit: cover;
-        border-radius: 0.375rem;
-    }
-
-    .review-video {
-        max-width: 100%;
-        border-radius: 0.375rem;
-    }
-</style>
-
-<div class="review-section">
-    <!-- Review Form -->
-    @auth
-    <div class="review-form">
-        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">Tulis Review</h3>
-        <form id="reviewForm" method="POST" action="{{ route('reviews.store') }}" enctype="multipart/form-data">
-            @csrf
-            <input type="hidden" name="id_produk" value="{{ $productId }}">
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem;">Rating</label>
-                <div class="star-rating">
-                    @for ($i = 1; $i <= 5; $i++)
-                        <span class="star" data-rating="{{ $i }}"
-                              onclick="setRating({{ $i }})"
-                              style="cursor: pointer;">★</span>
-                    @endfor
+    <!-- Rating Summary -->
+    @php
+        $avgRating = $product->average_rating ?? 0;
+        $reviewCount = $product->review_count ?? 0;
+        $avgRating = is_numeric($avgRating) ? $avgRating : 0;
+        $reviewCount = is_numeric($reviewCount) ? $reviewCount : 0;
+    @endphp
+    <div class="bg-light p-4 rounded-3 mb-4">
+        <div class="row align-items-center">
+            <div class="col-md-4 text-center">
+                <div class="display-4 fw-bold text-warning">
+                    {{ number_format($avgRating, 1) }}
                 </div>
-                <input type="hidden" name="rating" id="ratingInput" required>
+                <div class="text-muted small">
+                    dari 5 ⭐
+                </div>
+                <div class="text-muted small mt-2">
+                    {{ $reviewCount }} ulasan
+                </div>
             </div>
 
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem;">Komentar</label>
-                <textarea name="comment" rows="4" required></textarea>
+            <div class="col-md-8">
+                @for ($i = 5; $i >= 1; $i--)
+                    @php
+                        $count = $product->approvedReviews()->where('rating', $i)->count();
+                        $percentage = $reviewCount > 0 ? ($count / $reviewCount) * 100 : 0;
+                    @endphp
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="small text-muted" style="min-width: 30px;">{{ $i }} ⭐</span>
+                        <div class="progress flex-fill" style="height: 8px;">
+                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $percentage }}%;" aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+                        <span class="small text-muted" style="min-width: 30px; text-align: right;">{{ $count }}</span>
+                    </div>
+                @endfor
             </div>
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem;">Foto Produk (Opsional)</label>
-                <input type="file" name="photos[]" multiple accept="image/*">
-            </div>
-
-            <div style="margin-bottom: 1rem;">
-                <label style="display: block; margin-bottom: 0.5rem;">Video Review (Opsional)</label>
-                <input type="file" name="video" accept="video/*">
-            </div>
-
-            <button type="submit" class="submit-button">Kirim Review</button>
-        </form>
+        </div>
     </div>
+
+    <!-- Add Review Form (User Only) -->
+    @auth
+        <div id="review-form" class="bg-light p-4 rounded-3 mb-4" style="scroll-margin-top: 100px;">
+            <h3 class="h5 mb-3 text-dark">Tulis Ulasan Anda</h3>
+
+            <form id="reviewForm" class="row g-3">
+                @csrf
+
+                <!-- Rating -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Rating <span class="text-danger">*</span></label>
+                    <input type="hidden" name="rating" id="ratingInput" required>
+                    <div id="starRating" class="d-flex gap-2">
+                        @for ($i = 1; $i <= 5; $i++)
+                            <span class="star" data-value="{{ $i }}" style="cursor: pointer; font-size: 2rem; color: #6c757d; transition: color 0.2s;">⭐</span>
+                        @endfor
+                    </div>
+                    <small id="ratingError" class="text-danger d-none">Pilih rating terlebih dahulu</small>
+                </div>
+
+                <!-- Comment -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Komentar</label>
+                    <textarea name="comment" placeholder="Bagikan pengalaman Anda dengan produk ini..." required class="form-control" rows="4"></textarea>
+                </div>
+
+                <!-- Photos -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Foto (Opsional)</label>
+                    <input type="file" name="photos[]" multiple accept="image/*" class="form-control">
+                    <small class="text-muted">Maksimal 2MB per foto, format: JPG, PNG, GIF</small>
+                </div>
+
+                <!-- Video -->
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Video (Opsional)</label>
+                    <input type="file" name="video" accept="video/*" class="form-control">
+                    <small class="text-muted">Maksimal 20MB, format: MP4, MOV, AVI, WebM</small>
+                </div>
+
+                <div class="col-12">
+                    <button type="submit" class="btn btn-gold px-4">Kirim Ulasan</button>
+                </div>
+            </form>
+
+            <div id="reviewMessage" class="mt-3 p-3 rounded d-none"></div>
+        </div>
     @else
-    <p style="text-align: center; padding: 1rem;">
-        <a href="{{ route('login') }}" style="color: #2563EB;">Login</a> untuk menulis review
-    </p>
+        <div class="bg-light p-4 rounded-3 mb-4 text-center">
+            <p class="mb-0">
+                <a href="{{ route('login') }}" class="text-gold fw-semibold text-decoration-none">Login</a> untuk menulis ulasan
+            </p>
+        </div>
     @endauth
 
     <!-- Reviews List -->
-    <div style="margin-top: 2rem;">
-        <h3 style="font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;">
-            Reviews ({{ count($reviews) }})
-        </h3>
+    <div id="reviewsList">
+        <h3 class="h5 mb-3 text-dark">Ulasan Terbaru</h3>
 
-        @if(count($reviews) == 0)
-            <p style="text-align: center; color: #6B7280;">Belum ada review untuk produk ini.</p>
-        @else
-            @foreach($reviews as $review)
-            <div class="review-item">
-                <div style="display: flex; justify-content: space-between;">
-                    <div style="display: flex; gap: 1rem;">
-                        <div class="user-avatar">
-                            <span style="font-size: 1.25rem;">{{ substr($review->user->name, 0, 1) }}</span>
-                        </div>
-                        <div>
-                            <h4 style="font-weight: 600;">{{ $review->user->name }}</h4>
-                            <div class="star-rating">
-                                @for ($i = 1; $i <= 5; $i++)
-                                    <span class="{{ $i <= $review->rating ? '' : 'inactive' }}">★</span>
-                                @endfor
-                            </div>
-                            <p style="margin-top: 0.5rem; color: #4B5563;">{{ $review->comment }}</p>
+        @forelse ($product->approvedReviews()->latest()->get() as $review)
+            <div class="p-3 border-bottom">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <strong class="text-dark">{{ $review->user->name }}</strong>
+                        <div class="text-muted small">
+                            {{ $review->created_at->format('d M Y') }}
                         </div>
                     </div>
-                    <span style="color: #9CA3AF; font-size: 0.875rem;">
-                        {{ $review->created_at->format('d M Y') }}
+                    <span class="badge bg-warning text-dark">
+                        ⭐ {{ $review->rating }}/5
                     </span>
                 </div>
 
-                @if($review->photos)
-                <div class="review-photos">
-                    @foreach(json_decode($review->photos) as $photo)
-                        <img src="{{ Storage::url($photo) }}" class="review-photo"
-                             onclick="showImage('{{ Storage::url($photo) }}')">
-                    @endforeach
-                </div>
+                <p class="mb-2 text-secondary">{{ $review->comment }}</p>
+
+                @if ($review->photos && count($review->photos) > 0)
+                    <div class="row g-2 mt-3">
+                        @foreach ($review->photos as $photo)
+                            <div class="col-auto">
+                                @php
+                                    $photoPath = storage_path('app/public/' . $photo);
+                                    $photoUrl = file_exists($photoPath) ? asset('storage/' . $photo) : asset('img/logo.png');
+                                @endphp
+                                <img src="{{ $photoUrl }}" alt="Review photo" class="rounded shadow-sm" style="width: 100px; height: 100px; object-fit: cover; cursor: pointer;" onclick="openModal(this.src)">
+                            </div>
+                        @endforeach
+                    </div>
                 @endif
 
-                @if($review->video)
-                <div style="margin-top: 1rem;">
-                    <video src="{{ Storage::url($review->video) }}"
-                           controls class="review-video"></video>
-                </div>
+                @if ($review->video)
+                    <div class="mt-3">
+                        <video width="300" height="200" controls class="rounded">
+                            <source src="{{ asset('storage/' . $review->video) }}" type="video/mp4">
+                            Browser Anda tidak mendukung video.
+                        </video>
+                    </div>
                 @endif
+
+                @auth
+                    @if (auth()->user()->id === $review->user_id)
+                        <div class="d-flex gap-2 mt-3">
+                            <button onclick="editReview({{ $review->id }})" class="btn btn-primary btn-sm">Edit</button>
+                            <button onclick="deleteReview({{ $review->id }})" class="btn btn-danger btn-sm">Hapus</button>
+                        </div>
+                    @endif
+                @endauth
             </div>
-            @endforeach
-        @endif
+        @empty
+            <div class="text-center py-4 text-muted">
+                <p>Belum ada ulasan untuk produk ini.</p>
+            </div>
+        @endforelse
     </div>
 </div>
 
+<!-- Modal untuk foto -->
+<div id="photoModal" class="d-none position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex align-items-center justify-content-center" style="z-index: 1050;">
+    <span onclick="closeModal()" class="position-absolute top-0 end-0 text-white fs-1 fw-bold" style="cursor: pointer; top: 20px; right: 30px;">&times;</span>
+    <img id="modalImage" src="" alt="Modal Image" class="mw-100 mh-100">
+</div>
+
 <script>
-function setRating(rating) {
-    document.getElementById('ratingInput').value = rating;
-    const stars = document.querySelectorAll('.star');
-    stars.forEach((star, index) => {
-        star.classList.toggle('inactive', index >= rating);
+    const productId = {{ $product->id_produk }};
+    let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+    // Initialize CSRF token
+    async function initializeCsrfToken() {
+        if (!csrfToken) {
+            console.warn('CSRF token not found in meta tag, trying to fetch from API...');
+            try {
+                const tokenResponse = await fetch('/api/csrf-token');
+                if (tokenResponse.ok) {
+                    const tokenData = await tokenResponse.json();
+                    csrfToken = tokenData.csrf_token;
+                    console.log('CSRF token fetched from API');
+                }
+            } catch (error) {
+                console.error('Failed to fetch CSRF token:', error);
+            }
+        }
+    }
+
+    // Initialize on page load
+    initializeCsrfToken();
+
+    // Rating stars interaction
+    let selectedRating = 0;
+
+    document.querySelectorAll('.star').forEach(star => {
+        star.addEventListener('click', function() {
+            selectedRating = parseInt(this.dataset.value);
+            document.getElementById('ratingInput').value = selectedRating;
+            document.getElementById('ratingError').style.display = 'none';
+            updateStars(selectedRating);
+        });
+
+        star.addEventListener('mouseover', function() {
+            const value = parseInt(this.dataset.value);
+            updateStars(value);
+        });
     });
-}
 
-function showImage(url) {
-    // Buat lightbox sederhana
-    const overlay = document.createElement('div');
-    overlay.style.position = 'fixed';
-    overlay.style.top = '0';
-    overlay.style.left = '0';
-    overlay.style.width = '100%';
-    overlay.style.height = '100%';
-    overlay.style.backgroundColor = 'rgba(0,0,0,0.9)';
-    overlay.style.display = 'flex';
-    overlay.style.alignItems = 'center';
-    overlay.style.justifyContent = 'center';
-    overlay.style.zIndex = '1000';
+    document.querySelector('#starRating')?.addEventListener('mouseleave', function() {
+        updateStars(selectedRating);
+    });
 
-    const img = document.createElement('img');
-    img.src = url;
-    img.style.maxHeight = '90%';
-    img.style.maxWidth = '90%';
-    img.style.objectFit = 'contain';
+    function updateStars(rating) {
+        document.querySelectorAll('.star').forEach(s => {
+            const starValue = parseInt(s.dataset.value);
+            s.style.color = starValue <= rating ? '#ffc107' : '#6c757d';
+        });
+    }
 
-    overlay.appendChild(img);
-    overlay.onclick = () => overlay.remove();
-    document.body.appendChild(overlay);
-}
+    // Submit review
+    document.getElementById('reviewForm')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
 
-// Flash message handling
-@if(session('success'))
-    alert("{{ session('success') }}");
-@endif
+        // Validasi rating
+        const rating = document.getElementById('ratingInput')?.value;
+        if (!rating) {
+            const ratingError = document.getElementById('ratingError');
+            if (ratingError) ratingError.style.display = 'block';
+            return;
+        }
 
-@if($errors->any())
-    alert("{{ $errors->first() }}");
-@endif
+        const formData = new FormData();
+        formData.append('id_produk', productId);
+        formData.append('rating', rating);
+        const commentTextarea = document.querySelector('textarea[name="comment"]');
+        if (commentTextarea) {
+            formData.append('comment', commentTextarea.value);
+        }
+
+        // Add photos
+        const photosInput = document.querySelector('input[name="photos[]"]');
+        if (photosInput && photosInput.files) {
+            for (let photo of photosInput.files) {
+                formData.append('photos[]', photo);
+            }
+        }
+
+        // Add video
+        const videoInput = document.querySelector('input[name="video"]');
+        const video = videoInput?.files?.[0];
+        if (video) {
+            formData.append('video', video);
+        }
+
+        try {
+            const response = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                body: formData,
+                credentials: 'same-origin'
+            });
+
+            const data = await response.json();
+
+            if (response.ok) {
+                showMessage('success', data.message || 'Review berhasil ditambahkan!');
+                document.getElementById('reviewForm').reset();
+                selectedRating = 0;
+                document.getElementById('ratingInput').value = '';
+                document.querySelectorAll('.star').forEach(s => s.style.color = '#6c757d');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showMessage('error', data.message || 'Gagal mengirim ulasan');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('error', 'Terjadi kesalahan: ' + error.message);
+        }
+    });
+
+    function showMessage(type, message) {
+        const messageDiv = document.getElementById('reviewMessage');
+        messageDiv.textContent = message;
+        messageDiv.className = `alert ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+        messageDiv.classList.remove('d-none');
+    }
+
+    function editReview(reviewId) {
+        alert('Fitur edit review akan segera tersedia');
+    }
+
+    async function deleteReview(reviewId) {
+        if (!confirm('Yakin ingin menghapus ulasan ini?')) return;
+
+        try {
+            const response = await fetch(`/api/reviews/${reviewId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': csrfToken,
+                    'Accept': 'application/json'
+                },
+                credentials: 'same-origin'
+            });
+
+            if (response.ok) {
+                showMessage('success', 'Ulasan dihapus');
+                setTimeout(() => location.reload(), 1500);
+            } else {
+                showMessage('error', 'Gagal menghapus ulasan');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showMessage('error', 'Terjadi kesalahan: ' + error.message);
+        }
+    }
+
+    function openModal(src) {
+        document.getElementById('photoModal').style.display = 'flex';
+        document.getElementById('modalImage').src = src;
+    }
+
+    function closeModal() {
+        document.getElementById('photoModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('photoModal');
+        if (event.target === modal) {
+            modal.style.display = 'none';
+        }
+    }
 </script>
+@endif
