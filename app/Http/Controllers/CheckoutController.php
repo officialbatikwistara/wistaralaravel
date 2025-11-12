@@ -8,137 +8,130 @@ use Illuminate\Support\Facades\DB;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
-use App\Models\Admin;
-use App\Notifications\OrderStatusNotification;
+use App\Models\Produk;
 
 class CheckoutController extends Controller
 {
-    public function index(Request $request, $id_produk = null)
+    /**
+     * 🧾 Menampilkan halaman checkout
+     */
+    public function index($id_produk = null)
     {
-        // Jika checkout langsung dari "Beli Sekarang"
         if ($id_produk) {
-            $produk = \App\Models\Produk::findOrFail($id_produk);
+            $produk = Produk::findOrFail($id_produk);
             $cartItems = collect([
                 (object)[
-                    'produk' => $produk,
-                    'qty' => 1
+                    'id_produk' => $produk->id_produk,
+                    'qty' => 1,
+                    'produk' => $produk
                 ]
             ]);
         } else {
-            // Kalau checkout dari keranjang
-            $cartItems = \App\Models\Cart::where('user_id', Auth::id())
-                ->with('produk')
+            $cartItems = Cart::where('user_id', Auth::id())
+                ->with('produk.kategori')
                 ->get();
-
-            if ($cartItems->isEmpty()) {
-                return redirect()->route('katalog')->with('error', 'Keranjang belanja Anda kosong.');
-            }
         }
 
-        // Hitung total
-        $total = $cartItems->sum(fn($item) => $item->qty * $item->produk->harga);
+        if ($cartItems->isEmpty()) {
+            return redirect()->route('cart.index')->with('error', 'Keranjang kosong!');
+        }
 
-        return view('checkout.index', compact('cartItems', 'total'));
+        return view('checkout.index', compact('cartItems'));
     }
 
+    /**
+     * 💾 Proses checkout & simpan pesanan
+     */
     public function process(Request $request)
     {
-        $validated = $request->validate([
-            'tipe_order' => 'required|in:ambil,kirim',
-            'metode_pembayaran' => 'required|in:bank_transfer,qris,cod',
-            'nama' => 'required|string|max:100',
+        $request->validate([
+            'nama' => 'required|string|max:255',
             'telepon' => 'required|string|max:20',
-            'alamat' => 'required_if:tipe_order,kirim|string|nullable',
-            'catatan' => 'nullable|string',
-            'tanggal_ambil' => 'required|date|after:yesterday',
+            'tanggal_ambil' => 'required|date',
+            'metode_pembayaran' => 'required|string',
+            'tipe_order' => 'required|string'
         ]);
 
-        if ($validated['tipe_order'] === 'kirim') {
-            return back()->with('error', 'Fitur pengiriman sedang dalam pengembangan 🚚✨');
-        }
+        $userId = Auth::id();
 
-        try {
-            DB::beginTransaction();
+        // 🧠 Alamat otomatis untuk "ambil" di toko
+        $alamatFinal = $request->tipe_order === 'ambil'
+            ? 'Ambil di toko Batik Wistara - Jl. Ketintang No.88, Surabaya'
+            : ($request->alamat ?? 'Alamat tidak tersedia');
 
-            // Ambil data keranjang
-            $cartItems = Cart::where('user_id', Auth::id())
-                ->with('produk')
-                ->get();
+        // ⚡ Checkout langsung satu produk
+        if ($request->filled('id_produk')) {
+            $produk = Produk::findOrFail($request->id_produk);
 
-            if ($cartItems->isEmpty()) {
-                DB::rollback();
-                return redirect()->route('katalog')
-                    ->with('error', 'Keranjang belanja Anda kosong.');
-            }
-
-            // Hitung total
-            $total = $cartItems->sum(function($item) {
-                return $item->qty * $item->produk->harga;
-            });
-
-            // Buat order baru
             $order = Order::create([
-                'user_id' => Auth::id(),
-                'total' => $total,
+                'user_id' => $userId,
+                'nama' => $request->nama,
+                'telepon' => $request->telepon,
+                'total' => $produk->harga,
                 'status' => 'pending',
-                'tipe_order' => $validated['tipe_order'],
-                'metode_pembayaran' => $validated['metode_pembayaran'],
-                'nama' => $validated['nama'],
-                'telepon' => $validated['telepon'],
-                'alamat' => $validated['alamat'],
-                'catatan' => $validated['catatan'],
-                'tanggal_ambil' => $validated['tanggal_ambil'],
+                'status_pembayaran' => 'belum_bayar',
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'tanggal_ambil' => $request->tanggal_ambil,
+                'tipe_order' => $request->tipe_order,
+                'alamat' => $alamatFinal,
+                'catatan' => $request->catatan,
             ]);
 
-            // Pindahkan item dari cart ke order items
+            OrderItem::create([
+                'order_id' => $order->id,
+                'id_produk' => $produk->id_produk,
+                'qty' => 1,
+                'harga' => $produk->harga,
+                'subtotal' => $produk->harga,
+            ]);
+
+            $produk->decrement('stok', 1);
+        } else {
+            // 🛒 Checkout dari keranjang
+            $cartItems = Cart::where('user_id', $userId)->with('produk')->get();
+
+            if ($cartItems->isEmpty()) {
+                return back()->with('error', 'Tidak ada item untuk diproses.');
+            }
+
+            $total = $cartItems->sum(fn($item) => $item->qty * $item->produk->harga);
+
+            $order = Order::create([
+                'user_id' => $userId,
+                'nama' => $request->nama,
+                'telepon' => $request->telepon,
+                'total' => $total,
+                'status' => 'pending',
+                'status_pembayaran' => 'belum_bayar',
+                'metode_pembayaran' => $request->metode_pembayaran,
+                'tanggal_ambil' => $request->tanggal_ambil,
+                'tipe_order' => $request->tipe_order,
+                'alamat' => $alamatFinal,
+                'catatan' => $request->catatan,
+            ]);
+
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
                     'id_produk' => $item->id_produk,
                     'qty' => $item->qty,
                     'harga' => $item->produk->harga,
-                    'subtotal' => $item->qty * $item->produk->harga
+                    'subtotal' => $item->qty * $item->produk->harga,
                 ]);
+
+                $item->produk->decrement('stok', $item->qty);
             }
 
-            // Kosongkan cart
-            Cart::where('user_id', Auth::id())->delete();
+            Cart::where('user_id', $userId)->delete();
+        }
 
-            // Kirim notifikasi ke admin
-            $admin = Admin::first();
-            if ($admin) {
-                $messageText = "Ada pesanan baru yang perlu diproses!";
-                $admin->notify(new OrderStatusNotification($order, $messageText));
-            }
-
-            DB::commit();
-
-            // Redirect sesuai metode pembayaran
-            switch ($validated['metode_pembayaran']) {
-                case 'bank_transfer':
-                    return redirect()->route('checkout.bank-transfer', $order->id)
-                        ->with('success', 'Pesanan berhasil dibuat!');
-                case 'qris':
-                    return redirect()->route('checkout.qris', $order->id)
-                        ->with('success', 'Pesanan berhasil dibuat!');
-                default:
-                    return redirect()->route('user.orders')
-                        ->with('success', 'Pesanan berhasil dibuat!');
-            }
-
-        } catch (\Exception $e) {
-            DB::rollback();
-            return back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        // 🔁 Redirect sesuai metode pembayaran
+        if ($request->metode_pembayaran === 'bank_transfer') {
+            return redirect()->route('checkout.bank', $order->id);
+        } elseif ($request->metode_pembayaran === 'qris') {
+            return redirect()->route('checkout.qris', $order->id);
+        } else {
+            return redirect('/user/dashboard')->with('success', 'Pesanan berhasil dibuat!');
         }
     }
-
-    public function checkoutProduk($id_produk)
-    {
-        $produk = \App\Models\Produk::findOrFail($id_produk);
-
-        $total = $produk->harga;
-
-        return view('checkout.single', compact('produk', 'total'));
-    }
-
 }

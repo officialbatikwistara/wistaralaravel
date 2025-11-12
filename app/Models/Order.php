@@ -2,16 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class Order extends Model
 {
-    use HasFactory;
-
-    protected $table = 'orders';
+    protected $primaryKey = 'id';
+    public $incrementing = false; // ⚠️ nonaktifkan auto increment
+    protected $keyType = 'string';
 
     protected $fillable = [
+        'id',
         'user_id',
         'nama',
         'telepon',
@@ -19,19 +20,26 @@ class Order extends Model
         'catatan',
         'total',
         'status',
-        'tipe_order',
-        'metode_pembayaran',
-        'tanggal_ambil',
-        'tipe_order',
-        'metode_pembayaran',
-        'bukti_pembayaran',
         'status_pembayaran',
-        'tanggal_ambil',
-        'status',
+        'bukti_pembayaran',
+        'tipe_order',
+        'metode_pembayaran',
+        'tanggal_ambil'
     ];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::creating(function ($order) {
+            $today = now()->format('Ymd');
+            $random = strtoupper(Str::random(4)); // contoh: AX3P
+            $order->id = "WST-{$today}-{$random}";
+        });
+    }
 
     public function items()
     {
-        return $this->hasMany(\App\Models\OrderItem::class, 'order_id', 'id');
+        return $this->hasMany(OrderItem::class, 'order_id');
     }
 }
