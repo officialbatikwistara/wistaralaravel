@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+<<<<<<< Updated upstream
 use App\Models\Produk;
 use App\Models\Berita;
 use App\Models\Order;
@@ -11,6 +12,12 @@ use App\Models\Order;
 | Menyediakan data produk pesanan berita dalam format JSON
 | agar chatbot Node.js dapat mengaksesnya secara real-time.
 */
+=======
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use App\Http\Controllers\Api\ChatbotApiController;
+>>>>>>> Stashed changes
 
 // ✅ Produk
 Route::get('/produk', function () {
@@ -75,8 +82,6 @@ Route::post('/login', function (Request $request) {
     ]);
 });
 
-// 🔹 Route API yang butuh autentikasi
-Route::middleware('auth:sanctum')->group(function () {
-    Route::apiResource('reviews', ReviewController::class);
-});
+// 🔹 Route API Review - DIPINDAH KE routes/web.php untuk support session auth
+
 
