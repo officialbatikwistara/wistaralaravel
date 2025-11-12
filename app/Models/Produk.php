@@ -23,4 +23,24 @@ class Produk extends Model
     {
         return $this->belongsTo(KategoriProduk::class, 'id_kategori', 'id_kategori');
     }
+
+    public function reviews()
+    {
+        return $this->hasMany(Review::class, 'id_produk', 'id_produk');
+    }
+
+    public function approvedReviews()
+    {
+        return $this->reviews()->where('status', 'approved');
+    }
+
+    public function getAverageRatingAttribute()
+    {
+        return $this->approvedReviews()->avg('rating') ?? 0;
+    }
+
+    public function getReviewCountAttribute()
+    {
+        return $this->approvedReviews()->count();
+    }
 }

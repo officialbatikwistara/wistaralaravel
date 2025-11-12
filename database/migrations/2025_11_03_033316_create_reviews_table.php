@@ -12,9 +12,10 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->unsignedBigInteger('id_produk');
             $table->integer('rating');
-            $table->text('komentar');
-            $table->json('foto')->nullable();
+            $table->text('comment');
+            $table->json('photos')->nullable();
             $table->string('video')->nullable();
+            $table->enum('status', ['pending', 'approved', 'rejected'])->default('pending');
             $table->timestamps();
 
             $table->foreign('id_produk')

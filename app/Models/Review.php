@@ -13,9 +13,10 @@ class Review extends Model
         'user_id',
         'id_produk',
         'rating',
-        'comment',
+        'komentar',
         'photos',
-        'video'
+        'video',
+        'status'
     ];
 
     protected $casts = [
