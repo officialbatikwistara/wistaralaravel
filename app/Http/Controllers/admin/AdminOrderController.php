@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\User;
 use App\Notifications\OrderStatusNotification;
+use Illuminate\Support\Facades\Log;
 
 class AdminOrderController extends Controller
 {
@@ -15,7 +16,7 @@ class AdminOrderController extends Controller
      */
     public function index(Request $request)
     {
-        $query = \App\Models\Order::query();
+        $query = Order::query();
 
         if ($request->filled('start')) {
             $query->whereDate('created_at', '>=', $request->start);
@@ -28,7 +29,7 @@ class AdminOrderController extends Controller
         if ($request->filled('keyword')) {
             $query->where(function($q) use ($request) {
                 $q->where('nama', 'like', "%{$request->keyword}%")
-                ->orWhere('id', $request->keyword);
+                  ->orWhere('id', $request->keyword);
             });
         }
 
@@ -56,10 +57,13 @@ class AdminOrderController extends Controller
         ]);
 
         $order = Order::findOrFail($id);
+        $statusPembayaranChanged = false;
 
         // Simpan status pembayaran
         if ($request->filled('status_pembayaran')) {
+            $oldStatus = $order->status_pembayaran;
             $order->status_pembayaran = $request->status_pembayaran;
+            $statusPembayaranChanged = ($oldStatus !== $request->status_pembayaran);
         }
 
         // Simpan status pesanan
@@ -69,21 +73,28 @@ class AdminOrderController extends Controller
 
         $order->save();
 
-        // 📩 Kirim notifikasi ke user
-        $user = User::find($order->user_id);
-        if ($user && $request->filled('status_pembayaran')) {
-            if ($order->status_pembayaran === 'lunas') {
-                $user->notify(new OrderStatusNotification(
-                    $order,
-                    "✅ Pembayaran untuk pesanan #{$order->id} telah dikonfirmasi. Terima kasih 🙏"
-                ));
-                $this->sendWhatsapp($user->phone, "✅ Pembayaran untuk pesanan #{$order->id} telah dikonfirmasi. Terima kasih 🙏");
-            } elseif ($order->status_pembayaran === 'gagal') {
-                $user->notify(new OrderStatusNotification(
-                    $order,
-                    "❌ Pembayaran untuk pesanan #{$order->id} gagal diverifikasi. Silakan hubungi admin."
-                ));
-                $this->sendWhatsapp($user->phone, "❌ Pembayaran untuk pesanan #{$order->id} gagal diverifikasi. Silakan hubungi admin.");
+        // 📩 Kirim notifikasi ke user HANYA jika status pembayaran berubah
+        if ($statusPembayaranChanged) {
+            $user = User::find($order->user_id);
+
+            if ($user) {
+                try {
+                    if ($order->status_pembayaran === 'lunas') {
+                        $message = "✅ Pembayaran untuk pesanan #{$order->id} telah dikonfirmasi. Terima kasih 🙏";
+
+                        $user->notify(new OrderStatusNotification($order, $message));
+                        $this->sendWhatsapp($user->phone, $message);
+
+                    } elseif ($order->status_pembayaran === 'gagal') {
+                        $message = "❌ Pembayaran untuk pesanan #{$order->id} gagal diverifikasi. Silakan hubungi admin.";
+
+                        $user->notify(new OrderStatusNotification($order, $message));
+                        $this->sendWhatsapp($user->phone, $message);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error sending notification: ' . $e->getMessage());
+                    // Tetap lanjut meskipun notifikasi gagal
+                }
             }
         }
 
@@ -100,29 +111,30 @@ class AdminOrderController extends Controller
         ]);
 
         $order = Order::findOrFail($id);
+        $oldStatus = $order->status;
         $order->status = $request->status;
         $order->save();
 
-        $user = User::find($order->user_id);
-        if ($user) {
-            if ($request->status === 'proses') {
-                $user->notify(new OrderStatusNotification(
-                    $order,
-                    "🛍️ Pesanan Anda sedang diproses ✅"
-                ));
-                $this->sendWhatsapp($user->phone, "🛍️ Pesanan #{$order->id} sedang diproses ✅");
-            } elseif ($request->status === 'selesai') {
-                $user->notify(new OrderStatusNotification(
-                    $order,
-                    "🎉 Pesanan Anda telah selesai dan siap diambil 🧾"
-                ));
-                $this->sendWhatsapp($user->phone, "🎉 Pesanan #{$order->id} telah selesai dan siap diambil 🧾");
-            } elseif ($request->status === 'batal') {
-                $user->notify(new OrderStatusNotification(
-                    $order,
-                    "❌ Pesanan Anda #{$order->id} telah dibatalkan oleh admin."
-                ));
-                $this->sendWhatsapp($user->phone, "❌ Pesanan #{$order->id} telah dibatalkan oleh admin.");
+        // Kirim notifikasi HANYA jika status berubah
+        if ($oldStatus !== $request->status) {
+            $user = User::find($order->user_id);
+
+            if ($user) {
+                try {
+                    $messages = [
+                        'proses' => "🛍️ Pesanan #{$order->id} sedang diproses ✅",
+                        'selesai' => "🎉 Pesanan #{$order->id} telah selesai dan siap diambil 🧾",
+                        'batal' => "❌ Pesanan #{$order->id} telah dibatalkan oleh admin."
+                    ];
+
+                    if (isset($messages[$request->status])) {
+                        $message = $messages[$request->status];
+                        $user->notify(new OrderStatusNotification($order, $message));
+                        $this->sendWhatsapp($user->phone, $message);
+                    }
+                } catch (\Exception $e) {
+                    Log::error('Error sending notification: ' . $e->getMessage());
+                }
             }
         }
 
@@ -137,20 +149,37 @@ class AdminOrderController extends Controller
         if (!$phone) return;
 
         $token = env('FONNTE_TOKEN');
-        $curl = curl_init();
-        curl_setopt_array($curl, [
-            CURLOPT_URL => "https://api.fonnte.com/send",
-            CURLOPT_RETURNTRANSFER => true,
-            CURLOPT_POST => true,
-            CURLOPT_POSTFIELDS => [
-                'target' => $phone,
-                'message' => $message,
-            ],
-            CURLOPT_HTTPHEADER => [
-                "Authorization: $token"
-            ],
-        ]);
-        curl_exec($curl);
-        curl_close($curl);
+
+        if (!$token) {
+            Log::warning('FONNTE_TOKEN not configured');
+            return;
+        }
+
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => "https://api.fonnte.com/send",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_POSTFIELDS => [
+                    'target' => $phone,
+                    'message' => $message,
+                ],
+                CURLOPT_HTTPHEADER => [
+                    "Authorization: $token"
+                ],
+            ]);
+
+            $response = curl_exec($curl);
+
+            if (curl_errno($curl)) {
+                Log::error('WhatsApp send error: ' . curl_error($curl));
+            }
+
+            curl_close($curl);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp exception: ' . $e->getMessage());
+        }
     }
 }

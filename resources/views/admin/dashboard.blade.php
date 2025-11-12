@@ -17,7 +17,7 @@
 </section>
 
 <!-- ===== MAIN DASHBOARD CONTENT ===== -->
-<section class="dashboard-main">
+<section class="dashboard-main" style="background: url('{{ asset('img/background1.svg') }}') center/cover no-repeat;">
     <div class="container">
         <div class="row g-4 justify-content-center">
 
@@ -54,6 +54,15 @@
                     <h4>Berita</h4>
                     <p>Posting informasi & artikel terbaru untuk pengguna.</p>
                     <a href="{{ url('/admin/berita') }}" class="btn dashboard-btn w-100">Kelola Berita</a>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-lg-3">
+                <div class="dashboard-card">
+                    <div class="icon-badge"><i class="fa-solid fa-star"></i></div>
+                    <h4>Review</h4>
+                    <p>Kelola ulasan & rating produk dari pelanggan.</p>
+                    <a href="{{ url('/admin/reviews') }}" class="btn dashboard-btn w-100">Kelola Review</a>
                 </div>
             </div>
 
