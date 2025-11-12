@@ -14,6 +14,7 @@ use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Api\ReviewController;
 
 use Illuminate\Http\Request;
 
@@ -46,7 +47,7 @@ Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.de
 */
 
 Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
-Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
+Route::get('/produk/{slug}', [ProdukController::class, 'show'])->name('produk.show');
 /*
 |--------------------------------------------------------------------------
 | Route Keranjang
@@ -133,6 +134,14 @@ Route::middleware('auth', 'verified')->group(function () {
     });
 });
 
+// 📝 User Reviews
+Route::middleware('auth')->group(function () {
+    Route::get('/user/reviews', [\App\Http\Controllers\UserReviewController::class, 'index'])->name('user.reviews.index');
+    Route::get('/user/reviews/{id}/edit', [\App\Http\Controllers\UserReviewController::class, 'edit'])->name('user.reviews.edit');
+    Route::patch('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'update'])->name('user.reviews.update');
+    Route::delete('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'destroy'])->name('user.reviews.destroy');
+});
+
 // Halaman verifikasi email
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -177,6 +186,13 @@ Route::get('/check-user', function (Illuminate\Http\Request $request) {
         'type' => $type
     ]);
 })->name('check.user');
+
+// 🔑 Get CSRF token for API testing
+Route::get('/api/csrf-token', function () {
+    return response()->json([
+        'csrf_token' => csrf_token()
+    ]);
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -309,3 +325,66 @@ Route::prefix('admin')->group(function () {
             'destroy' => 'admin.berita.delete',
         ]);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Review API Routes (menggunakan web middleware untuk session auth)
+|--------------------------------------------------------------------------
+*/
+// Public routes
+Route::get('/api/reviews', [ReviewController::class, 'index']);
+Route::get('/api/reviews/{id}', [ReviewController::class, 'show']);
+
+// Protected routes (butuh login)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/reviews', [ReviewController::class, 'store']);
+    Route::patch('/api/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/api/reviews/{id}', [ReviewController::class, 'destroy']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Review Admin (Moderasi)
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/reviews', function (Request $request) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->index($request);
+})->name('admin.reviews.index');
+
+Route::get('/admin/reviews/{id}/edit', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->edit($id);
+})->name('admin.reviews.edit');
+
+Route::patch('/admin/reviews/{id}', function ($id, Request $request) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->update($request, $id);
+})->name('admin.reviews.update');
+
+Route::patch('/admin/reviews/{id}/approve', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->approve($id);
+})->name('admin.reviews.approve');
+
+Route::patch('/admin/reviews/{id}/reject', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->reject($id);
+})->name('admin.reviews.reject');
+
+Route::delete('/admin/reviews/{id}', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->destroy($id);
+})->name('admin.reviews.delete');
