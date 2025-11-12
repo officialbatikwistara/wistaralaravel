@@ -112,15 +112,16 @@
                             @if($order->status == 'selesai')
                             <td>
                                 @php
-                                    // Cek apakah user sudah pernah review produk ini
+                                    // Cek apakah user sudah pernah review produk ini dalam order ini
                                     $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
                                         ->where('id_produk', $item->id_produk)
+                                        ->where('order_id', $order->id)
                                         ->exists();
                                 @endphp
                                 @if($hasReviewed)
                                     <span class="badge bg-success">✓ Sudah Direview</span>
                                 @else
-                                    <a href="{{ route('produk.show', $item->produk->slug) }}#review-form"
+                                    <a href="{{ route('produk.show', $item->produk->slug) }}?order_id={{ $order->id }}#review-form"
                                        class="btn btn-sm btn-warning">
                                         <i class="fa-solid fa-star me-1"></i> Tulis Review
                                     </a>

@@ -2,7 +2,7 @@
 @if(!isset($product))
     <div class="alert alert-danger">Error: Product data not found</div>
 @else
-<div class="bg-white rounded-3 p-4 shadow-sm">
+<div class="card shadow-lg rounded-4 border-0 p-4">
     <h2 class="h4 mb-4 text-dark">Ulasan Produk</h2>
 
     <!-- Rating Summary -->
@@ -61,7 +61,7 @@
                             <span class="star" data-value="{{ $i }}" style="cursor: pointer; font-size: 2rem; color: #6c757d; transition: color 0.2s;">⭐</span>
                         @endfor
                     </div>
-                    <small id="ratingError" class="text-danger d-none">Pilih rating terlebih dahulu</small>
+                    <div id="ratingError" class="text-danger small d-none">Pilih rating terlebih dahulu</div>
                 </div>
 
                 <!-- Comment -->
@@ -170,27 +170,17 @@
 
 <script>
     const productId = {{ $product->id_produk }};
+
+    // Get order_id from URL parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const orderId = urlParams.get('order_id');
+
+    // Get CSRF token - try meta tag first, then fallback
     let csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
-
-    // Initialize CSRF token
-    async function initializeCsrfToken() {
-        if (!csrfToken) {
-            console.warn('CSRF token not found in meta tag, trying to fetch from API...');
-            try {
-                const tokenResponse = await fetch('/api/csrf-token');
-                if (tokenResponse.ok) {
-                    const tokenData = await tokenResponse.json();
-                    csrfToken = tokenData.csrf_token;
-                    console.log('CSRF token fetched from API');
-                }
-            } catch (error) {
-                console.error('Failed to fetch CSRF token:', error);
-            }
-        }
+    if (!csrfToken) {
+        // Fallback: try to get from a hidden input or other sources
+        csrfToken = document.querySelector('input[name="_token"]')?.value;
     }
-
-    // Initialize on page load
-    initializeCsrfToken();
 
     // Rating stars interaction
     let selectedRating = 0;
@@ -199,7 +189,8 @@
         star.addEventListener('click', function() {
             selectedRating = parseInt(this.dataset.value);
             document.getElementById('ratingInput').value = selectedRating;
-            document.getElementById('ratingError').style.display = 'none';
+            const ratingError = document.getElementById('ratingError');
+            if (ratingError) ratingError.classList.add('d-none');
             updateStars(selectedRating);
         });
 
@@ -228,16 +219,28 @@
         const rating = document.getElementById('ratingInput')?.value;
         if (!rating) {
             const ratingError = document.getElementById('ratingError');
-            if (ratingError) ratingError.style.display = 'block';
+            if (ratingError) ratingError.classList.remove('d-none');
+            return;
+        } else {
+            const ratingError = document.getElementById('ratingError');
+            if (ratingError) ratingError.classList.add('d-none');
+        }
+
+        // Check CSRF token
+        if (!csrfToken) {
+            showMessage('error', 'CSRF token tidak ditemukan. Silakan refresh halaman.');
             return;
         }
 
         const formData = new FormData();
         formData.append('id_produk', productId);
+        if (orderId) {
+            formData.append('order_id', orderId);
+        }
         formData.append('rating', rating);
         const commentTextarea = document.querySelector('textarea[name="comment"]');
-        if (commentTextarea) {
-            formData.append('comment', commentTextarea.value);
+        if (commentTextarea && commentTextarea.value.trim()) {
+            formData.append('comment', commentTextarea.value.trim());
         }
 
         // Add photos
@@ -287,7 +290,7 @@
     function showMessage(type, message) {
         const messageDiv = document.getElementById('reviewMessage');
         messageDiv.textContent = message;
-        messageDiv.className = `alert ${type === 'success' ? 'alert-success' : 'alert-danger'}`;
+        messageDiv.className = `alert ${type === 'success' ? 'alert-success' : 'alert-danger'} mt-3`;
         messageDiv.classList.remove('d-none');
     }
 
