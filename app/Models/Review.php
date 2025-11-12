@@ -13,7 +13,7 @@ class Review extends Model
         'user_id',
         'id_produk',
         'rating',
-        'komentar',
+        'comment',
         'photos',
         'video',
         'status'

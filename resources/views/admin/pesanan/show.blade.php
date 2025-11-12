@@ -1,7 +1,7 @@
 @include('admin.header')
 
 <div class="container py-4">
-    <h3 class="fw-bold mb-4">🧾 Detail Pesanan #{{ $order->id }}</h3>
+    <h3 class="fw-bold mb-4">🧾 Detail Pesanan #{{ $order->order_code }}</h3>
 
     <!-- Informasi Pemesan -->
     <div class="mb-4">

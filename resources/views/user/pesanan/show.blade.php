@@ -6,7 +6,7 @@
 
             <!-- 🧾 Header Detail -->
             <h3 class="fw-bold mb-3">
-                <i class="fa-solid fa-receipt me-2 text-dark"></i> Detail Pesanan #{{ $order->id }}
+                <i class="fa-solid fa-receipt me-2 text-dark"></i> Detail Pesanan #{{ $order->order_code }}
             </h3>
 
             <!-- 📅 Informasi Pesanan -->

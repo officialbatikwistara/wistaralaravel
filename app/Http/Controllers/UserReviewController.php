@@ -52,12 +52,12 @@ class UserReviewController extends BaseController
 
         $validated = $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'komentar' => 'required|string',
+            'comment' => 'required|string',
         ]);
 
         $review->update([
             'rating' => $validated['rating'],
-            'komentar' => $validated['komentar'],
+            'comment' => $validated['comment'],
         ]);
 
         return redirect()->route('user.reviews.index')->with('success', 'Review diperbarui.');

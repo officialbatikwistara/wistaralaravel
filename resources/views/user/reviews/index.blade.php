@@ -85,7 +85,7 @@
                                             </td>
                                             <td>
                                                 <div class="text-truncate" style="max-width: 300px;">
-                                                    {{ $review->komentar }}
+                                                    {{ $review->comment }}
                                                 </div>
                                             </td>
                                             <td class="text-center">
@@ -142,7 +142,7 @@
                                         @endif
                                     </div>
 
-                                    <p class="mb-3 text-secondary">{{ $review->komentar }}</p>
+                                    <p class="mb-3 text-secondary">{{ $review->comment }}</p>
 
                                     <div class="d-flex gap-2">
                                         <a href="{{ route('user.reviews.edit', $review->id) }}" class="btn btn-primary btn-sm flex-fill rounded-pill">

@@ -31,7 +31,7 @@ class ReviewSeeder extends Seeder
                     'user_id' => $user->id,
                     'id_produk' => $product->id_produk,
                     'rating' => rand(4, 5),
-                    'komentar' => $this->getRandomComment(),
+                    'comment' => $this->getRandomComment(),
                     'photos' => null,
                     'video' => null,
                     'status' => 'approved'

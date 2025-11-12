@@ -228,7 +228,7 @@ h1 {
                     </td>
                     <td class="review-cell">
                         <div class="text-truncate" style="max-width: 300px;">
-                            {{ $review->komentar }}
+                            {{ $review->comment }}
                         </div>
                     </td>
                     <td class="review-cell">

@@ -29,7 +29,7 @@ class ReviewAdminController extends Controller
             $search = $request->search;
             $query->whereHas('user', function ($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%");
-            })->orWhere('komentar', 'like', "%{$search}%");
+            })->orWhere('comment', 'like', "%{$search}%");
         }
 
         // Sorting
@@ -71,13 +71,13 @@ class ReviewAdminController extends Controller
     {
         $request->validate([
             'rating' => 'required|integer|min:1|max:5',
-            'komentar' => 'required|string|max:1000',
+            'comment' => 'required|string|max:1000',
         ]);
 
         $review = Review::findOrFail($id);
         $review->update([
             'rating' => $request->rating,
-            'komentar' => $request->komentar,
+            'comment' => $request->comment,
         ]);
 
         return redirect()->route('admin.reviews.index')->with('success', 'Review berhasil diperbarui.');

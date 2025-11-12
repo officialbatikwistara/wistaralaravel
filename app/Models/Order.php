@@ -8,11 +8,10 @@ use Illuminate\Support\Str;
 class Order extends Model
 {
     protected $primaryKey = 'id';
-    public $incrementing = false; // ⚠️ nonaktifkan auto increment
-    protected $keyType = 'string';
+    public $incrementing = true;
+    protected $keyType = 'int';
 
     protected $fillable = [
-        'id',
         'user_id',
         'nama',
         'telepon',
@@ -27,19 +26,23 @@ class Order extends Model
         'tanggal_ambil'
     ];
 
+    protected $appends = ['order_code'];
+
     public static function boot()
     {
         parent::boot();
 
-        static::creating(function ($order) {
-            $today = now()->format('Ymd');
-            $random = strtoupper(Str::random(4)); // contoh: AX3P
-            $order->id = "WST-{$today}-{$random}";
-        });
+        // Remove the creating event that was setting string IDs
     }
 
     public function items()
     {
         return $this->hasMany(OrderItem::class, 'order_id');
+    }
+
+    // Accessor to get formatted order code
+    public function getOrderCodeAttribute()
+    {
+        return "WST-" . str_pad($this->id, 6, '0', STR_PAD_LEFT);
     }
 }

@@ -95,7 +95,7 @@
                                 @foreach ($orders->where('status', $status)->when($status == null, fn($q) => $orders) as $order)
                                     <tr>
                                         <td>{{ $no++ }}</td>
-                                        <td>#{{ $order->id }}</td>
+                                        <td>#{{ $order->order_code }}</td>
                                         <td>{{ $order->nama }}</td>
                                         <td>{{ $order->created_at->format('d M Y') }}</td>
                                         <td>Rp {{ number_format($order->total, 0, ',', '.') }}</td>

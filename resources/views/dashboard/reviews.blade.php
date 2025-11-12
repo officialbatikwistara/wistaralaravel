@@ -25,7 +25,7 @@
                                 @endif
                             @endfor
                         </div>
-                        <p class="mt-2 text-gray-600">{{ $review->komentar }}</p>
+                        <p class="mt-2 text-gray-600">{{ $review->comment }}</p>
 
                         <!-- Gambar Review -->
                         @if($review->foto)

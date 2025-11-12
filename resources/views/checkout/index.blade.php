@@ -85,7 +85,14 @@
                 <tr class="border-bottom">
                   <td>
                     <div class="d-flex align-items-center gap-3">
-                      <img src="{{ asset($item->produk->gambar) }}"
+                      @php
+                        $fileName = basename($item->produk->gambar ?? '');
+                        $gambarPath = public_path('uploads/produk/'.$fileName);
+                        $gambarUrl = (file_exists($gambarPath) && $fileName)
+                          ? asset('uploads/produk/'.$fileName)
+                          : asset('img/logo.png');
+                      @endphp
+                      <img src="{{ $gambarUrl }}"
                            alt="{{ $item->produk->nama_produk }}"
                            class="rounded shadow-sm border"
                            style="width: 60px; height: 60px; object-fit: cover;">
@@ -134,9 +141,11 @@
           </button>
         </div>
         <div class="p-3 bg-light rounded-3 border text-center" id="qrisInfo" style="display:none;">
-          <img src="{{ asset('img/qris.png') }}" alt="QRIS Batik Wistara"
-               style="max-width:200px; border-radius:10px;">
-          <p class="mt-2 mb-0"><small>Scan QRIS di atas untuk pembayaran</small></p>
+          <div class="bg-secondary text-white d-inline-flex align-items-center justify-content-center rounded"
+               style="width: 200px; height: 200px; font-size: 1.2rem; font-weight: bold;">
+            QRIS<br>Coming Soon
+          </div>
+          <p class="mt-2 mb-0"><small>QRIS payment akan segera tersedia</small></p>
         </div>
       </div>
 

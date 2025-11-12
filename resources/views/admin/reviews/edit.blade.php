@@ -96,9 +96,9 @@ h1 {
           </div>
 
           <div class="mb-3">
-            <label for="komentar" class="form-label fw-semibold">Komentar <span class="text-danger">*</span></label>
-            <textarea name="komentar" id="komentar" class="form-control" rows="5" required
-              placeholder="Masukkan komentar review...">{{ $review->komentar }}</textarea>
+            <label for="comment" class="form-label fw-semibold">Komentar <span class="text-danger">*</span></label>
+            <textarea name="comment" id="comment" class="form-control" rows="5" required
+              placeholder="Masukkan komentar review...">{{ $review->comment }}</textarea>
           </div>
 
           <div class="mb-3">
