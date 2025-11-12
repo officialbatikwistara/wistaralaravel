@@ -1,23 +1,23 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-<<<<<<< Updated upstream
+use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Berita;
 use App\Models\Order;
-/*
-|--------------------------------------------------------------------------
-| API Routes for Chatbot Wistara
-|--------------------------------------------------------------------------
-| Menyediakan data produk pesanan berita dalam format JSON
-| agar chatbot Node.js dapat mengaksesnya secara real-time.
-*/
-=======
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
 use App\Http\Controllers\Api\ChatbotApiController;
->>>>>>> Stashed changes
+
+/*
+|--------------------------------------------------------------------------
+| API Routes for Chatbot Wistara & Review System
+|--------------------------------------------------------------------------
+| Menyediakan data produk pesanan berita dalam format JSON
+| agar chatbot Node.js dapat mengaksesnya secara real-time.
+| Dan menyediakan API untuk sistem review produk.
+*/
 
 // ✅ Produk
 Route::get('/produk', function () {

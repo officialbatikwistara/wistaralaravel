@@ -1,4 +1,3 @@
-# ProductReview.vue
 <template>
   <div class="reviews-section bg-white p-6 rounded-lg shadow">
     <!-- Review Form -->
