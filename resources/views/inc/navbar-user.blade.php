@@ -34,6 +34,29 @@
 
     <!-- Bagian Kanan -->
     <div class="d-flex align-items-center gap-3" id="rightNavbarIcons">
+      <!-- ⭐ Ikon Review -->
+      @php
+          $pendingReviews = 0;
+          if (Auth::check()) {
+              $pendingReviews = \App\Models\Review::where('user_id', Auth::id())
+                  ->where('status', 'pending')
+                  ->count();
+          }
+      @endphp
+
+      <a href="{{ route('user.reviews.index') }}"
+        class="nav-link text-white position-relative p-0 d-inline-flex align-items-center me-3">
+        <i class="fa-solid fa-star fa-lg"></i>
+
+        @if($pendingReviews > 0)
+          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
+                style="font-size: 0.7rem; min-width: 20px; padding: 4px 6px;">
+            {{ $pendingReviews }}
+            <span class="visually-hidden">review pending</span>
+          </span>
+        @endif
+      </a>
+
       <!-- 🛒 Ikon Keranjang -->
       @php
           $cartCount = 0;
@@ -42,7 +65,7 @@
           }
       @endphp
 
-      <a href="{{ url('/cart') }}" 
+      <a href="{{ url('/cart') }}"
         class="nav-link text-white position-relative p-0 d-inline-flex align-items-center">
         <i class="fa-solid fa-cart-shopping fa-lg"></i>
 
@@ -68,6 +91,11 @@
                 <i class="fa-solid fa-user-circle me-2"></i> Profil
               </a>
             </li>
+            <li>
+              <a class="dropdown-item" href="{{ route('user.reviews.index') }}">
+                <i class="fa-solid fa-star me-2"></i> Review Saya
+              </a>
+            </li>
             <li><hr class="dropdown-divider"></li>
             <li>
               <form action="{{ route('user.logout') }}" method="GET" class="m-0">
@@ -85,7 +113,7 @@
         </a>
       @endauth
     </div>
-    
+
   </div>
 </nav>
 
