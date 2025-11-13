@@ -81,6 +81,13 @@
                         data-bs-target="#produkModal{{ $p->id_produk }}">
                   <i class="bi bi-cart-plus me-1"></i> Beli
                 </button>
+                @auth
+                <button id="wishlist-btn-{{ $p->id_produk }}" onclick="toggleWishlist({{ $p->id_produk }})"
+                        class="btn btn-outline-danger rounded-pill fw-semibold"
+                        style="border-color: #cda349; color: #cda349; padding: 0.375rem 0.75rem;">
+                  ❤️
+                </button>
+                @endauth
               </div>
             </div>
 
@@ -215,6 +222,81 @@
   @endauth
   @endforeach
 </section>
+
+@auth
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   // Check wishlist status for all products
+   @foreach($produk as $p)
+   checkWishlistStatus({{ $p->id_produk }});
+   @endforeach
+});
+
+function checkWishlistStatus(productId) {
+   fetch(`/wishlist/check/${productId}`)
+       .then(response => response.json())
+       .then(data => {
+           const btn = document.getElementById(`wishlist-btn-${productId}`);
+           if (data.in_wishlist) {
+               btn.classList.remove('btn-outline-danger');
+               btn.classList.add('btn-danger');
+               btn.style.backgroundColor = '#cda349';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = 'white';
+           } else {
+               btn.classList.remove('btn-danger');
+               btn.classList.add('btn-outline-danger');
+               btn.style.backgroundColor = 'transparent';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = '#cda349';
+           }
+       });
+}
+
+function toggleWishlist(productId) {
+   const btn = document.getElementById(`wishlist-btn-${productId}`);
+   const isInWishlist = btn.style.backgroundColor === 'rgb(205, 163, 73)'; // #cda349
+
+   if (isInWishlist) {
+       // Remove from wishlist
+       fetch(`/wishlist/remove/${productId}`, {
+           method: 'DELETE',
+           headers: {
+               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+               'Content-Type': 'application/json'
+           }
+       })
+       .then(response => response.json())
+       .then(data => {
+           btn.classList.remove('btn-danger');
+           btn.classList.add('btn-outline-danger');
+           btn.style.backgroundColor = 'transparent';
+           btn.style.borderColor = '#cda349';
+           btn.style.color = '#cda349';
+       });
+   } else {
+       // Add to wishlist
+       fetch(`/wishlist/add/${productId}`, {
+           method: 'POST',
+           headers: {
+               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+               'Content-Type': 'application/json'
+           }
+       })
+       .then(response => response.json())
+       .then(data => {
+           if (data.message === 'Added to wishlist') {
+               btn.classList.remove('btn-outline-danger');
+               btn.classList.add('btn-danger');
+               btn.style.backgroundColor = '#cda349';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = 'white';
+           }
+       });
+   }
+}
+</script>
+@endauth
 
 {{-- ==================== Footer ==================== --}}
 @include('inc.footer')

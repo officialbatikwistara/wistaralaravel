@@ -49,7 +49,10 @@ class CheckoutController extends Controller
             'telepon' => 'required|string|max:20',
             'tanggal_ambil' => 'required|date',
             'metode_pembayaran' => 'required|string',
-            'tipe_order' => 'required|string'
+            'tipe_order' => 'required|string',
+            'coupon_id' => 'nullable|exists:coupons,id',
+            'discount_amount' => 'nullable|numeric|min:0',
+            'final_total' => 'nullable|numeric|min:0'
         ]);
 
         $userId = Auth::id();
@@ -65,9 +68,12 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => $userId,
+                'coupon_id' => $request->coupon_id,
                 'nama' => $request->nama,
                 'telepon' => $request->telepon,
                 'total' => $produk->harga,
+                'discount_amount' => $request->discount_amount ?? 0,
+                'final_total' => $request->final_total ?? $produk->harga,
                 'status' => 'pending',
                 'status_pembayaran' => 'belum_bayar',
                 'metode_pembayaran' => $request->metode_pembayaran,
@@ -86,6 +92,11 @@ class CheckoutController extends Controller
             ]);
 
             $produk->decrement('stok', 1);
+
+            // Increment coupon usage if coupon was used
+            if ($request->coupon_id) {
+                \App\Models\Coupon::where('id', $request->coupon_id)->increment('used_count');
+            }
         } else {
             // 🛒 Checkout dari keranjang
             $cartItems = Cart::where('user_id', $userId)->with('produk')->get();
@@ -98,9 +109,12 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => $userId,
+                'coupon_id' => $request->coupon_id,
                 'nama' => $request->nama,
                 'telepon' => $request->telepon,
                 'total' => $total,
+                'discount_amount' => $request->discount_amount ?? 0,
+                'final_total' => $request->final_total ?? $total,
                 'status' => 'pending',
                 'status_pembayaran' => 'belum_bayar',
                 'metode_pembayaran' => $request->metode_pembayaran,
@@ -123,6 +137,11 @@ class CheckoutController extends Controller
             }
 
             Cart::where('user_id', $userId)->delete();
+
+            // Increment coupon usage if coupon was used
+            if ($request->coupon_id) {
+                \App\Models\Coupon::where('id', $request->coupon_id)->increment('used_count');
+            }
         }
 
         // 🔁 Redirect sesuai metode pembayaran

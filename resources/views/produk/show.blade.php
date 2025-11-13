@@ -102,6 +102,10 @@
             @else
               <button class="btn btn-secondary w-100" disabled>Stok Habis</button>
             @endif
+            <button id="wishlist-btn" onclick="toggleWishlist({{ $product->id_produk }})"
+                    class="btn btn-outline-danger flex-fill rounded-pill" style="border-color: #cda349; color: #cda349;">
+              ❤️ Tambah ke Wishlist
+            </button>
           @else
             <a href="{{ route('login') }}" class="btn btn-primary w-100">
               Login untuk Membeli
@@ -144,5 +148,81 @@
     </div>
   </div>
 </section>
+
+<script>
+@auth
+document.addEventListener('DOMContentLoaded', function() {
+    checkWishlistStatus({{ $product->id_produk }});
+});
+
+function checkWishlistStatus(productId) {
+    fetch(`/wishlist/check/${productId}`)
+        .then(response => response.json())
+        .then(data => {
+            const btn = document.getElementById('wishlist-btn');
+            if (data.in_wishlist) {
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-danger');
+                btn.style.backgroundColor = '#cda349';
+                btn.style.borderColor = '#cda349';
+                btn.style.color = 'white';
+                btn.innerHTML = '❤️ Sudah di Wishlist';
+            } else {
+                btn.classList.remove('btn-danger');
+                btn.classList.add('btn-outline-danger');
+                btn.style.backgroundColor = 'transparent';
+                btn.style.borderColor = '#cda349';
+                btn.style.color = '#cda349';
+                btn.innerHTML = '❤️ Tambah ke Wishlist';
+            }
+        });
+}
+
+function toggleWishlist(productId) {
+    const btn = document.getElementById('wishlist-btn');
+    const isInWishlist = btn.style.backgroundColor === 'rgb(205, 163, 73)'; // #cda349
+
+    if (isInWishlist) {
+        // Remove from wishlist
+        fetch(`/wishlist/remove/${productId}`, {
+            method: 'DELETE',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.classList.remove('btn-danger');
+            btn.classList.add('btn-outline-danger');
+            btn.style.backgroundColor = 'transparent';
+            btn.style.borderColor = '#cda349';
+            btn.style.color = '#cda349';
+            btn.innerHTML = '❤️ Tambah ke Wishlist';
+        });
+    } else {
+        // Add to wishlist
+        fetch(`/wishlist/add/${productId}`, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'Added to wishlist') {
+                btn.classList.remove('btn-outline-danger');
+                btn.classList.add('btn-danger');
+                btn.style.backgroundColor = '#cda349';
+                btn.style.borderColor = '#cda349';
+                btn.style.color = 'white';
+                btn.innerHTML = '❤️ Sudah di Wishlist';
+            }
+        });
+    }
+}
+@endauth
+</script>
 
 @include('inc.footer')

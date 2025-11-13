@@ -85,9 +85,9 @@
                                 </svg>
                             </button>
                             <div class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 hidden group-hover:block">
-                                <a href="{{ route('dashboard.reviews') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Review Saya</a>
+                                <a href="{{ route('user.reviews.index') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Review Saya</a>
                                 <a href="{{ route('user.orders') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Pesanan Saya</a>
-                                <form method="POST" action="{{ route('logout') }}">
+                                <form method="POST" action="{{ route('user.logout') }}">
                                     @csrf
                                     <button type="submit" class="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Logout</button>
                                 </form>
@@ -116,7 +116,7 @@
                         <!-- User Dropdown -->
                         <div class="relative">
                             <span>{{ Auth::user()->name }}</span>
-                            <form action="{{ route('logout') }}" method="POST" style="display: inline;">
+                            <form action="{{ route('user.logout') }}" method="POST" style="display: inline;">
                                 @csrf
                                 <button type="submit" class="nav-link" style="border: none; background: none; cursor: pointer;">
                                     Logout

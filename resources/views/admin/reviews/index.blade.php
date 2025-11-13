@@ -207,6 +207,7 @@ h1 {
                     <th>Produk</th>
                     <th>Rating</th>
                     <th>Komentar</th>
+                    <th>Reply</th>
                     <th>Status</th>
                     <th>Tanggal</th>
                     <th class="text-center">Aksi</th>
@@ -232,12 +233,24 @@ h1 {
                         </div>
                     </td>
                     <td class="review-cell">
+                        @if($review->reply)
+                            <div class="text-truncate" style="max-width: 200px; font-size: 0.9em; color: #666;">
+                                {{ $review->reply }}
+                            </div>
+                        @else
+                            <span class="text-muted">-</span>
+                        @endif
+                    </td>
+                    <td class="review-cell">
                         @if ($review->status === 'pending')
                             <span class="badge status-pending">Pending</span>
                         @elseif ($review->status === 'approved')
                             <span class="badge status-approved">Disetujui</span>
                         @else
                             <span class="badge status-rejected">Ditolak</span>
+                        @endif
+                        @if($review->is_verified_purchase)
+                            <br><small class="text-success"><i class="fa-solid fa-check-circle"></i> Verified</small>
                         @endif
                     </td>
                     <td class="review-cell fw-semibold">
@@ -281,7 +294,7 @@ h1 {
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="7" class="text-center text-muted py-4">
+                    <td colspan="8" class="text-center text-muted py-4">
                         <i class="fa-solid fa-folder-open fa-2x mb-2"></i><br>
                         Belum ada review
                     </td>

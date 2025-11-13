@@ -11,7 +11,7 @@
             <div class="border rounded-lg p-4">
                 <div class="flex items-start justify-between">
                     <div>
-                        <h3 class="font-semibold">{{ $review->produk->nama }}</h3>
+                        <h3 class="font-semibold">{{ $review->product->nama_produk }}</h3>
                         <div class="flex items-center mt-1">
                             @for($i = 1; $i <= 5; $i++)
                                 @if($i <= $review->rating)

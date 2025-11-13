@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Review;
+use App\Models\ReviewHelpfulVote;
 use Illuminate\Support\Facades\Storage;
 
 class ReviewController extends Controller
@@ -100,6 +101,8 @@ class ReviewController extends Controller
         }
         if ($isAdmin) {
             $rules['status'] = 'nullable|in:pending,approved,rejected';
+            $rules['reply'] = 'nullable|string';
+            $rules['is_verified_purchase'] = 'nullable|boolean';
         }
 
         if (empty($rules)) {
@@ -108,6 +111,12 @@ class ReviewController extends Controller
 
         $validated = $request->validate($rules);
         $review->fill($validated);
+
+        // Set replied_at if reply is provided
+        if (isset($validated['reply']) && $validated['reply']) {
+            $review->replied_at = now();
+        }
+
         $review->save();
 
         return response()->json(['message' => 'Review diperbarui.', 'data' => $review]);
@@ -138,6 +147,37 @@ class ReviewController extends Controller
         $review->delete();
 
         return response()->json(['message' => 'Review dihapus.']);
+    }
+
+    // POST /api/reviews/{id}/helpful
+    public function markHelpful(Request $request, $id)
+    {
+        $review = Review::findOrFail($id);
+
+        if (!$request->user()) {
+            return response()->json(['message' => 'Authentication required'], 401);
+        }
+
+        $userId = $request->user()->id;
+
+        // Check if user already voted
+        if ($review->hasUserVotedHelpful($userId)) {
+            return response()->json(['message' => 'Already voted helpful'], 400);
+        }
+
+        // Create vote
+        ReviewHelpfulVote::create([
+            'review_id' => $review->id,
+            'user_id' => $userId
+        ]);
+
+        // Update helpful count
+        $review->increment('helpful_count');
+
+        return response()->json([
+            'message' => 'Marked as helpful',
+            'helpful_count' => $review->helpful_count
+        ]);
     }
 }
 

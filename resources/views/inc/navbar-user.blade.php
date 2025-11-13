@@ -57,6 +57,12 @@
         @endif
       </a>
 
+      <!-- ❤️ Ikon Wishlist -->
+      <a href="{{ route('wishlist.index') }}"
+        class="nav-link text-white position-relative p-0 d-inline-flex align-items-center me-3">
+        <i class="fa-solid fa-heart fa-lg"></i>
+      </a>
+
       <!-- 🛒 Ikon Keranjang -->
       @php
           $cartCount = 0;

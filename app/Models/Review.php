@@ -17,12 +17,19 @@ class Review extends Model
         'comment',
         'photos',
         'video',
-        'status'
+        'status',
+        'reply',
+        'replied_at',
+        'is_verified_purchase',
+        'helpful_count'
     ];
 
     protected $casts = [
         'photos' => 'array',
-        'rating' => 'integer'
+        'rating' => 'integer',
+        'is_verified_purchase' => 'boolean',
+        'helpful_count' => 'integer',
+        'replied_at' => 'datetime'
     ];
 
     public function user()
@@ -38,6 +45,16 @@ class Review extends Model
     public function order()
     {
         return $this->belongsTo(Order::class, 'order_id', 'id');
+    }
+
+    public function helpfulVotes()
+    {
+        return $this->hasMany(ReviewHelpfulVote::class);
+    }
+
+    public function hasUserVotedHelpful($userId)
+    {
+        return $this->helpfulVotes()->where('user_id', $userId)->exists();
     }
 }
 

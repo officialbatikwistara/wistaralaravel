@@ -14,7 +14,7 @@ class UserReviewController extends BaseController
         $this->middleware('auth');
     }
 
-    // GET /user/reviews
+    // GET /user/reviews or /dashboard/reviews
     public function index(Request $request)
     {
         $query = Review::where('user_id', auth()->id())
@@ -25,6 +25,11 @@ class UserReviewController extends BaseController
         }
 
         $reviews = $query->orderBy('created_at', 'desc')->paginate(15);
+
+        // Check if this is dashboard route
+        if ($request->is('dashboard/reviews')) {
+            return view('dashboard.reviews', compact('reviews'));
+        }
 
         return view('user.reviews.index', compact('reviews'));
     }

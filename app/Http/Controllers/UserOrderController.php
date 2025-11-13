@@ -10,7 +10,20 @@ use Illuminate\Support\Facades\DB;
 class UserOrderController extends Controller
 {
     /**
-     * 📄 Detail pesanan user
+     * 📋 Daftar semua pesanan user
+     */
+    public function index()
+    {
+        $orders = Order::where('user_id', Auth::id())
+            ->with(['items.produk'])
+            ->orderBy('created_at', 'desc')
+            ->paginate(10);
+
+        return view('user.pesanan.index', compact('orders'));
+    }
+
+    /**
+     * � Detail pesanan user
      */
     public function show($id)
     {
