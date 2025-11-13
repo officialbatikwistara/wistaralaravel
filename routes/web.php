@@ -235,6 +235,77 @@ Route::get('/api/csrf-token', function () {
     ]);
 });
 
+// 🔔 Notification routes
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', function () {
+        $notifications = auth()->user()->notifications()->latest()->limit(10)->get();
+        return response()->json(['notifications' => $notifications]);
+    });
+
+    Route::get('/notifications/check', function () {
+        $user = auth()->user();
+        $count = $user->unreadNotifications()->count();
+        return response()->json(['count' => $count]);
+    });
+
+    Route::get('/notifications/stream', function () {
+        $user = auth()->user();
+        $lastCount = (int) request('last_count', 0);
+
+        return response()->stream(function () use ($user, $lastCount) {
+            $lastCheck = time();
+
+            while (true) {
+                $currentCount = $user->unreadNotifications()->count();
+
+                if ($currentCount > $lastCount) {
+                    $newNotifications = $user->notifications()
+                        ->where('created_at', '>', now()->subSeconds(30))
+                        ->latest()
+                        ->limit(5)
+                        ->get();
+
+                    $data = [
+                        'count' => $currentCount,
+                        'new_count' => $currentCount - $lastCount,
+                        'notifications' => $newNotifications,
+                        'timestamp' => time()
+                    ];
+
+                    echo "data: " . json_encode($data) . "\n\n";
+                    ob_flush();
+                    flush();
+                }
+
+                // Check every 5 seconds
+                sleep(5);
+
+                // Timeout after 5 minutes
+                if (time() - $lastCheck > 300) {
+                    break;
+                }
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Cache-Control',
+        ]);
+    });
+
+    Route::post('/notifications/{id}/mark-as-read', function ($id) {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/notifications/mark-all-read', function () {
+        auth()->user()->unreadNotifications()->update(['read_at' => now()]);
+        return response()->json(['success' => true]);
+    });
+});
+
 /*
 |--------------------------------------------------------------------------
 | Route Login & Auth Admin

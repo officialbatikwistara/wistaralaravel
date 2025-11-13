@@ -35,10 +35,19 @@ class WishlistController extends BaseController
             return response()->json(['message' => 'Already in wishlist'], 400);
         }
 
+        $product = \App\Models\Produk::find($productId);
+        $user = auth()->user();
+
         Wishlist::create([
             'user_id' => auth()->id(),
             'id_produk' => $productId
         ]);
+
+        // Notify admin about new wishlist addition
+        $admin = \App\Models\Admin::first(); // Assuming there's at least one admin
+        if ($admin) {
+            $admin->notify(new \App\Notifications\WishlistNotification($product, $user));
+        }
 
         return response()->json(['message' => 'Added to wishlist']);
     }

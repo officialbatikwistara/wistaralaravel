@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -83,6 +84,16 @@ class CheckoutController extends Controller
                 'catatan' => $request->catatan,
             ]);
 
+            // Notify admin about new order
+            $admin = \App\Models\Admin::first();
+            $user = Auth::user();
+            if ($admin && $user) {
+                $admin->notify(new \App\Notifications\NewOrderNotification($order, $user));
+
+                // Send WhatsApp notification
+                $this->sendWhatsapp($admin->phone ?? env('ADMIN_PHONE'), "🆕 PESANAN BARU!\n\nID: #{$order->id}\nCustomer: {$user->name}\nTotal: Rp " . number_format($order->total, 0, ',', '.') . "\n\nSegera cek dashboard untuk detail lengkap.");
+            }
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'id_produk' => $produk->id_produk,
@@ -124,6 +135,16 @@ class CheckoutController extends Controller
                 'catatan' => $request->catatan,
             ]);
 
+            // Notify admin about new order
+            $admin = \App\Models\Admin::first();
+            $user = Auth::user();
+            if ($admin && $user) {
+                $admin->notify(new \App\Notifications\NewOrderNotification($order, $user));
+
+                // Send WhatsApp notification
+                $this->sendWhatsapp($admin->phone ?? env('ADMIN_PHONE'), "🆕 PESANAN BARU!\n\nID: #{$order->id}\nCustomer: {$user->name}\nTotal: Rp " . number_format($order->total, 0, ',', '.') . "\n\nSegera cek dashboard untuk detail lengkap.");
+            }
+
             foreach ($cartItems as $item) {
                 OrderItem::create([
                     'order_id' => $order->id,
@@ -151,6 +172,48 @@ class CheckoutController extends Controller
             return redirect()->route('checkout.qris', $order->id);
         } else {
             return redirect('/user/dashboard')->with('success', 'Pesanan berhasil dibuat!');
+        }
+    }
+
+    /**
+     * 📲 Helper kirim pesan WhatsApp via Fonnte API
+     */
+    protected function sendWhatsapp($phone, $message)
+    {
+        if (!$phone) return;
+
+        $token = env('FONNTE_TOKEN');
+
+        if (!$token) {
+            Log::warning('FONNTE_TOKEN not configured');
+            return;
+        }
+
+        try {
+            $curl = curl_init();
+            curl_setopt_array($curl, [
+                CURLOPT_URL => "https://api.fonnte.com/send",
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_POST => true,
+                CURLOPT_TIMEOUT => 10,
+                CURLOPT_POSTFIELDS => [
+                    'target' => $phone,
+                    'message' => $message,
+                ],
+                CURLOPT_HTTPHEADER => [
+                    "Authorization: $token"
+                ],
+            ]);
+
+            $response = curl_exec($curl);
+
+            if (curl_errno($curl)) {
+                Log::error('WhatsApp send error: ' . curl_error($curl));
+            }
+
+            curl_close($curl);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp exception: ' . $e->getMessage());
         }
     }
 }

@@ -138,13 +138,9 @@
                         </div>
 
                         <!-- Total & Checkout -->
-                        @php
-                            $totalHarga = $cartItems->sum(fn($item) => $item->qty * (optional($item->produk)->harga ?? 0));
-                        @endphp
-
                         <div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mt-4 pt-3 border-top">
                             <h5 class="fw-bold mb-0">
-                                Total: <span class="text-warning">Rp {{ number_format($totalHarga, 0, ',', '.') }}</span>
+                                Total: <span class="text-warning">Rp {{ number_format($total, 0, ',', '.') }}</span>
                             </h5>
                             <a href="{{ route('checkout.index') }}" class="btn btn-warning rounded-pill px-4 fw-semibold">
                                 <i class="fa-solid fa-cash-register me-2"></i> Checkout

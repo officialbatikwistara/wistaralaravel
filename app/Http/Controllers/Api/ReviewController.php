@@ -70,6 +70,12 @@ class ReviewController extends Controller
 
         $review->save();
 
+        // Notify admin about new review
+        $admin = \App\Models\Admin::first(); // Assuming there's at least one admin
+        if ($admin) {
+            $admin->notify(new \App\Notifications\ReviewNotification($review->load('product'), $request->user()));
+        }
+
         return response()->json([
             'message' => 'Review berhasil ditambahkan dan menunggu persetujuan.',
             'data' => $review->load(['user:id,name'])

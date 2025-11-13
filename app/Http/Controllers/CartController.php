@@ -30,16 +30,24 @@ class CartController extends Controller
      */
     public function add(Request $request, $produkId)
     {
-        // Pastikan produk valid
+        // Pastikan produk valid dan tersedia
         $produk = Produk::findOrFail($produkId);
+
+        if ($produk->stok <= 0) {
+            return back()->with('error', 'Produk ini sedang habis stok');
+        }
 
         // Cek apakah produk sudah ada di keranjang user
         $cart = Cart::where('user_id', Auth::id())
-            ->where('id_produk', $produkId) // pakai id_produk sesuai DB kamu
+            ->where('id_produk', $produkId)
             ->first();
 
         if ($cart) {
-            // Jika sudah ada, tambahkan qty
+            // Jika sudah ada, tambahkan qty tapi jangan melebihi stok
+            $newQty = $cart->qty + 1;
+            if ($newQty > $produk->stok) {
+                return back()->with('error', 'Jumlah melebihi stok tersedia');
+            }
             $cart->increment('qty');
         } else {
             // Jika belum ada, buat baru
@@ -64,7 +72,12 @@ class CartController extends Controller
 
         $cart = Cart::where('id', $id)
             ->where('user_id', Auth::id())
+            ->with('produk')
             ->firstOrFail();
+
+        if ($request->qty > $cart->produk->stok) {
+            return back()->with('error', 'Jumlah melebihi stok tersedia');
+        }
 
         $cart->update(['qty' => $request->qty]);
 
