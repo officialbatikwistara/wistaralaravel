@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Produk;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -15,10 +16,11 @@ class HomeController extends Controller
             ->limit(4)
             ->get();
 
-        // Ambil 8 produk terbaru
-        $produk = DB::table('produk')
-            ->join('kategori_produk', 'produk.id_kategori', '=', 'kategori_produk.id_kategori')
-            ->select('produk.*', 'kategori_produk.nama_kategori')
+        // Ambil 8 produk terbaru + kategori + reviews approved
+        $produk = Produk::with([
+                'kategori:id_kategori,nama_kategori',
+                'approvedReviews:id,id_produk,rating,status'
+            ])
             ->orderBy('tanggal_upload', 'desc')
             ->limit(8)
             ->get();

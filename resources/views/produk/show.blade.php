@@ -1,228 +1,182 @@
 @include('inc.header')
-
 <!-- 🟡 Hero Header -->
 <section class="page-header d-flex align-items-center justify-content-center text-center"
-         style="background: linear-gradient(rgba(0,0,0,0.45), rgba(0, 0, 0, 0.71)), url('{{ asset('img/bghero.svg') }}') center/cover no-repeat; min-height: 200px;">
+         style="background: linear-gradient(rgba(0,0,0,0.45), rgba(0, 0, 0, 0.71)), url('{{ asset('img/bghero.svg') }}') center/cover no-repeat;">
   <div class="container position-relative">
-    <h1 class="fw-bold page-title text-white display-5">{{ $product->nama_produk ?? 'Produk' }}</h1>
+    <h1 class="fw-bold page-title text-white display-5">{{ $product->nama_produk }}</h1>
   </div>
 </section>
 
-<!-- 📦 Detail Produk -->
-<section class="py-5">
-  <div class="container">
-    <!-- Breadcrumb -->
-    <div class="mb-4" style="color: #666; font-size: 0.875rem;">
-      <a href="{{ route('home') }}" style="color: #007bff; text-decoration: none;">Home</a>
-      <span> / </span>
-      <a href="{{ route('katalog') }}" style="color: #007bff; text-decoration: none;">Katalog</a>
-      <span> / </span>
-      <span>{{ $product->nama_produk }}</span>
-    </div>
+<!-- ========================= HERO PRODUK ========================= -->
+<section class="produk-detail pt-5 mt-4">
+    <div class="container py-4">
 
-    <!-- Product Details Grid -->
-    <div class="row g-4 mb-5">
-      <!-- Product Image -->
-      <div class="col-md-6">
-        <div class="bg-light rounded overflow-hidden" style="aspect-ratio: 1;">
-          @php
-            $fileName = basename($product->gambar ?? '');
-            // Map old database paths to actual filenames
-            $imageMap = [
-                'batik-parang.jpg' => '1760930150_14.jpg',
-                'batik-mega-mendung.jpg' => '1760930168_6.jpg',
-                'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
-            ];
-            $actualFileName = $imageMap[$fileName] ?? $fileName;
-            $gambarPath = public_path('uploads/produk/'.$actualFileName);
-            $gambarUrl = (file_exists($gambarPath) && $actualFileName)
-                ? asset('uploads/produk/'.$actualFileName)
-                : asset('img/logo.png');
-          @endphp
-          <img src="{{ $gambarUrl }}" alt="{{ $product->nama_produk }}" class="w-100 h-100" style="object-fit: cover;">
-        </div>
-      </div>
+        <div class="row g-4">
 
-      <!-- Product Info -->
-      <div class="col-md-6">
-        <h1 class="fw-bold mb-3">{{ $product->nama_produk }}</h1>
+            <!-- ==================== FOTO PRODUK ==================== -->
+            <div class="col-lg-6">
 
-        <!-- Rating Summary -->
-        <div class="bg-light p-3 rounded mb-3">
-          <div class="d-flex align-items-center gap-3">
-            <div class="text-center">
-              <div class="fs-2 fw-bold text-warning">
-                {{ number_format($product->average_rating, 1) }}
-              </div>
-              <div class="text-muted small">⭐ dari 5</div>
+                <div class="main-image shadow-sm rounded-4 overflow-hidden mb-3">
+                    <img id="mainPreview" 
+                         src="{{ asset($product->gambar) }}" 
+                         class="img-fluid w-100" 
+                         style="object-fit: cover; height: 420px;">
+                </div>
+
+                <!-- Thumbnail -->
+                <div class="d-flex gap-2">
+                    <img src="{{ asset($product->gambar) }}" 
+                         class="thumb-img rounded shadow-sm" 
+                         onclick="changeImage(this)">
+                </div>
+
             </div>
-            <div class="border-start ps-3">
-              <div class="fw-semibold">{{ $product->review_count }} ulasan</div>
-              <div class="text-muted small">dari {{ $product->reviews()->count() }} total</div>
+
+            <!-- ==================== INFO PRODUK ==================== -->
+            <div class="col-lg-6">
+
+                <!-- Kategori -->
+                <span class="badge bg-dark mb-2">{{ $product->kategori->nama_kategori }}</span>
+
+                <h2 class="fw-bold">{{ $product->nama_produk }}</h2>
+
+                <!-- Rating -->
+                @php
+                    $avgRating = round($product->average_rating, 1);
+                    $reviewCount = $product->review_count;
+                @endphp
+
+                <div class="rating-stars mb-2">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= floor($avgRating))
+                            <i class="fa-solid fa-star text-warning"></i>
+                        @elseif($i == ceil($avgRating) && $avgRating - floor($avgRating) >= 0.5)
+                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                        @else
+                            <i class="fa-regular fa-star text-secondary"></i>
+                        @endif
+                    @endfor
+                    <span class="text-muted ms-1 small">({{ $reviewCount }} ulasan)</span>
+                </div>
+
+                <!-- Harga -->
+                <h3 class="fw-bold text-warning mb-3">
+                    Rp {{ number_format($product->harga, 0, ',', '.') }}
+                </h3>
+
+                <!-- Deskripsi -->
+                <p class="text-muted" style="line-height: 1.7;">
+                    {!! nl2br(e($product->deskripsi)) !!}
+                </p>
+
+                <!-- TOMBOL AKSI -->
+                <div class="d-flex gap-3 mt-4">
+
+                    <!-- Beli Sekarang -->
+                    <a href="{{ route('checkout.direct', $product->id_produk) }}" 
+                       class="btn btn-warning px-4 py-2 fw-bold text-dark shadow-sm">
+                        🛍️ Beli Sekarang
+                    </a>
+
+                    <!-- Tambah Keranjang -->
+                    @auth
+                        <form action="{{ route('cart.add', $product->id_produk) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="qty" value="1">
+                            <button class="btn btn-outline-dark px-4 py-2 fw-bold">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" 
+                           class="btn btn-outline-dark px-4 py-2 fw-bold">
+                           <i class="fa-solid fa-cart-plus"></i>
+                        </a>
+                    @endauth
+
+                </div>
+
+                <!-- Marketplace -->
+                <div class="mt-4">
+                    <p class="fw-semibold mb-2">Atau beli melalui:</p>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="https://wa.me/62895381110035?text={{ urlencode('Halo admin, saya tertarik dengan produk ' . $product->nama_produk) }}"
+                           class="btn btn-success btn-sm d-flex align-items-center gap-2">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+
+                        @if ($product->link_shopee)
+                            <a href="{{ $product->link_shopee }}" target="_blank" 
+                               class="btn btn-warning btn-sm text-dark d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-bag-shopping"></i> Shopee
+                            </a>
+                        @endif
+
+                        @if ($product->link_tiktok)
+                            <a href="{{ $product->link_tiktok }}" target="_blank" 
+                               class="btn btn-dark btn-sm d-flex align-items-center gap-2">
+                                <i class="fa-brands fa-tiktok"></i> TikTok Shop
+                            </a>
+                        @endif
+                    </div>
+                </div>
+
             </div>
-          </div>
+
         </div>
 
-        <!-- Price -->
-        <div class="mb-3">
-          <h3 class="text-warning fw-bold">Rp {{ number_format($product->harga, 0, ',', '.') }}</h3>
-        </div>
+        <!-- ========================= REVIEW USER ========================= -->
+        <hr class="my-5">
 
-        <!-- Category -->
-        <div class="mb-3">
-          @if($product->kategori)
-            <span class="badge bg-secondary">{{ $product->kategori->nama_kategori }}</span>
-          @else
-            <span class="badge bg-secondary">Tanpa Kategori</span>
-          @endif
-        </div>
+        <h4 class="fw-bold mb-3">Ulasan Produk</h4>
 
-        <!-- Stock -->
-        <div class="mb-4">
-          @if ($product->stok > 0)
-            <span class="badge bg-success">✅ Stok Tersedia ({{ $product->stok }})</span>
-          @else
-            <span class="badge bg-danger">❌ Stok Habis</span>
-          @endif
-        </div>
+        @forelse ($product->approvedReviews as $review)
+            <div class="card border-0 shadow-sm p-3 mb-3">
 
-        <!-- Action Buttons -->
-        <div class="d-flex gap-2 mb-4">
-          @auth
-            @if ($product->stok > 0)
-              <form action="{{ route('cart.add', $product->id_produk) }}" method="POST" class="flex-fill">
-                @csrf
-                <button type="submit" class="btn btn-primary w-100">
-                  🛒 Tambah ke Keranjang
-                </button>
-              </form>
-              <a href="{{ route('checkout.direct', $product->id_produk) }}" class="btn btn-success flex-fill">
-                ⚡ Beli Sekarang
-              </a>
-            @else
-              <button class="btn btn-secondary w-100" disabled>Stok Habis</button>
-            @endif
-            <button id="wishlist-btn" onclick="toggleWishlist({{ $product->id_produk }})"
-                    class="btn btn-outline-danger flex-fill rounded-pill" style="border-color: #cda349; color: #cda349;">
-              ❤️ Tambah ke Wishlist
-            </button>
-          @else
-            <a href="{{ route('login') }}" class="btn btn-primary w-100">
-              Login untuk Membeli
-            </a>
-          @endauth
-        </div>
+                <div class="d-flex justify-content-between">
+                    <strong>{{ $review->user->name ?? 'User' }}</strong>
+                    <small class="text-muted">{{ $review->created_at->format('d M Y') }}</small>
+                </div>
 
-        <!-- Marketplace Links -->
-        @if ($product->link_shopee || $product->link_tiktok)
-          <div class="mb-3">
-            <h6 class="fw-semibold mb-2">Beli di Marketplace:</h6>
-            <div class="d-flex gap-2">
-              @if ($product->link_shopee)
-                <a href="{{ $product->link_shopee }}" target="_blank" class="btn btn-sm btn-outline-warning">
-                  🛍️ Shopee
-                </a>
-              @endif
-              @if ($product->link_tiktok)
-                <a href="{{ $product->link_tiktok }}" target="_blank" class="btn btn-sm btn-outline-dark">
-                  🎵 TikTok Shop
-                </a>
-              @endif
+                <!-- Rating -->
+                <div class="rating-stars my-1">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if($i <= $review->rating)
+                            <i class="fa-solid fa-star text-warning"></i>
+                        @else
+                            <i class="fa-regular fa-star text-secondary"></i>
+                        @endif
+                    @endfor
+                </div>
+
+                <p class="mb-2">{{ $review->comment }}</p>
+
+                @if($review->photos)
+                    <div class="d-flex gap-2 mt-2">
+                        @foreach($review->photos as $photo)
+                            <img src="{{ asset('storage/'.$photo) }}" class="rounded" width="90">
+                        @endforeach
+                    </div>
+                @endif
+
+                @if($review->video)
+                    <video class="mt-3 rounded" width="200" controls>
+                        <source src="{{ asset('storage/'.$review->video) }}">
+                    </video>
+                @endif
+
             </div>
-          </div>
-        @endif
-      </div>
-    </div>
+        @empty
+            <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
+        @endforelse
 
-    <!-- Product Description -->
-    <div class="bg-light p-4 rounded mb-5">
-      <h2 class="h4 mb-3">Deskripsi Produk</h2>
-      <div style="line-height: 1.8; color: #555;">
-        {!! nl2br(e($product->deskripsi)) !!}
-      </div>
     </div>
-
-    <!-- Reviews Section -->
-    <div>
-      @include('components.product-review', ['product' => $product])
-    </div>
-  </div>
 </section>
 
 <script>
-@auth
-document.addEventListener('DOMContentLoaded', function() {
-    checkWishlistStatus({{ $product->id_produk }});
-});
-
-function checkWishlistStatus(productId) {
-    fetch(`/wishlist/check/${productId}`)
-        .then(response => response.json())
-        .then(data => {
-            const btn = document.getElementById('wishlist-btn');
-            if (data.in_wishlist) {
-                btn.classList.remove('btn-outline-danger');
-                btn.classList.add('btn-danger');
-                btn.style.backgroundColor = '#cda349';
-                btn.style.borderColor = '#cda349';
-                btn.style.color = 'white';
-                btn.innerHTML = '❤️ Sudah di Wishlist';
-            } else {
-                btn.classList.remove('btn-danger');
-                btn.classList.add('btn-outline-danger');
-                btn.style.backgroundColor = 'transparent';
-                btn.style.borderColor = '#cda349';
-                btn.style.color = '#cda349';
-                btn.innerHTML = '❤️ Tambah ke Wishlist';
-            }
-        });
-}
-
-function toggleWishlist(productId) {
-    const btn = document.getElementById('wishlist-btn');
-    const isInWishlist = btn.style.backgroundColor === 'rgb(205, 163, 73)'; // #cda349
-
-    if (isInWishlist) {
-        // Remove from wishlist
-        fetch(`/wishlist/remove/${productId}`, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            btn.classList.remove('btn-danger');
-            btn.classList.add('btn-outline-danger');
-            btn.style.backgroundColor = 'transparent';
-            btn.style.borderColor = '#cda349';
-            btn.style.color = '#cda349';
-            btn.innerHTML = '❤️ Tambah ke Wishlist';
-        });
-    } else {
-        // Add to wishlist
-        fetch(`/wishlist/add/${productId}`, {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                'Content-Type': 'application/json'
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if (data.message === 'Added to wishlist') {
-                btn.classList.remove('btn-outline-danger');
-                btn.classList.add('btn-danger');
-                btn.style.backgroundColor = '#cda349';
-                btn.style.borderColor = '#cda349';
-                btn.style.color = 'white';
-                btn.innerHTML = '❤️ Sudah di Wishlist';
-            }
-        });
+    function changeImage(el) {
+        document.getElementById('mainPreview').src = el.src;
     }
-}
-@endauth
 </script>
-
 @include('inc.footer')

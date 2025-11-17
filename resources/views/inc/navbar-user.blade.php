@@ -1,5 +1,7 @@
 <!-- ================= NAVBAR ================= -->
 <nav id="navbarWistara" class="navbar navbar-dark navbar-expand-lg position-fixed top-0 start-0 w-100" style="z-index: 1000;">
+
+<div class="navbar-overlay"></div>
   <div class="container">
 
     <!-- Logo -->
@@ -34,35 +36,6 @@
 
     <!-- Bagian Kanan -->
     <div class="d-flex align-items-center gap-3" id="rightNavbarIcons">
-      <!-- ⭐ Ikon Review -->
-      @php
-          $pendingReviews = 0;
-          if (Auth::check()) {
-              $pendingReviews = \App\Models\Review::where('user_id', Auth::id())
-                  ->where('status', 'pending')
-                  ->count();
-          }
-      @endphp
-
-      <a href="{{ route('user.reviews.index') }}"
-        class="nav-link text-white position-relative p-0 d-inline-flex align-items-center me-3">
-        <i class="fa-solid fa-star fa-lg"></i>
-
-        @if($pendingReviews > 0)
-          <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning text-dark"
-                style="font-size: 0.7rem; min-width: 20px; padding: 4px 6px;">
-            {{ $pendingReviews }}
-            <span class="visually-hidden">review pending</span>
-          </span>
-        @endif
-      </a>
-
-      <!-- ❤️ Ikon Wishlist -->
-      <a href="{{ route('wishlist.index') }}"
-        class="nav-link text-white position-relative p-0 d-inline-flex align-items-center me-3">
-        <i class="fa-solid fa-heart fa-lg"></i>
-      </a>
-
       <!-- 🛒 Ikon Keranjang -->
       @php
           $cartCount = 0;

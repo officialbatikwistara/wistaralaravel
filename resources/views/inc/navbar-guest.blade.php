@@ -1,5 +1,8 @@
 <!-- ================= NAVBAR ================= -->
 <nav id="navbarWistara" class="navbar navbar-dark navbar-expand-lg position-fixed top-0 start-0 w-100" style="z-index: 1000;">
+
+  <!-- OVERLAY -->
+  <div class="navbar-overlay"></div>
   <div class="container">
 
     <!-- Logo -->

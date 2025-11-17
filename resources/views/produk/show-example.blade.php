@@ -1,144 +1,174 @@
-<!-- Contoh Halaman Detail Produk dengan Review Component -->
-@extends('layouts.app')
+@include('inc.header')
+<!-- ========================= HERO PRODUK ========================= -->
+<section class="produk-detail pt-5 mt-4">
+    <div class="container py-4">
 
-@section('content')
-<div style="max-width: 1200px; margin: 0 auto; padding: 2rem 1rem;">
-    <!-- Breadcrumb -->
-    <div style="margin-bottom: 2rem; color: #666; font-size: 0.875rem;">
-        <a href="{{ route('home') }}" style="color: #007bff; text-decoration: none;">Home</a>
-        <span> / </span>
-        <a href="{{ route('katalog') }}" style="color: #007bff; text-decoration: none;">Katalog</a>
-        <span> / </span>
-        <span>{{ $product->nama_produk }}</span>
-    </div>
+        <div class="row g-4">
 
-    <!-- Product Details Grid -->
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;">
-        <!-- Product Image -->
-        <div>
-            <div style="background: #f8f9fa; border-radius: 0.5rem; overflow: hidden; aspect-ratio: 1;">
-                @if ($product->gambar)
-                    <img src="{{ asset('storage/' . $product->gambar) }}" alt="{{ $product->nama_produk }}" style="width: 100%; height: 100%; object-fit: cover;">
-                @else
-                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #999;">
-                        Tidak ada gambar
-                    </div>
-                @endif
-            </div>
-        </div>
+            <!-- ==================== FOTO PRODUK ==================== -->
+            <div class="col-lg-6">
 
-        <!-- Product Info -->
-        <div>
-            <h1 style="margin-top: 0; margin-bottom: 1rem; font-size: 2rem; color: #333;">{{ $product->nama_produk }}</h1>
-
-            <!-- Rating Summary (dari Review Component) -->
-            <div style="background: #f8f9fa; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1.5rem;">
-                <div style="display: flex; align-items: center; gap: 1rem;">
-                    <div style="text-align: center;">
-                        <div style="font-size: 2rem; font-weight: bold; color: #ffc107;">
-                            {{ number_format($product->average_rating, 1) }}
-                        </div>
-                        <div style="color: #666; font-size: 0.875rem;">⭐ dari 5</div>
-                    </div>
-                    <div style="border-left: 1px solid #ddd; padding-left: 1rem;">
-                        <div style="color: #333; font-weight: 600;">{{ $product->review_count }} ulasan</div>
-                        <div style="color: #666; font-size: 0.875rem;">dari {{ $product->reviews()->count() }} total</div>
-                    </div>
+                <div class="main-image shadow-sm rounded-4 overflow-hidden mb-3">
+                    <img id="mainPreview" 
+                         src="{{ asset($product->gambar) }}" 
+                         class="img-fluid w-100" 
+                         style="object-fit: cover; height: 420px;">
                 </div>
+
+                <!-- Thumbnail -->
+                <div class="d-flex gap-2">
+                    <img src="{{ asset($product->gambar) }}" 
+                         class="thumb-img rounded shadow-sm" 
+                         onclick="changeImage(this)">
+                </div>
+
             </div>
 
-            <!-- Price -->
-            <div style="margin-bottom: 1.5rem;">
-                <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Harga</div>
-                <div style="font-size: 1.75rem; font-weight: bold; color: #28a745;">
+            <!-- ==================== INFO PRODUK ==================== -->
+            <div class="col-lg-6">
+
+                <!-- Kategori -->
+                <span class="badge bg-dark mb-2">{{ $product->kategori->nama_kategori }}</span>
+
+                <h2 class="fw-bold">{{ $product->nama_produk }}</h2>
+
+                <!-- Rating -->
+                @php
+                    $avgRating = round($product->average_rating, 1);
+                    $reviewCount = $product->review_count;
+                @endphp
+
+                <div class="rating-stars mb-2">
+                    @for($i = 1; $i <= 5; $i++)
+                        @if($i <= floor($avgRating))
+                            <i class="fa-solid fa-star text-warning"></i>
+                        @elseif($i == ceil($avgRating) && $avgRating - floor($avgRating) >= 0.5)
+                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                        @else
+                            <i class="fa-regular fa-star text-secondary"></i>
+                        @endif
+                    @endfor
+                    <span class="text-muted ms-1 small">({{ $reviewCount }} ulasan)</span>
+                </div>
+
+                <!-- Harga -->
+                <h3 class="fw-bold text-warning mb-3">
                     Rp {{ number_format($product->harga, 0, ',', '.') }}
-                </div>
-            </div>
+                </h3>
 
-            <!-- Stock -->
-            <div style="margin-bottom: 1.5rem;">
-                <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Stok</div>
-                <div style="font-size: 1rem; color: {{ $product->stok > 0 ? '#28a745' : '#dc3545' }}; font-weight: 600;">
-                    {{ $product->stok > 0 ? $product->stok . ' tersedia' : 'Habis' }}
-                </div>
-            </div>
+                <!-- Deskripsi -->
+                <p class="text-muted" style="line-height: 1.7;">
+                    {!! nl2br(e($product->deskripsi)) !!}
+                </p>
 
-            <!-- Category -->
-            @if ($product->kategori)
-                <div style="margin-bottom: 1.5rem;">
-                    <div style="color: #666; font-size: 0.875rem; margin-bottom: 0.5rem;">Kategori</div>
-                    <div style="display: inline-block; background: #e7f3ff; color: #0066cc; padding: 0.5rem 1rem; border-radius: 0.25rem; font-size: 0.875rem;">
-                        {{ $product->kategori->nama_kategori }}
+                <!-- TOMBOL AKSI -->
+                <div class="d-flex gap-3 mt-4">
+
+                    <!-- Beli Sekarang -->
+                    <a href="{{ route('checkout.direct', $product->id_produk) }}" 
+                       class="btn btn-warning px-4 py-2 fw-bold text-dark shadow-sm">
+                        🛍️ Beli Sekarang
+                    </a>
+
+                    <!-- Tambah Keranjang -->
+                    @auth
+                        <form action="{{ route('cart.add', $product->id_produk) }}" method="POST">
+                            @csrf
+                            <input type="hidden" name="qty" value="1">
+                            <button class="btn btn-outline-dark px-4 py-2 fw-bold">
+                                <i class="fa-solid fa-cart-plus"></i>
+                            </button>
+                        </form>
+                    @else
+                        <a href="{{ route('login') }}" 
+                           class="btn btn-outline-dark px-4 py-2 fw-bold">
+                           <i class="fa-solid fa-cart-plus"></i>
+                        </a>
+                    @endauth
+
+                </div>
+
+                <!-- Marketplace -->
+                <div class="mt-4">
+                    <p class="fw-semibold mb-2">Atau beli melalui:</p>
+
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="https://wa.me/62895381110035?text={{ urlencode('Halo admin, saya tertarik dengan produk ' . $product->nama_produk) }}"
+                           class="btn btn-success btn-sm d-flex align-items-center gap-2">
+                            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+                        </a>
+
+                        @if ($product->link_shopee)
+                            <a href="{{ $product->link_shopee }}" target="_blank" 
+                               class="btn btn-warning btn-sm text-dark d-flex align-items-center gap-2">
+                                <i class="fa-solid fa-bag-shopping"></i> Shopee
+                            </a>
+                        @endif
+
+                        @if ($product->link_tiktok)
+                            <a href="{{ $product->link_tiktok }}" target="_blank" 
+                               class="btn btn-dark btn-sm d-flex align-items-center gap-2">
+                                <i class="fa-brands fa-tiktok"></i> TikTok Shop
+                            </a>
+                        @endif
                     </div>
                 </div>
-            @endif
 
-            <!-- Action Buttons -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem;">
-                @if ($product->stok > 0)
-                    <form action="{{ route('cart.add', $product->id_produk) }}" method="POST" style="flex: 1;">
-                        @csrf
-                        <button type="submit" style="width: 100%; padding: 0.75rem 1.5rem; background-color: #007bff; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600; font-size: 1rem;">
-                            🛒 Tambah ke Keranjang
-                        </button>
-                    </form>
-
-                    <a href="{{ route('checkout.direct', $product->id_produk) }}" style="flex: 1; padding: 0.75rem 1.5rem; background-color: #28a745; color: white; border: none; border-radius: 0.25rem; cursor: pointer; font-weight: 600; font-size: 1rem; text-align: center; text-decoration: none;">
-                        💳 Beli Sekarang
-                    </a>
-                @else
-                    <button disabled style="flex: 1; padding: 0.75rem 1.5rem; background-color: #ccc; color: #666; border: none; border-radius: 0.25rem; cursor: not-allowed; font-weight: 600; font-size: 1rem;">
-                        Stok Habis
-                    </button>
-                @endif
             </div>
 
-            <!-- Social Links -->
-            @if ($product->link_shopee || $product->link_tiktok)
-                <div style="display: flex; gap: 1rem;">
-                    @if ($product->link_shopee)
-                        <a href="{{ $product->link_shopee }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #ee4d2d; color: white; border-radius: 0.25rem; text-decoration: none; font-size: 0.875rem;">
-                            🛍️ Shopee
-                        </a>
-                    @endif
-                    @if ($product->link_tiktok)
-                        <a href="{{ $product->link_tiktok }}" target="_blank" style="display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.5rem 1rem; background: #000; color: white; border-radius: 0.25rem; text-decoration: none; font-size: 0.875rem;">
-                            🎵 TikTok
-                        </a>
-                    @endif
+        </div>
+
+        <!-- ========================= REVIEW USER ========================= -->
+        <hr class="my-5">
+
+        <h4 class="fw-bold mb-3">Ulasan Produk</h4>
+
+        @forelse ($product->approvedReviews as $review)
+            <div class="card border-0 shadow-sm p-3 mb-3">
+
+                <div class="d-flex justify-content-between">
+                    <strong>{{ $review->user->name ?? 'User' }}</strong>
+                    <small class="text-muted">{{ $review->created_at->format('d M Y') }}</small>
                 </div>
-            @endif
-        </div>
+
+                <!-- Rating -->
+                <div class="rating-stars my-1">
+                    @for ($i = 1; $i <= 5; $i++)
+                        @if($i <= $review->rating)
+                            <i class="fa-solid fa-star text-warning"></i>
+                        @else
+                            <i class="fa-regular fa-star text-secondary"></i>
+                        @endif
+                    @endfor
+                </div>
+
+                <p class="mb-2">{{ $review->comment }}</p>
+
+                @if($review->photos)
+                    <div class="d-flex gap-2 mt-2">
+                        @foreach($review->photos as $photo)
+                            <img src="{{ asset('storage/'.$photo) }}" class="rounded" width="90">
+                        @endforeach
+                    </div>
+                @endif
+
+                @if($review->video)
+                    <video class="mt-3 rounded" width="200" controls>
+                        <source src="{{ asset('storage/'.$review->video) }}">
+                    </video>
+                @endif
+
+            </div>
+        @empty
+            <p class="text-muted">Belum ada ulasan untuk produk ini.</p>
+        @endforelse
+
     </div>
+</section>
 
-    <!-- Product Description -->
-    <div style="background: #f8f9fa; padding: 2rem; border-radius: 0.5rem; margin-bottom: 3rem;">
-        <h2 style="margin-top: 0; margin-bottom: 1rem; font-size: 1.5rem; color: #333;">Deskripsi Produk</h2>
-        <div style="color: #555; line-height: 1.6;">
-            {!! nl2br(e($product->deskripsi)) !!}
-        </div>
-    </div>
-
-    <!-- Reviews Section (Component) -->
-    <div>
-        @include('components.product-review', ['product' => $product])
-    </div>
-</div>
-
-<!-- Responsive Design -->
-<style>
-    @media (max-width: 768px) {
-        div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-        }
-
-        div[style*="display: flex"][style*="gap: 1rem"] {
-            flex-direction: column;
-        }
-
-        div[style*="display: flex"][style*="gap: 1rem"] > * {
-            flex: 1 !important;
-        }
+<script>
+    function changeImage(el) {
+        document.getElementById('mainPreview').src = el.src;
     }
-</style>
-@endsection
+</script>
+@include('inc.footer')
