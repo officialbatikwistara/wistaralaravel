@@ -70,11 +70,6 @@
                 <i class="fa-solid fa-user-circle me-2"></i> Profil
               </a>
             </li>
-            <li>
-              <a class="dropdown-item" href="{{ route('user.reviews.index') }}">
-                <i class="fa-solid fa-star me-2"></i> Review Saya
-              </a>
-            </li>
             <li><hr class="dropdown-divider"></li>
             <li>
               <form action="{{ route('user.logout') }}" method="GET" class="m-0">

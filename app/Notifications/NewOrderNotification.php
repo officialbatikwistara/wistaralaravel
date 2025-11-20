@@ -21,13 +21,11 @@ class NewOrderNotification extends Notification implements ShouldQueue
     public function __construct($order, $user)
     {
         $this->order = $order;
-        $this->user = $user;
+        $this->user  = $user;
     }
 
     /**
-     * Get the notification's delivery channels.
-     *
-     * @return array<int, string>
+     * Delivery channels.
      */
     public function via(object $notifiable): array
     {
@@ -35,28 +33,35 @@ class NewOrderNotification extends Notification implements ShouldQueue
     }
 
     /**
-     * Get the mail representation of the notification.
+     * Email notification using MailMessage wrapper for Mailable.
      */
     public function toMail(object $notifiable): MailMessage
     {
-        return (new NewOrderMail($this->order, $this->user))
-            ->to($notifiable->email);
+        // Menggunakan template dari Mailable (NewOrderMail)
+        return (new MailMessage)
+            ->subject('Pesanan Baru Masuk')
+            ->view(
+                'emails.new_order', // Blade file dari NewOrderMail
+                [
+                    'order' => $this->order,
+                    'user'  => $this->user,
+                    'admin' => $notifiable
+                ]
+            );
     }
 
     /**
-     * Get the array representation of the notification.
-     *
-     * @return array<string, mixed>
+     * Payload for database notifications.
      */
     public function toArray(object $notifiable): array
     {
         return [
-            'message' => "Pesanan baru #{$this->order->id} dari {$this->user->name}",
-            'order_id' => $this->order->id,
-            'user_name' => $this->user->name,
-            'total' => $this->order->total,
-            'url' => '/admin/pesanan/' . $this->order->id,
-            'type' => 'new_order'
+            'message'     => "Pesanan baru #{$this->order->id} dari {$this->user->name}",
+            'order_id'    => $this->order->id,
+            'user_name'   => $this->user->name,
+            'total'       => $this->order->total,
+            'url'         => '/admin/pesanan/' . $this->order->id,
+            'type'        => 'new_order'
         ];
     }
 }

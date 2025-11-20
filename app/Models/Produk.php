@@ -11,59 +11,49 @@ class Produk extends Model
 
     protected $table = 'produk';
     protected $primaryKey = 'id_produk';
+    public $incrementing = true;
+    protected $keyType = 'int';
     public $timestamps = false;
 
     protected $fillable = [
-        'nama_produk', 
-        'slug', 
-        'deskripsi', 
-        'harga', 
-        'stok', 
+        'nama_produk',
+        'slug',
+        'deskripsi',
+        'harga',
+        'stok',
         'gambar',
-        'id_kategori', 
-        'link_shopee', 
-        'link_tiktok', 
+        'id_kategori',
+        'link_shopee',
+        'link_tiktok',
         'status',
-        'tanggal_upload', 
+        'tanggal_upload',
         'tanggal_update'
     ];
 
-    // ============================
-    //   RELASI CATEGORY
-    // ============================
     public function kategori()
     {
         return $this->belongsTo(KategoriProduk::class, 'id_kategori', 'id_kategori');
     }
 
-    // ============================
-    //   RELASI REVIEWS
-    // ============================
     public function reviews()
     {
         return $this->hasMany(Review::class, 'id_produk', 'id_produk');
     }
 
-    // Review yang sudah disetujui
     public function approvedReviews()
     {
-        return $this->reviews()->where('status', 'approved');
+        return $this->hasMany(Review::class, 'id_produk', 'id_produk')
+                    ->where('status', 'approved');
     }
 
-    // ============================
-    //   ACCESSOR: AVERAGE RATING
-    // ============================
+    // ⭐ FIX: gunakan field dari withAvg / withCount
     public function getAverageRatingAttribute()
     {
-        $avg = $this->approvedReviews()->avg('rating');
-        return $avg ? round($avg, 1) : 0;
+        return round($this->attributes['average_rating'] ?? 0, 1);
     }
 
-    // ============================
-    //   ACCESSOR: REVIEW COUNT
-    // ============================
     public function getReviewCountAttribute()
     {
-        return $this->approvedReviews()->count();
+        return $this->attributes['review_count'] ?? 0;
     }
 }

@@ -56,7 +56,7 @@
 - `routes/web.php` - Web Routes
 
 ### **Frontend:**
-- `resources/views/produk/show-backup.blade.php` - Halaman detail produk
+- `resources/views/produk/show.blade.php` - Halaman detail produk
 - `resources/views/components/product-review.blade.php` - Komponen review
 - `resources/views/user/pesanan/show.blade.php` - Detail pesanan (dengan tombol review)
 - `resources/views/admin/reviews/index.blade.php` - Admin review management

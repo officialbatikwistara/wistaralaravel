@@ -60,7 +60,7 @@ class CheckoutController extends Controller
 
         // 🧠 Alamat otomatis untuk "ambil" di toko
         $alamatFinal = $request->tipe_order === 'ambil'
-            ? 'Ambil di toko Batik Wistara - Jl. Ketintang No.88, Surabaya'
+            ? 'Ambil di toko Batik Wistara - Jl. Tambak Medokan Ayu VI C No.56B, Medokan Ayu, Rungkut, Jawa Timur'
             : ($request->alamat ?? 'Alamat tidak tersedia');
 
         // ⚡ Checkout langsung satu produk
@@ -120,7 +120,7 @@ class CheckoutController extends Controller
 
             $order = Order::create([
                 'user_id' => $userId,
-                'coupon_id' => $request->coupon_id,
+                'coupon_id' => $request->coupon_id ?: null,
                 'nama' => $request->nama,
                 'telepon' => $request->telepon,
                 'total' => $total,

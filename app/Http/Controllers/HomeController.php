@@ -16,14 +16,21 @@ class HomeController extends Controller
             ->limit(4)
             ->get();
 
-        // Ambil 8 produk terbaru + kategori + reviews approved
-        $produk = Produk::with([
-                'kategori:id_kategori,nama_kategori',
-                'approvedReviews:id,id_produk,rating,status'
-            ])
-            ->orderBy('tanggal_upload', 'desc')
-            ->limit(8)
-            ->get();
+        // Ambil produk + kategori + avg rating + jumlah review
+$produk = Produk::with([
+        'kategori:id_kategori,nama_kategori',
+        'approvedReviews:id,id_produk,rating,status'
+    ])
+    ->withAvg('approvedReviews as average_rating', 'rating')
+    ->withCount('approvedReviews as review_count')
+    ->orderBy('tanggal_upload', 'desc')
+    ->limit(8)
+    ->get()
+    ->map(function ($p) {
+        $p->average_rating = $p->average_rating ? round($p->average_rating, 1) : 0;
+        return $p;
+    });
+
 
         return view('home', compact('berita', 'produk'));
     }

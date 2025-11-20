@@ -152,19 +152,30 @@
 
                 <p class="mb-2">{{ $review->comment }}</p>
 
-                @if($review->photos)
-                    <div class="d-flex gap-2 mt-2">
-                        @foreach($review->photos as $photo)
-                            <img src="{{ asset('storage/'.$photo) }}" class="rounded" width="90">
-                        @endforeach
-                    </div>
+                {{-- FOTO REVIEW --}}
+                @if(!empty($review->photos) && is_string($review->photos))
+                    @php
+                        $photoArray = json_decode($review->photos, true);
+                    @endphp
+
+                    @if(is_array($photoArray))
+                        <div class="d-flex gap-2 mt-2">
+                            @foreach($photoArray as $photo)
+                                <img src="{{ asset('uploads/reviews/photos/'.$photo) }}" 
+                                    class="rounded shadow-sm"
+                                    width="90" height="90"
+                                    style="object-fit: cover;">
+                            @endforeach
+                        </div>
+                    @endif
                 @endif
 
-                @if($review->video)
-                    <video class="mt-3 rounded" width="200" controls>
-                        <source src="{{ asset('storage/'.$review->video) }}">
-                    </video>
-                @endif
+
+            @if($review->video)
+                <video class="mt-3 rounded shadow-sm" width="200" controls>
+                    <source src="{{ asset('uploads/reviews/videos/'.$review->video) }}" type="video/mp4">
+                </video>
+            @endif
 
             </div>
         @empty

@@ -37,8 +37,8 @@
           </li>
           <li class="mb-2">
             <strong>WhatsApp:</strong><br>
-            <a href="https://wa.me/6281234567890" class="text-dark text-decoration-none d-block">
-              0812-3456-7890
+            <a href="https://wa.me/62895381110035" class="text-dark text-decoration-none d-block">
+              0895-3811-10035
             </a>
           </li>
           <li>
