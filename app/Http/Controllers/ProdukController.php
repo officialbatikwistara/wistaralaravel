@@ -27,6 +27,14 @@ class ProdukController extends Controller
 
         return view('katalog', compact('kategori', 'produk', 'filter'));
     }
+
+    public function show($slug)
+    {
+        $product = Produk::with('kategori')->where('slug', $slug)->firstOrFail();
+
+        // Gunakan view backup yang sudah ada header/footer
+        return view('produk.show-backup', compact('product'));
+    }
     public function nonaktif($id)
     {
         $produk = Produk::findOrFail($id);

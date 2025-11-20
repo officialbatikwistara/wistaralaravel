@@ -72,7 +72,7 @@
                 <tbody>
                   @foreach($orders as $order)
                   <tr>
-                    <td>#{{ $order->id }}</td>
+                    <td>#{{ $order->order_code }}</td>
                     <td>{{ \Carbon\Carbon::parse($order->tanggal_ambil)->format('d M Y') }}</td>
                     <td>
                       @if($order->metode_pembayaran === 'bank_transfer')
@@ -122,7 +122,7 @@
               @foreach($orders as $order)
               <div class="border rounded-4 p-3 mb-3 shadow-sm bg-light" data-aos="fade-up" data-aos-delay="100">
                 <div class="d-flex justify-content-between align-items-center mb-2">
-                  <h6 class="fw-bold mb-0">#{{ $order->id }}</h6>
+                  <h6 class="fw-bold mb-0">#{{ $order->order_code }}</h6>
                   <small class="text-muted">{{ \Carbon\Carbon::parse($order->tanggal_ambil)->format('d M Y') }}</small>
                 </div>
 

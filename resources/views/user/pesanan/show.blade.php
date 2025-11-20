@@ -6,17 +6,17 @@
 
             <!-- 🧾 Header Detail -->
             <h3 class="fw-bold mb-3">
-                <i class="fa-solid fa-receipt me-2 text-dark"></i> Detail Pesanan #{{ $order->id }}
+                <i class="fa-solid fa-receipt me-2 text-dark"></i> Detail Pesanan #{{ $order->order_code }}
             </h3>
 
             <!-- 📅 Informasi Pesanan -->
             <div class="mb-3">
                 <p><strong>Tanggal Pesan:</strong> {{ $order->created_at->format('d M Y H:i') }}</p>
                 <p><strong>Tanggal Ambil:</strong> {{ \Carbon\Carbon::parse($order->tanggal_ambil)->format('d M Y') }}</p>
-                <p><strong>Metode Pembayaran:</strong> 
-                    @if($order->metode_pembayaran === 'bank_transfer') 🏦 Bank Transfer 
-                    @elseif($order->metode_pembayaran === 'qris') 📱 QRIS 
-                    @else 💵 COD 
+                <p><strong>Metode Pembayaran:</strong>
+                    @if($order->metode_pembayaran === 'bank_transfer') 🏦 Bank Transfer
+                    @elseif($order->metode_pembayaran === 'qris') 📱 QRIS
+                    @else 💵 COD
                     @endif
                 </p>
 
@@ -72,6 +72,9 @@
                             <th>Qty</th>
                             <th>Harga</th>
                             <th>Subtotal</th>
+                            @if($order->status == 'selesai')
+                            <th>Aksi</th>
+                            @endif
                         </tr>
                     </thead>
                     <tbody>
@@ -79,9 +82,23 @@
                         <tr>
                             <td>
                                 <div class="d-flex align-items-center gap-3">
-                                    <img src="{{ asset($item->produk->gambar) }}" 
-                                        alt="{{ $item->produk->nama_produk }}" 
-                                        style="width: 50px; height: 50px; object-fit: cover;" 
+                                    @php
+                                        $fileName = basename($item->produk->gambar ?? '');
+                                        // Map old database paths to actual filenames
+                                        $imageMap = [
+                                            'batik-parang.jpg' => '1760930150_14.jpg',
+                                            'batik-mega-mendung.jpg' => '1760930168_6.jpg',
+                                            'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
+                                        ];
+                                        $actualFileName = $imageMap[$fileName] ?? $fileName;
+                                        $gambarPath = public_path('uploads/produk/'.$actualFileName);
+                                        $gambarUrl = (file_exists($gambarPath) && $actualFileName)
+                                                ? asset('uploads/produk/'.$actualFileName)
+                                                : asset('img/logo.png');
+                                    @endphp
+                                    <img src="{{ $gambarUrl }}"
+                                        alt="{{ $item->produk->nama_produk }}"
+                                        style="width: 50px; height: 50px; object-fit: cover;"
                                         class="rounded shadow-sm border">
                                     <div>
                                         <span class="fw-semibold">{{ $item->produk->nama_produk }}</span><br>
@@ -92,6 +109,25 @@
                             <td>{{ $item->qty }}</td>
                             <td>Rp {{ number_format($item->harga, 0, ',', '.') }}</td>
                             <td>Rp {{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                            @if($order->status == 'selesai')
+                            <td>
+                                @php
+                                    // Cek apakah user sudah pernah review produk ini dalam order ini
+                                    $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
+                                        ->where('id_produk', $item->id_produk)
+                                        ->where('order_id', $order->id)
+                                        ->exists();
+                                @endphp
+                                @if($hasReviewed)
+                                    <span class="badge bg-success">✓ Sudah Direview</span>
+                                @else
+                                    <a href="{{ route('produk.show', $item->produk->slug) }}?order_id={{ $order->id }}#review-form"
+                                       class="btn btn-sm btn-warning">
+                                        <i class="fa-solid fa-star me-1"></i> Tulis Review
+                                    </a>
+                                @endif
+                            </td>
+                            @endif
                         </tr>
                         @endforeach
                     </tbody>
@@ -123,9 +159,9 @@
             @if($order->bukti_pembayaran)
             <hr>
             <h5 class="fw-bold mb-2">🧾 Bukti Pembayaran</h5>
-            <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}" 
-                alt="Bukti Pembayaran" 
-                class="img-fluid rounded shadow-sm mb-3" 
+            <img src="{{ asset('uploads/bukti/'.$order->bukti_pembayaran) }}"
+                alt="Bukti Pembayaran"
+                class="img-fluid rounded shadow-sm mb-3"
                 style="max-width: 350px;">
             @endif
 

@@ -9,12 +9,14 @@ use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\UserOrderController;
+use App\Http\Controllers\UserReviewController;
 use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\SalesAnalyticsController;
+use App\Http\Controllers\Api\ReviewController;
 
 use Illuminate\Http\Request;
 
@@ -47,7 +49,7 @@ Route::get('/berita/{slug}', [BeritaController::class, 'show'])->name('berita.de
 */
 
 Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
-Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
+Route::get('/produk/{slug}', [ProdukController::class, 'show'])->name('produk.show');
 /*
 |--------------------------------------------------------------------------
 | Route Keranjang
@@ -81,6 +83,7 @@ Route::get('/checkout/{id_produk}', [CheckoutController::class, 'index'])
 */
 
 Route::middleware('auth')->group(function () {
+    Route::get('/user/orders', [UserOrderController::class, 'index'])->name('user.orders');
     Route::get('/user/orders/{id}', [UserOrderController::class, 'show'])->name('user.order.show');
     Route::post('/user/orders/{id}/upload-bukti', [UserOrderController::class, 'uploadBukti'])->name('user.order.uploadBukti');
     Route::post('/user/orders/{id}/cancel', [UserOrderController::class, 'cancel'])->name('user.order.cancel');
@@ -134,6 +137,53 @@ Route::middleware('auth', 'verified')->group(function () {
     });
 });
 
+// 📝 User Reviews
+Route::middleware('auth')->group(function () {
+    Route::get('/user/reviews', [UserReviewController::class, 'index'])->name('user.reviews.index');
+    Route::get('/user/reviews/{id}/edit', [\App\Http\Controllers\UserReviewController::class, 'edit'])->name('user.reviews.edit');
+    Route::patch('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'update'])->name('user.reviews.update');
+    Route::delete('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'destroy'])->name('user.reviews.destroy');
+});
+
+// ❤️ Wishlist
+Route::middleware('auth')->group(function () {
+    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
+    Route::post('/wishlist/add/{productId}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
+    Route::delete('/wishlist/remove/{productId}', [\App\Http\Controllers\WishlistController::class, 'remove'])->name('wishlist.remove');
+    Route::get('/wishlist/check/{productId}', [\App\Http\Controllers\WishlistController::class, 'check'])->name('wishlist.check');
+});
+
+// 🎫 Coupon validation
+Route::middleware('auth')->post('/api/coupons/validate', function (Request $request) {
+    $request->validate([
+        'code' => 'required|string',
+        'total' => 'required|numeric|min:0'
+    ]);
+
+    $coupon = \App\Models\Coupon::where('code', $request->code)->first();
+
+    if (!$coupon) {
+        return response()->json(['valid' => false, 'message' => 'Kupon tidak ditemukan']);
+    }
+
+    if (!$coupon->isValid()) {
+        return response()->json(['valid' => false, 'message' => 'Kupon tidak valid atau sudah kadaluarsa']);
+    }
+
+    $discount = $coupon->calculateDiscount($request->total);
+
+    if ($discount <= 0) {
+        return response()->json(['valid' => false, 'message' => 'Kupon tidak dapat diterapkan untuk total ini']);
+    }
+
+    return response()->json([
+        'valid' => true,
+        'discount' => $discount,
+        'coupon_id' => $coupon->id,
+        'message' => 'Kupon valid'
+    ]);
+});
+
 // Halaman verifikasi email
 Route::get('/email/verify', function () {
     return view('auth.verify-email');
@@ -178,6 +228,84 @@ Route::get('/check-user', function (Illuminate\Http\Request $request) {
         'type' => $type
     ]);
 })->name('check.user');
+
+// 🔑 Get CSRF token for API testing
+Route::get('/api/csrf-token', function () {
+    return response()->json([
+        'csrf_token' => csrf_token()
+    ]);
+});
+
+// 🔔 Notification routes
+Route::middleware('auth')->group(function () {
+    Route::get('/notifications', function () {
+        $notifications = auth()->user()->notifications()->latest()->limit(10)->get();
+        return response()->json(['notifications' => $notifications]);
+    });
+
+    Route::get('/notifications/check', function () {
+        $user = auth()->user();
+        $count = $user->unreadNotifications()->count();
+        return response()->json(['count' => $count]);
+    });
+
+    Route::get('/notifications/stream', function () {
+        $user = auth()->user();
+        $lastCount = (int) request('last_count', 0);
+
+        return response()->stream(function () use ($user, $lastCount) {
+            $lastCheck = time();
+
+            while (true) {
+                $currentCount = $user->unreadNotifications()->count();
+
+                if ($currentCount > $lastCount) {
+                    $newNotifications = $user->notifications()
+                        ->where('created_at', '>', now()->subSeconds(30))
+                        ->latest()
+                        ->limit(5)
+                        ->get();
+
+                    $data = [
+                        'count' => $currentCount,
+                        'new_count' => $currentCount - $lastCount,
+                        'notifications' => $newNotifications,
+                        'timestamp' => time()
+                    ];
+
+                    echo "data: " . json_encode($data) . "\n\n";
+                    ob_flush();
+                    flush();
+                }
+
+                // Check every 5 seconds
+                sleep(5);
+
+                // Timeout after 5 minutes
+                if (time() - $lastCheck > 300) {
+                    break;
+                }
+            }
+        }, 200, [
+            'Content-Type' => 'text/event-stream',
+            'Cache-Control' => 'no-cache',
+            'Connection' => 'keep-alive',
+            'Access-Control-Allow-Origin' => '*',
+            'Access-Control-Allow-Headers' => 'Cache-Control',
+        ]);
+    });
+
+    Route::post('/notifications/{id}/mark-as-read', function ($id) {
+        $notification = auth()->user()->notifications()->findOrFail($id);
+        $notification->markAsRead();
+        return response()->json(['success' => true]);
+    });
+
+    Route::post('/notifications/mark-all-read', function () {
+        auth()->user()->unreadNotifications()->update(['read_at' => now()]);
+        return response()->json(['success' => true]);
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -313,3 +441,67 @@ Route::prefix('admin')->group(function () {
             'destroy' => 'admin.berita.delete',
         ]);
 });
+
+/*
+|--------------------------------------------------------------------------
+| Review API Routes (menggunakan web middleware untuk session auth)
+|--------------------------------------------------------------------------
+*/
+// Public routes
+Route::get('/api/reviews', [ReviewController::class, 'index']);
+Route::get('/api/reviews/{id}', [ReviewController::class, 'show']);
+
+// Protected routes (butuh login)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/reviews', [ReviewController::class, 'store']);
+    Route::patch('/api/reviews/{id}', [ReviewController::class, 'update']);
+    Route::delete('/api/reviews/{id}', [ReviewController::class, 'destroy']);
+    Route::post('/api/reviews/{id}/helpful', [ReviewController::class, 'markHelpful']);
+});
+
+/*
+|--------------------------------------------------------------------------
+| Review Admin (Moderasi)
+|--------------------------------------------------------------------------
+*/
+Route::get('/admin/reviews', function (Request $request) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->index($request);
+})->name('admin.reviews.index');
+
+Route::get('/admin/reviews/{id}/edit', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->edit($id);
+})->name('admin.reviews.edit');
+
+Route::patch('/admin/reviews/{id}', function ($id, Request $request) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->update($request, $id);
+})->name('admin.reviews.update');
+
+Route::patch('/admin/reviews/{id}/approve', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->approve($id);
+})->name('admin.reviews.approve');
+
+Route::patch('/admin/reviews/{id}/reject', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->reject($id);
+})->name('admin.reviews.reject');
+
+Route::delete('/admin/reviews/{id}', function ($id) {
+    if (!session()->has('admin_logged_in')) {
+        return redirect()->route('admin.login');
+    }
+    return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->destroy($id);
+})->name('admin.reviews.delete');

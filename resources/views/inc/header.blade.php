@@ -3,10 +3,31 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{{ $title ?? 'Batik Wistara' }}</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>{{ $title ?? 'Batik Wistara - Toko Batik Online Terpercaya' }}</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Batik Wistara - Toko batik online terpercaya dengan koleksi batik tradisional dan modern. Jual batik berkualitas dengan harga terbaik.">
+  <meta name="keywords" content="batik, batik online, toko batik, batik tradisional, batik modern, batik indonesia">
+  <meta name="author" content="Batik Wistara">
+  <meta name="robots" content="index, follow">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="{{ $title ?? 'Batik Wistara - Toko Batik Online Terpercaya' }}">
+  <meta property="og:description" content="Batik Wistara - Toko batik online terpercaya dengan koleksi batik tradisional dan modern.">
+  <meta property="og:image" content="{{ asset('img/logo.png') }}">
+  <meta property="og:url" content="{{ url()->current() }}">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ $title ?? 'Batik Wistara - Toko Batik Online Terpercaya' }}">
+  <meta name="twitter:description" content="Batik Wistara - Toko batik online terpercaya dengan koleksi batik tradisional dan modern.">
+  <meta name="twitter:image" content="{{ asset('img/logo.png') }}">
 
   <!-- Favicon -->
   <link rel="icon" href="{{ asset('img/favicon.ico') }}" type="image/x-icon">
+  <link rel="apple-touch-icon" href="{{ asset('img/apple-touch-icon.png') }}">
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

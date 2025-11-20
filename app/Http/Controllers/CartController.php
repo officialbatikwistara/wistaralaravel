@@ -30,10 +30,10 @@ class CartController extends Controller
      */
     public function add(Request $request, $produkId)
     {
-        // Pastikan produk valid
+        // Pastikan produk valid dan tersedia
         $produk = Produk::findOrFail($produkId);
 
-        // qty dari request (minimal 1)
+        
         $qty = max((int) $request->input('qty', 1), 1);
 
         // Cek stok
@@ -80,6 +80,7 @@ class CartController extends Controller
         // Ambil item keranjang milik user
         $cart = Cart::where('id', $id)
             ->where('user_id', Auth::id())
+            ->with('produk')
             ->firstOrFail();
 
         // Pastikan tidak melebihi stok produk terkait

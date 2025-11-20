@@ -1,104 +1,146 @@
 /* ============================
            🌸 Batik Wistara Admin Header
         ============================ */
+
+/* Navbar Background */
+#navbarAdmin {
+    background-color: rgba(7, 23, 57, 0.9);
+    backdrop-filter: blur(8px);
+    transition: background-color 0.4s ease, box-shadow 0.4s ease, backdrop-filter 0.4s ease;
+}
+
+/* Navbar saat scroll */
+#navbarAdmin.scrolled {
+    background-color: #071739;
+    backdrop-filter: blur(8px);
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+}
+
+/* Logo - always use white logo for admin */
+.logo-warna {
+    display: none;
+}
+
+.logo-putih {
+    display: block;
+}
+
+/* Link dasar */
+#navbarAdmin .nav-link {
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+/* Halaman aktif */
+#navbarAdmin .nav-link.active {
+    color: #ffae00;
+    font-weight: 700;
+}
+
+/* Hover */
+#navbarAdmin .nav-link:hover {
+    color: #ffae00;
+    transform: translateY(-1px);
+}
+
+/* Cart icon */
+#navbarAdmin .fa-cart-shopping {
+    color: white !important;
+    transition: color 0.3s;
+}
+
+#navbarAdmin.scrolled .fa-cart-shopping {
+    color: #1a2247 !important;
+}
+
+/* Admin dropdown button */
+#navbarAdmin .btn-outline-light {
+    color: white !important;
+    border-color: white !important;
+}
+
+#navbarAdmin.scrolled .btn-outline-light {
+    color: #1a2247 !important;
+    border-color: #1a2247 !important;
+}
+
+/* Badge styling */
+#navbarAdmin .badge {
+    font-size: 0.7rem;
+    padding: 4px 6px;
+}
+
+/* Button signin styling */
+#navbarAdmin .btn-outline-light {
+    color: #1a2247;
+    border-color: #1a2247;
+    background-color: transparent;
+}
+
+/* Saat mobile dropdown terbuka */
+#navbarAdmin.menu-open {
+    background-color: #071739 !important;
+    backdrop-filter: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+#navbarAdmin.menu-open .nav-link {
+    color: #ffffff !important;
+}
+
+#navbarAdmin.menu-open .nav-link.active {
+    color: #ffae00 !important;
+}
+
+#navbarAdmin.menu-open .logo-putih {
+    display: block;
+}
+
+#navbarAdmin.menu-open .logo-warna {
+    display: none;
+}
+
+#navbarAdmin.menu-open .btn-outline-light {
+    color: #ffffff !important;
+    border-color: #ffffff !important;
+    background-color: transparent !important;
+}
+
+/* Saat mobile menu dibuka (selalu solid) */
+@media (max-width: 991.98px) {
+    #navbarAdmin.menu-open {
+        background-color: #071739 !important;
+        backdrop-filter: none;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    #navbarAdmin.menu-open .nav-link {
+        color: #ffffff !important;
+    }
+
+    #navbarAdmin.menu-open .nav-link.active {
+        color: #ffae00 !important;
+    }
+
+    #navbarAdmin.menu-open .logo-putih {
+        display: block;
+    }
+
+    #navbarAdmin.menu-open .logo-warna {
+        display: none;
+    }
+
+    #navbarAdmin.menu-open .btn-outline-light,
+    #navbarAdmin.menu-open .fa-cart-shopping {
+        color: #ffffff !important;
+    }
+}
+
+/* Body padding for fixed navbar */
 body {
-    font-family: "Poppins", sans-serif;
-    background-color: #f8f9fa;
-    padding-top: 85px;
-}
-
-.navbar-admin {
-    background-color: #0a1b40; /* NAVY */
-    padding: 1rem 2rem;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.15);
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    z-index: 1030;
-}
-
-.navbar-admin .navbar-brand img {
-    height: 55px;
-}
-
-/* MENU NAVBAR */
-.navbar-admin .nav-link {
-    color: #ffffff;
-    font-weight: 600;
-    letter-spacing: 0.4px;
-    transition: color 0.3s ease;
-}
-
-.navbar-admin .nav-link:hover,
-.navbar-admin .nav-link.active {
-    color: #f6b400;
-}
-
-/* TROLI */
-.icon-btn {
-    color: #ffffff;
-    font-size: 1.3rem;
-    margin-right: 1.5rem;
-    transition: color 0.3s ease;
-    position: relative;
-}
-
-.icon-btn:hover {
-    color: #f6b400;
-}
-
-.icon-btn .badge {
-    position: absolute;
-    top: -7px;
-    right: -10px;
-    font-size: 0.75rem;
-    background-color: #f6b400;
-    color: #0a1b40;
-    border-radius: 50px;
-    font-weight: bold;
-}
-
-/* DROPDOWN ADMIN */
-.dropdown-toggle {
-    background-color: #ffffff;
-    color: #0a1b40;
-    font-weight: 600;
-    border: none;
-    border-radius: 10px;
-    padding: 8px 14px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-}
-
-.dropdown-toggle:hover,
-.dropdown-toggle.show {
-    background-color: #f6b400;
-    color: #0a1b40;
-}
-
-.dropdown-menu {
-    border: none;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
-    border-radius: 10px;
-    padding: 0.5rem;
-}
-
-.dropdown-item:hover {
-    background-color: #f6b400;
-    color: #0a1b40;
-}
-
-/* RESPONSIF */
-@media (max-width: 991px) {
-    .navbar-collapse {
-        background-color: #0a1b40;
-        padding: 1rem;
-        border-radius: 10px;
-    }
-
-    .dropdown-toggle {
-        background-color: #ffffff;
-    }
+    font-family: "Cabin", sans-serif;
+    overflow-x: hidden;
+    padding-top: 80px;
 }

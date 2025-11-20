@@ -34,20 +34,27 @@
     <div class="row g-4">
       @foreach($produk as $p)
         @php
-          $fileName = basename($p->gambar);
-          $gambarPath = public_path('uploads/produk/'.$fileName);
-          $gambarUrl = (file_exists($gambarPath) && $fileName)
-              ? asset('uploads/produk/'.$fileName)
-              : asset('img/no-image.jpg');
+          $fileName = basename($p->gambar ?? '');
+          // Map old database paths to actual filenames
+          $imageMap = [
+              'batik-parang.jpg' => '1760930150_14.jpg',
+              'batik-mega-mendung.jpg' => '1760930168_6.jpg',
+              'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
+          ];
+          $actualFileName = $imageMap[$fileName] ?? $fileName;
+          $gambarPath = public_path('uploads/produk/'.$actualFileName);
+          $gambarUrl = (file_exists($gambarPath) && $actualFileName)
+              ? asset('uploads/produk/'.$actualFileName)
+              : asset('img/logo.png');
         @endphp
 
         <div class="col-12 col-sm-6 col-lg-4">
           <div class="produk-card border-0 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden bg-white">
-            
+
             <!-- Gambar Produk -->
             <div class="position-relative" style="height: 240px;">
-              <img src="{{ $gambarUrl }}" 
-                  alt="{{ $p->nama_produk }}" 
+              <img src="{{ $gambarUrl }}"
+                  alt="{{ $p->nama_produk }}"
                   class="w-100 h-100 object-fit-cover rounded-top-4">
               <span class="badge bg-light text-gold position-absolute top-0 end-0 m-2 px-3 py-2 rounded-pill">
                 {{ $p->nama_kategori }}
@@ -63,12 +70,25 @@
               <p class="text-muted small flex-grow-1 mb-3">
                 {{ Str::limit($p->deskripsi, 70) }}
               </p>
-              <button type="button" 
-                      class="btn btn-gold w-100 rounded-pill fw-semibold mt-auto"
-                      data-bs-toggle="modal" 
-                      data-bs-target="#produkModal{{ $p->id_produk }}">
-                <i class="bi bi-eye me-1"></i> Detail Produk
-              </button>
+              <div class="d-flex gap-2">
+                <a href="{{ route('produk.show', $p->slug) }}"
+                   class="btn btn-gold flex-fill rounded-pill fw-semibold">
+                  <i class="bi bi-eye me-1"></i> Detail
+                </a>
+                <button type="button"
+                        class="btn btn-outline-secondary flex-fill rounded-pill fw-semibold"
+                        data-bs-toggle="modal"
+                        data-bs-target="#produkModal{{ $p->id_produk }}">
+                  <i class="bi bi-cart-plus me-1"></i> Beli
+                </button>
+                @auth
+                <button id="wishlist-btn-{{ $p->id_produk }}" onclick="toggleWishlist({{ $p->id_produk }})"
+                        class="btn btn-outline-danger rounded-pill fw-semibold"
+                        style="border-color: #cda349; color: #cda349; padding: 0.375rem 0.75rem;">
+                  ❤️
+                </button>
+                @endauth
+              </div>
             </div>
 
           </div>
@@ -80,11 +100,18 @@
   <!-- ============= Modal Detail Produk & Qty ============= -->
   @foreach($produk as $p)
   @php
-    $fileName = basename($p->gambar);
-    $gambarPath = public_path('uploads/produk/'.$fileName);
-    $gambarUrl = (file_exists($gambarPath) && $fileName)
-        ? asset('uploads/produk/'.$fileName)
-        : asset('img/no-image.jpg');
+    $fileName = basename($p->gambar ?? '');
+    // Map old database paths to actual filenames
+    $imageMap = [
+        'batik-parang.jpg' => '1760930150_14.jpg',
+        'batik-mega-mendung.jpg' => '1760930168_6.jpg',
+        'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
+    ];
+    $actualFileName = $imageMap[$fileName] ?? $fileName;
+    $gambarPath = public_path('uploads/produk/'.$actualFileName);
+    $gambarUrl = (file_exists($gambarPath) && $actualFileName)
+        ? asset('uploads/produk/'.$actualFileName)
+        : asset('img/logo.png');
   @endphp
 
   <!-- Modal Produk -->
@@ -182,7 +209,7 @@
         <form action="{{ route('cart.add', $p->id_produk) }}" method="POST">
           @csrf
           <div class="modal-body text-center">
-            <input type="number" name="qty" value="1" min="1" max="{{ $p->stok }}" 
+            <input type="number" name="qty" value="1" min="1" max="{{ $p->stok }}"
                   class="form-control text-center mb-3 mx-auto" style="max-width: 100px;">
             <button type="submit" class="btn btn-dark w-100 rounded-pill">
               <i class="bi bi-cart-plus me-1"></i> Tambah ke Keranjang
@@ -195,6 +222,81 @@
   @endauth
   @endforeach
 </section>
+
+@auth
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+   // Check wishlist status for all products
+   @foreach($produk as $p)
+   checkWishlistStatus({{ $p->id_produk }});
+   @endforeach
+});
+
+function checkWishlistStatus(productId) {
+   fetch(`/wishlist/check/${productId}`)
+       .then(response => response.json())
+       .then(data => {
+           const btn = document.getElementById(`wishlist-btn-${productId}`);
+           if (data.in_wishlist) {
+               btn.classList.remove('btn-outline-danger');
+               btn.classList.add('btn-danger');
+               btn.style.backgroundColor = '#cda349';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = 'white';
+           } else {
+               btn.classList.remove('btn-danger');
+               btn.classList.add('btn-outline-danger');
+               btn.style.backgroundColor = 'transparent';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = '#cda349';
+           }
+       });
+}
+
+function toggleWishlist(productId) {
+   const btn = document.getElementById(`wishlist-btn-${productId}`);
+   const isInWishlist = btn.style.backgroundColor === 'rgb(205, 163, 73)'; // #cda349
+
+   if (isInWishlist) {
+       // Remove from wishlist
+       fetch(`/wishlist/remove/${productId}`, {
+           method: 'DELETE',
+           headers: {
+               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+               'Content-Type': 'application/json'
+           }
+       })
+       .then(response => response.json())
+       .then(data => {
+           btn.classList.remove('btn-danger');
+           btn.classList.add('btn-outline-danger');
+           btn.style.backgroundColor = 'transparent';
+           btn.style.borderColor = '#cda349';
+           btn.style.color = '#cda349';
+       });
+   } else {
+       // Add to wishlist
+       fetch(`/wishlist/add/${productId}`, {
+           method: 'POST',
+           headers: {
+               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+               'Content-Type': 'application/json'
+           }
+       })
+       .then(response => response.json())
+       .then(data => {
+           if (data.message === 'Added to wishlist') {
+               btn.classList.remove('btn-outline-danger');
+               btn.classList.add('btn-danger');
+               btn.style.backgroundColor = '#cda349';
+               btn.style.borderColor = '#cda349';
+               btn.style.color = 'white';
+           }
+       });
+   }
+}
+</script>
+@endauth
 
 {{-- ==================== Footer ==================== --}}
 @include('inc.footer')
