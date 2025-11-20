@@ -2,9 +2,37 @@
 
 <link rel="stylesheet" href="{{ asset('css/admin/dashboard.css') }}">
 
-<!-- ===== HERO SECTION ===== -->
+<!-- ===== SALES ANALYTICS SECTION ===== -->
+<section class="dashboard-analytics bg-megamendung">
+    <div class="container">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <div>
+                    <h3 class="mb-1">Monitoring Penjualan</h3>
+                    <p class="text-muted mb-0">Ringkasan transaksi 12 bulan terakhir / klik untuk detail produk</p>
+                </div>
+                <div class="quarter-nav">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-prev-btn">
+                        <i class="fa-solid fa-chevron-left me-1"></i> Quartal Sebelumnya
+                    </button>
+                    <span class="quarter-label text-muted mx-2" id="quarter-label">-</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-next-btn">
+                        Quartal Berikutnya <i class="fa-solid fa-chevron-right ms-1"></i>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-outline-dark btn-sm" id="sales-back-btn" hidden>Level Bulanan</button>
+            </div>
+            <div id="sales-chart" class="analytics-chart"></div>
+            <div class="analytics-legend mt-3">
+                <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== HERO SECTION ===== --
 <section class="hero-admin">
-    <!-- Background Video -->
+    -- Background Video --
     <video autoplay muted loop playsinline class="background-video">
         <source src="{{ asset('img/vidbatik.mp4') }}" type="video/mp4">
         Your browser does not support HTML5 video.
@@ -15,6 +43,7 @@
         <p>Selamat datang Admin <span class="text-warning">Batik Wistara</span></p>
     </div>
 </section>
+-->
 
 <!-- ===== MAIN DASHBOARD CONTENT ===== -->
 <section class="dashboard-main">
@@ -57,34 +86,6 @@
                 </div>
             </div>
 
-        </div>
-    </div>
-</section>
-
-<!-- ===== SALES ANALYTICS SECTION ===== -->
-<section class="dashboard-analytics">
-    <div class="container">
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <div>
-                    <h3 class="mb-1">Monitoring Penjualan</h3>
-                    <p class="text-muted mb-0">Ringkasan transaksi 12 bulan terakhir / klik untuk detail produk</p>
-                </div>
-                <div class="quarter-nav">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-prev-btn">
-                        <i class="fa-solid fa-chevron-left me-1"></i> Quartal Sebelumnya
-                    </button>
-                    <span class="quarter-label text-muted mx-2" id="quarter-label">-</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-next-btn">
-                        Quartal Berikutnya <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </button>
-                </div>
-                <button type="button" class="btn btn-outline-dark btn-sm" id="sales-back-btn" hidden>Level Bulanan</button>
-            </div>
-            <div id="sales-chart" class="analytics-chart"></div>
-            <div class="analytics-legend mt-3">
-                <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
-            </div>
         </div>
     </div>
 </section>
@@ -140,8 +141,8 @@
             colors: ['#d4af37'],
             plotOptions: {
                 bar: {
-                    distributed: false,
-                    columnWidth: '45%',
+                    horizontal: true,
+                    barHeight: '55%',
                     borderRadius: 8
                 }
             },
@@ -154,7 +155,7 @@
             },
             yaxis: {
                 labels: {
-                    formatter: (value) => currencyFormatter.format(value)
+                    style: { fontSize: '12px' }
                 }
             },
             dataLabels: {
@@ -178,56 +179,114 @@
 
         chart.render();
 
-        const applyCurrencyFormatting = (maxValue = 0) => {
-            const baseMax = 1000000; // default 5 juta
+        const toValidNumber = (value) => {
+            const numericValue = typeof value === 'number' ? value : parseFloat(value);
+            return Number.isFinite(numericValue) ? numericValue : 0;
+        };
+
+        const applyCurrencyFormatting = (maxValue = 0, categories = null, labelCssClass = '') => {
+            const baseMax = 1000000; // default 1 juta
             const step = 250000;
-            const targetMax = Math.max(maxValue, step);
+            const targetMax = Math.max(toValidNumber(maxValue), step);
             const safeMax = Math.max(baseMax, Math.ceil(targetMax / step) * step);
             const tickAmount = Math.max(Math.round(safeMax / step), 1);
 
-            chart.updateOptions({
-                yaxis: {
-                    min: 0,
-                    max: safeMax,
-                    tickAmount,
-                    labels: {
-                        formatter: (value) => currencyFormatter.format(value)
+            let customFormatter = (value, index) => currencyFormatter.format(toValidNumber(value));
+
+            if (Array.isArray(categories)) {
+                const labelCount = categories.length;
+                const viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+                if (viewportWidth && viewportWidth < 400 && labelCount > 6) {
+                    customFormatter = (value, index) => {
+                        const displayIndex = index ?? categories.indexOf(value);
+                        if (displayIndex === 0 || displayIndex === labelCount - 1 || displayIndex % 3 === 0) {
+                            return currencyFormatter.format(toValidNumber(value));
+                        }
+                        return '';
+                    };
+                }
+            }
+
+            const xaxisConfig = {
+                min: 0,
+                max: safeMax,
+                tickAmount,
+                labels: {
+                    formatter: customFormatter,
+                    style: {
+                        fontSize: '12px',
+                        ...(labelCssClass ? { cssClass: labelCssClass } : {})
                     }
-                },
+                }
+            };
+
+            if (Array.isArray(categories)) {
+                xaxisConfig.categories = categories;
+            }
+
+            chart.updateOptions({
+                xaxis: xaxisConfig,
                 dataLabels: {
                     enabled: true,
-                    formatter: (value) => currencyFormatter.format(value)
+                    formatter: (value) => currencyFormatter.format(toValidNumber(value))
                 },
                 tooltip: {
                     y: {
-                        formatter: (value) => currencyFormatter.format(value)
+                        formatter: (value) => currencyFormatter.format(toValidNumber(value))
                     }
                 }
             }, false, true);
         };
 
-        const applyQuantityFormatting = (maxValue = 0) => {
+        const applyQuantityFormatting = (maxValue = 0, categories = null, labelCssClass = '') => {
             const step = 1;
-            const targetMax = Math.max(maxValue, step);
+            const targetMax = Math.max(toValidNumber(maxValue), step);
             const safeMax = Math.max(10, Math.ceil(targetMax / step) * step);
             const tickAmount = Math.max(Math.round(safeMax / step), 1);
 
-            chart.updateOptions({
-                yaxis: {
-                    min: 0,
-                    max: safeMax,
-                    tickAmount,
-                    labels: {
-                        formatter: (value) => `${value}`
+            let customFormatter = (value, index) => `${toValidNumber(value)}`;
+
+            if (Array.isArray(categories)) {
+                const labelCount = categories.length;
+                const viewportWidth = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+
+                if (viewportWidth && viewportWidth < 400 && labelCount > 6) {
+                    customFormatter = (value, index) => {
+                        if (index === 0 || index === labelCount - 1 || index % 3 === 0) {
+                            return `${toValidNumber(value)}`;
+                        }
+                        return '';
+                    };
+                }
+            }
+
+            const xaxisConfig = {
+                min: 0,
+                max: safeMax,
+                tickAmount,
+                labels: {
+                    formatter: customFormatter,
+                    style: {
+                        fontSize: '12px',
+                        ...(labelCssClass ? { cssClass: labelCssClass } : {})
                     }
-                },
+                }
+            };
+
+            if (Array.isArray(categories)) {
+                xaxisConfig.categories = categories;
+            }
+
+            chart.updateOptions({
+                xaxis: xaxisConfig,
                 dataLabels: {
                     enabled: true,
-                    formatter: (value) => `${value}`
+                    formatter: (value) => `${toValidNumber(value)}`
                 },
                 tooltip: {
                     y: {
-                        formatter: (value) => `${value} pcs`
+                        formatter: (value) => `${toValidNumber(value)} pcs`
                     }
                 }
             }, false, true);
@@ -236,6 +295,48 @@
         const quarterPrevBtn = document.querySelector('#quarter-prev-btn');
         const quarterNextBtn = document.querySelector('#quarter-next-btn');
         const quarterLabel = document.querySelector('#quarter-label');
+        const quarterNav = document.querySelector('.quarter-nav');
+        const summaryCurrencyLabelClass = 'apexcharts-currency-vertical';
+        const wrapCategoryLabel = (label = '', maxLength = 18) => {
+            if (typeof label !== 'string') {
+                return '';
+            }
+
+            const normalized = label.trim();
+            if (normalized.length <= maxLength) {
+                return normalized;
+            }
+
+            const words = normalized.split(' ');
+            const lines = [];
+            let currentLine = '';
+
+            words.forEach((word) => {
+                const tentative = currentLine ? `${currentLine} ${word}` : word;
+                if (tentative.length > maxLength) {
+                    if (currentLine) {
+                        lines.push(currentLine);
+                    }
+
+                    if (word.length > maxLength) {
+                        for (let i = 0; i < word.length; i += maxLength) {
+                            lines.push(word.slice(i, i + maxLength));
+                        }
+                        currentLine = '';
+                    } else {
+                        currentLine = word;
+                    }
+                } else {
+                    currentLine = tentative;
+                }
+            });
+
+            if (currentLine) {
+                lines.push(currentLine);
+            }
+
+            return lines.join('\n');
+        };
 
         function prepareQuarterSlices(summary = []) {
             if (!Array.isArray(summary) || !summary.length) {
@@ -325,12 +426,16 @@
                     noData: { text: 'Belum ada data penjualan' }
                 });
                 visibleSummaryItems = [];
+                applyCurrencyFormatting(0, [], summaryCurrencyLabelClass);
                 updateQuarterNav();
                 return;
             }
 
             currentLevel = 'summary';
             backButton.hidden = true;
+            if (quarterNav) {
+                quarterNav.hidden = false;
+            }
 
             const activeSlice = quarterSlices[currentQuarterIndex] || { items: [] };
             visibleSummaryItems = activeSlice.items;
@@ -347,8 +452,7 @@
                 subtitle: {
                     text: 'Klik batang bulan tertentu untuk melihat penjualan per produk',
                     style: { fontSize: '13px' }
-                },
-                xaxis: { categories: labels }
+                }
             });
 
             chart.updateSeries([
@@ -358,13 +462,16 @@
                 }
             ]);
 
-            applyCurrencyFormatting(maxTotal);
+            applyCurrencyFormatting(maxTotal, labels, summaryCurrencyLabelClass);
             updateQuarterNav();
         }
 
         function renderDetail(monthKey, label) {
             currentLevel = 'detail';
             backButton.hidden = false;
+            if (quarterNav) {
+                quarterNav.hidden = true;
+            }
 
             const detail =
                 analyticsData && analyticsData.details && analyticsData.details[monthKey]
@@ -372,7 +479,7 @@
                     : [];
 
             if (!detail.length) {
-                applyQuantityFormatting(0);
+                applyQuantityFormatting(0, []);
                 chart.updateSeries([]);
                 chart.updateOptions({
                     title: { text: `Detail Penjualan (${label})` },
@@ -382,10 +489,11 @@
                 return;
             }
 
+            const detailCategories = detail.map((item) => wrapCategoryLabel(item.name));
+
             chart.updateOptions({
                 title: { text: `Penjualan per Produk (${label})` },
-                subtitle: { text: 'Tekan "Level Bulanan" untuk kembali' },
-                xaxis: { categories: detail.map((item) => item.name) }
+                subtitle: { text: 'Tekan "Level Bulanan" untuk kembali' }
             });
 
             chart.updateSeries([
@@ -396,7 +504,7 @@
             ]);
 
             const maxQty = detail.reduce((acc, item) => Math.max(acc, item.qty), 0);
-            applyQuantityFormatting(maxQty);
+            applyQuantityFormatting(maxQty, detailCategories);
         }
     });
 </script>
