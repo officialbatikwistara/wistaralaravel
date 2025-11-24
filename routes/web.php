@@ -11,12 +11,14 @@ use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\UserReviewController;
 use App\Http\Controllers\InvoiceController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
 use Illuminate\Http\Request;
 
@@ -181,11 +183,9 @@ Route::middleware('auth')->group(function () {
         ->name('user.update.profile');
 });
 
-// 🛡️ Dashboard User (middleware proteksi)
-Route::middleware('auth', 'verified')->group(function () {
-    Route::get('/user/dashboard', function () {
-        return view('user.dashboard');
-    });
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
+        ->name('user.dashboard');
 });
 
 // Halaman verifikasi email
@@ -331,6 +331,9 @@ Route::get('/admin/dashboard', function () {
     }
     return view('admin.dashboard');
 })->name('admin.dashboard');
+
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->name('admin.dashboard');
 
 /*
 |--------------------------------------------------------------------------

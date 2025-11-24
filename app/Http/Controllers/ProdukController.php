@@ -33,11 +33,17 @@ class ProdukController extends Controller
 
     public function show($slug)
     {
-        $product = Produk::with('kategori')
-            ->withCount(['approvedReviews as reviews_count'])
-            ->withAvg(['approvedReviews as reviews_avg_rating' => function ($q) {
-                $q->where('status', 'approved');
-            }], 'rating')
+        $product = Produk::with(['kategori'])
+            ->withCount([
+                'approvedReviews as review_count' => function ($q) {
+                    $q->where('status', 'approved');
+                }
+            ])
+            ->withAvg([
+                'approvedReviews as average_rating' => function ($q) {
+                    $q->where('status', 'approved');
+                }
+            ], 'rating')
             ->where('slug', $slug)
             ->firstOrFail();
 

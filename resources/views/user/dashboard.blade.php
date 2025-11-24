@@ -11,7 +11,20 @@
         <!-- 👤 Profil Pengguna -->
         <div class="card shadow-lg rounded-4 p-4 text-center border-0 mb-4">
           <i class="fa-solid fa-user-circle fa-4x text-dark mb-3"></i>
-          <h2 class="fw-bold mb-2 text-dark">{{ Auth::user()->name }}</h2>
+          <h2 class="fw-bold mb-2 text-dark">
+              {{ Auth::user()->name }}
+
+              <!-- BADGE LEVEL USER -->
+              <span class="ms-2 badge px-3 py-2"
+                  style="background: {{ $level['color'] }}; color:white; font-size:0.9rem;">
+                  <i class="fa-solid {{ $level['icon'] }} me-1"></i> {{ $level['label'] }}
+              </span>
+          </h2>
+
+          <p class="text-muted mb-4">
+              Anda telah menyelesaikan <strong>{{ $totalSelesai }}</strong> pesanan.
+          </p>
+
           <p class="text-muted mb-4">Selamat datang di Dashboard User — Anda telah berhasil login ✅</p>
 
           <div class="d-flex justify-content-center gap-3 flex-wrap">

@@ -40,24 +40,28 @@
 
                 <h2 class="fw-bold">{{ $product->nama_produk }}</h2>
 
-                <!-- Rating -->
-                @php
-                    $avgRating = round($product->average_rating, 1);
-                    $reviewCount = $product->review_count;
-                @endphp
+{{-- Rating --}}
+@php
+    $avgRating = round($product->average_rating ?? 0, 1);
+    $reviewCount = $product->review_count ?? 0;
+@endphp
 
-                <div class="rating-stars mb-2">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= floor($avgRating))
-                            <i class="fa-solid fa-star text-warning"></i>
-                        @elseif($i == ceil($avgRating) && $avgRating - floor($avgRating) >= 0.5)
-                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
-                        @else
-                            <i class="fa-regular fa-star text-secondary"></i>
-                        @endif
-                    @endfor
-                    <span class="text-muted ms-1 small">({{ $reviewCount }} ulasan)</span>
-                </div>
+<div class="rating-stars mb-2">
+    @for($i = 1; $i <= 5; $i++)
+        @if($i <= floor($avgRating))
+            <i class="fa-solid fa-star text-warning"></i>
+        @elseif($i == ceil($avgRating) && ($avgRating - floor($avgRating)) >= 0.5)
+            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+        @else
+            <i class="fa-regular fa-star text-secondary"></i>
+        @endif
+    @endfor
+
+    <span class="text-muted ms-1 small">
+        ({{ $reviewCount }} ulasan)
+    </span>
+</div>
+
 
                 <!-- Harga -->
                 <h3 class="fw-bold text-warning mb-3">

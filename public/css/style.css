@@ -507,12 +507,21 @@ h5 {
 /* Video */
 .katalog-media {
     width: 100%;
-    max-width: 360px;
-    aspect-ratio: 3/4;
-    border-radius: 14px;
+    max-width: 260px; /* 🟡 dari 360px → lebih kecil */
+    aspect-ratio: 9/16; /* bentuk tetap portrait */
+    border-radius: 16px;
     overflow: hidden;
     background: #000;
+    position: relative;
 }
+
+.katalog-media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+}
+
 
 /* Card */
 .produk-card {

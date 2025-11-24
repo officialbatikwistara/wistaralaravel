@@ -80,7 +80,6 @@
 </section>
 
 <!-- ================= KATALOG ================= -->
-<!-- ================= KATALOG ================= -->
 <section class="section-katalog-slider py-5">
     <div class="container">
 
