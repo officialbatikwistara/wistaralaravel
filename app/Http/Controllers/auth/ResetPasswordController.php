@@ -6,13 +6,14 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 
 class ResetPasswordController extends Controller
 {
     /**
-     * Tampilkan form reset password.
+     * Display the password reset view.
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request, $token)
     {
         return view('auth.reset-password', [
             'token' => $token,
@@ -21,7 +22,7 @@ class ResetPasswordController extends Controller
     }
 
     /**
-     * Update password user.
+     * Reset the given user's password.
      */
     public function reset(Request $request)
     {
@@ -33,15 +34,17 @@ class ResetPasswordController extends Controller
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user) use ($request) {
+            function ($user, $password) {
                 $user->forceFill([
-                    'password' => Hash::make($request->password),
-                ])->save();
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+
+                $user->save();
             }
         );
 
-        return $status == Password::PASSWORD_RESET
-            ? redirect()->route('user.login')->with('success', 'Password berhasil direset. Silakan login.')
-            : back()->withErrors(['email' => [__($status)]]);
+        return $status === Password::PASSWORD_RESET
+            ? redirect()->route('login')->with('status', 'Password berhasil direset!')
+            : back()->withErrors(['email' => 'Gagal mereset password.']);
     }
 }
