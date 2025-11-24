@@ -168,10 +168,10 @@ Route::prefix('admin')->group(function () {
         return redirect()->route('admin.login');
     })->name('admin.home');
 
-    // Protected admin routes
+    // Protected admin routes - use 'auth:admin' middleware
     Route::middleware(['auth:admin'])->group(function () {
         Route::get('/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
-        Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\Admin\AdminDashboardController::class, 'index'])->name('admin.dashboard');
 
         // Produk
         Route::get('/produk', [ProdukAdminController::class, 'index'])->name('admin.produk.index');
