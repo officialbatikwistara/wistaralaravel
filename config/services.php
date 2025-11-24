@@ -35,4 +35,16 @@ return [
         ],
     ],
 
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+    ],
+
+    'whatsapp' => [
+        'provider' => env('WHATSAPP_PROVIDER', 'fonnte'), // 'fonnte' or 'wablas'
+        'api_url' => env('WHATSAPP_API_URL', 'https://api.fonnte.com'),
+        'api_token' => env('WHATSAPP_API_TOKEN'),
+    ],
+
 ];

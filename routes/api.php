@@ -10,8 +10,8 @@ use App\Models\Order;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\Api\ChatbotApiController;
-use App\Models\Admin;
+use App\Http\Controllers\WhatsAppWebhookController;
+use App\Services\WhatsAppService;
 
 /*
 |--------------------------------------------------------------------------
@@ -291,6 +291,66 @@ Route::middleware(['auth:sanctum', 'throttle:60,1'])->prefix('v1/notifications')
         $user->unreadNotifications()->update(['read_at' => now()]);
 
         return response()->json(['success' => true]);
+    });
+});
+
+// WhatsApp Webhook Routes (NO AUTH - untuk terima dari Fonnte/Wablas)
+Route::post('/whatsapp/webhook', [WhatsAppWebhookController::class, 'handleIncoming']);
+Route::post('/whatsapp/status', [WhatsAppWebhookController::class, 'handleStatus']);
+
+// WhatsApp Send API (WITH AUTH - untuk kirim dari admin)
+Route::middleware(['auth:sanctum'])->prefix('whatsapp')->group(function () {
+    // Send single message
+    Route::post('/send', function (Request $request) {
+        try {
+            $validated = $request->validate([
+                'phone' => 'required|string',
+                'message' => 'required|string',
+                'image_url' => 'nullable|url'
+            ]);
+
+            $whatsapp = app(WhatsAppService::class);
+
+            $result = $whatsapp->sendMessage(
+                $validated['phone'],
+                $validated['message'],
+                $validated['image_url'] ?? null
+            );
+
+            return response()->json($result);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp send error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    });
+
+    // Send bulk messages
+    Route::post('/send-bulk', function (Request $request) {
+        try {
+            $validated = $request->validate([
+                'phones' => 'required|array',
+                'phones.*' => 'required|string',
+                'message' => 'required|string'
+            ]);
+
+            $whatsapp = app(WhatsAppService::class);
+
+            $result = $whatsapp->sendBulk(
+                $validated['phones'],
+                $validated['message']
+            );
+
+            return response()->json(['results' => $result]);
+        } catch (\Exception $e) {
+            Log::error('WhatsApp bulk send error', ['error' => $e->getMessage()]);
+            return response()->json([
+                'success' => false,
+                'error' => $e->getMessage()
+            ], 500);
+        }
     });
 });
 
