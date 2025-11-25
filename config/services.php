@@ -55,4 +55,9 @@ return [
         'max_tokens' => env('GROQ_MAX_TOKENS', 1000),
     ],
 
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
+    ],
+
 ];

@@ -14,5 +14,7 @@ class VerifyCsrfToken extends Middleware
     protected $except = [
         'webhook/*',
         '/webhook/whatsapp',
+        'api/*',           // Semua API routes
+        'chatbot/*',       // Semua chatbot routes
     ];
 }

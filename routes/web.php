@@ -43,7 +43,9 @@ use App\Http\Controllers\UploadBuktiController;
 // Public Routes
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/tentang', function () { return view('tentang'); })->name('tentang');
-Route::get('/kontak', function () { return view('kontak'); })->name('kontak');
+Route::get('/kontak', function() {
+    return view('kontak.index');
+})->name('kontak.index');
 
 // Produk
 Route::get('/katalog', [ProdukController::class, 'index'])->name('katalog');
@@ -276,6 +278,15 @@ Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'ch
 Route::post('/chatbot/clear', [App\Http\Controllers\ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
 Route::get('/chatbot/test', [App\Http\Controllers\ChatbotController::class, 'test'])->name('chatbot.test');
 
-// WhatsApp Webhook (Groq AI Enabled)
-Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook'])->name('webhook.whatsapp');
-Route::delete('/webhook/history/{phone}', [App\Http\Controllers\WhatsAppWebhookController::class, 'clearHistory'])->name('webhook.clear');
+// WhatsApp Webhook - Update ke versi AI
+Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook']);
+
+// Health Check
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+
+
+})->name('health.check');// Products route
+Route::get('/produk', function() {
+    return view('produk.index');
+})->name('produk.index');

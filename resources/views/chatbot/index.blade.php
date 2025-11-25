@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>AI Chatbot - Batik Wistara</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: Arial, sans-serif; background: #f0f2f5; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif; background: #f0f2f5; }
         .chat-container { max-width: 800px; margin: 20px auto; background: white; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); height: 90vh; display: flex; flex-direction: column; }
         .chat-header { padding: 20px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 12px 12px 0 0; }
         .chat-header h2 { margin-bottom: 5px; }
@@ -19,7 +18,7 @@
         .message { margin-bottom: 16px; display: flex; animation: slideIn 0.3s ease; }
         @keyframes slideIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .message.user { justify-content: flex-end; }
-        .message-content { max-width: 70%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; word-wrap: break-word; }
+        .message-content { max-width: 70%; padding: 12px 16px; border-radius: 18px; line-height: 1.4; word-wrap: break-word; white-space: pre-wrap; }
         .message.user .message-content { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-bottom-right-radius: 4px; }
         .message.bot .message-content { background: white; color: #333; box-shadow: 0 1px 2px rgba(0,0,0,0.1); border-bottom-left-radius: 4px; }
         .chat-input { padding: 20px; border-top: 1px solid #e9ecef; display: flex; gap: 10px; background: white; border-radius: 0 0 12px 12px; }
@@ -68,7 +67,7 @@
 
         async function checkConnection() {
             try {
-                const response = await fetch('/chatbot/test');
+                const response = await fetch('/api/chatbot/test');
                 const data = await response.json();
 
                 if (data.success) {
@@ -118,11 +117,10 @@
             showLoading();
 
             try {
-                const response = await fetch('/chatbot/chat', {
+                const response = await fetch('/api/chatbot/chat', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
                     },
                     body: JSON.stringify({ message })
                 });

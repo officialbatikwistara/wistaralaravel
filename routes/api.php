@@ -354,7 +354,29 @@ Route::middleware(['auth:sanctum'])->prefix('whatsapp')->group(function () {
     });
 });
 
-// WhatsApp Webhook (No CSRF in api routes)
+// Chatbot API (No CSRF)
+Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat']);
+Route::post('/chatbot/clear', [App\Http\Controllers\ChatbotController::class, 'clearHistory']);
+Route::get('/chatbot/test', [App\Http\Controllers\ChatbotController::class, 'test']);
+
+// WhatsApp Webhook with AI
 Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook']);
+
+// Telegram Webhook with AI
+Route::post('/telegram/webhook', [App\Http\Controllers\TelegramBotController::class, 'webhook']);
+Route::get('/telegram/set-webhook', [App\Http\Controllers\TelegramBotController::class, 'setWebhook']);
+Route::get('/telegram/webhook-info', [App\Http\Controllers\TelegramBotController::class, 'getWebhookInfo']);
+
+// Health check
+Route::get('/health', function() {
+    return response()->json([
+        'status' => 'healthy',
+        'timestamp' => now(),
+        'services' => [
+            'groq' => !empty(config('services.groq.api_key')),
+            'whatsapp' => !empty(config('services.whatsapp.api_token')),
+        ]
+    ]);
+});
 
 

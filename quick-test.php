@@ -1,56 +1,41 @@
 <?php
 
-require __DIR__ . '/vendor/autoload.php';
+echo "🧪 QUICK TEST - Groq AI Multi-Channel\n";
+echo str_repeat('═', 50) . "\n\n";
 
-use Illuminate\Support\Facades\Http;
+$base = 'http://localhost:8000';
+$tests = [
+    ['name' => 'Groq Config', 'url' => '/api/chatbot/test', 'method' => 'GET'],
+    ['name' => 'Web Chatbot UI', 'url' => '/chatbot', 'method' => 'GET'],
+    ['name' => 'Web AI Chat', 'url' => '/api/chatbot/chat', 'method' => 'POST', 'data' => ['message' => 'hai']],
+    ['name' => 'WhatsApp Webhook', 'url' => '/api/webhook/whatsapp', 'method' => 'POST', 'data' => ['from' => '6281234', 'message' => 'test', 'name' => 'User']],
+];
 
-$app = require_once __DIR__ . '/bootstrap/app.php';
-$app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+foreach ($tests as $i => $test) {
+    echo ($i + 1) . ". " . $test['name'] . "... ";
 
-echo "🧪 GROQ QUICK TEST\n";
-echo "==================\n\n";
+    $ch = curl_init($base . $test['url']);
 
-$apiKey = env('GROQ_API_KEY');
-$apiUrl = env('GROQ_API_URL', 'https://api.groq.com/openai/v1');
-$model = env('GROQ_MODEL', 'llama-3.3-70b-versatile');
-
-echo "📋 Configuration:\n";
-echo "   API Key: " . substr($apiKey, 0, 15) . "...\n";
-echo "   Model: $model\n";
-echo "   URL: $apiUrl\n\n";
-
-echo "🚀 Sending test message...\n";
-
-try {
-    $response = Http::withHeaders([
-        'Authorization' => 'Bearer ' . $apiKey,
-        'Content-Type' => 'application/json',
-    ])->timeout(30)->post($apiUrl . '/chat/completions', [
-        'model' => $model,
-        'messages' => [
-            ['role' => 'user', 'content' => 'Halo! Jawab dengan singkat: siapa kamu?']
-        ],
-        'max_tokens' => 100,
-    ]);
-
-    if ($response->successful()) {
-        $data = $response->json();
-        echo "\n✅ SUCCESS!\n\n";
-        echo "📨 Response:\n";
-        echo "   " . $data['choices'][0]['message']['content'] . "\n\n";
-        echo "📊 Token Usage:\n";
-        echo "   Prompt: " . $data['usage']['prompt_tokens'] . "\n";
-        echo "   Completion: " . $data['usage']['completion_tokens'] . "\n";
-        echo "   Total: " . $data['usage']['total_tokens'] . "\n\n";
-        echo "🎉 Groq AI is working perfectly!\n";
-        echo "\n💡 Now check: https://console.groq.com/usage\n";
-        echo "   Your API calls should be > 0\n";
-    } else {
-        echo "\n❌ FAILED!\n\n";
-        echo "Status: " . $response->status() . "\n";
-        echo "Error: " . $response->body() . "\n";
+    if ($test['method'] == 'POST') {
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($test['data'] ?? []));
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
     }
-} catch (\Exception $e) {
-    echo "\n❌ ERROR!\n\n";
-    echo $e->getMessage() . "\n";
+
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+
+    $result = curl_exec($ch);
+    $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+    curl_close($ch);
+
+    if ($code == 200) {
+        echo "✅ PASS ($code)\n";
+    } else {
+        echo "❌ FAIL ($code)\n";
+    }
 }
+
+echo "\n" . str_repeat('═', 50) . "\n";
+echo "✅ Test selesai!\n";
+echo "📝 Cek log: Get-Content storage\\logs\\laravel.log -Tail 50\n";

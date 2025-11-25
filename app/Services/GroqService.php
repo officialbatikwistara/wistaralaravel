@@ -18,15 +18,15 @@ class GroqService
         $this->apiKey = config('services.groq.api_key');
         $this->apiUrl = config('services.groq.api_url');
         $this->model = config('services.groq.model');
-        $this->temperature = config('services.groq.temperature');
-        $this->maxTokens = config('services.groq.max_tokens');
+        $this->temperature = (float) config('services.groq.temperature', 0.7);
+        $this->maxTokens = (int) config('services.groq.max_tokens', 1000);
     }
 
     public function chat(string $message, array $conversationHistory = [])
     {
         try {
             if (empty($this->apiKey)) {
-                throw new \Exception('GROQ_API_KEY tidak ditemukan');
+                throw new \Exception('GROQ_API_KEY not found');
             }
 
             $messages = array_merge($conversationHistory, [
@@ -54,7 +54,7 @@ class GroqService
 
             return [
                 'success' => false,
-                'error' => $response->json()['error']['message'] ?? 'Groq API error',
+                'error' => $response->json()['error']['message'] ?? 'API error',
             ];
         } catch (\Exception $e) {
             Log::error('Groq Error: ' . $e->getMessage());
