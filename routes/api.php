@@ -354,4 +354,7 @@ Route::middleware(['auth:sanctum'])->prefix('whatsapp')->group(function () {
     });
 });
 
+// WhatsApp Webhook (No CSRF in api routes)
+Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook']);
+
 

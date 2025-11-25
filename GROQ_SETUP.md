@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
     |--------------------------------------------------------------------------
     | Third Party Services
@@ -47,12 +46,20 @@ return [
         'api_token' => env('WHATSAPP_API_TOKEN'),
     ],
 
+    'ai_agent' => [
+        'provider' => env('AI_AGENT_PROVIDER', 'groq'), // 'groq', 'gemini', 'openrouter', 'ollama', 'openai'
+        'api_key' => env('AI_AGENT_API_KEY'),
+        'api_url' => env('AI_AGENT_API_URL'),
+        'model' => env('AI_AGENT_MODEL'),
+        'temperature' => env('AI_AGENT_TEMPERATURE', 0.7),
+        'max_tokens' => env('AI_AGENT_MAX_TOKENS', 1000),
+    ],
+
     'groq' => [
         'api_key' => env('GROQ_API_KEY'),
-        'api_url' => env('GROQ_API_URL', 'https://api.groq.com/openai/v1'),
         'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
         'temperature' => env('GROQ_TEMPERATURE', 0.7),
         'max_tokens' => env('GROQ_MAX_TOKENS', 1000),
+        'session_driver' => env('SESSION_DRIVER', 'file'),
     ],
-
 ];

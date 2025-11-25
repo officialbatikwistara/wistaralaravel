@@ -94,7 +94,7 @@ Route::get('/checkout/{id_produk}', [CheckoutController::class, 'directCheckout'
 Route::post('/checkout/process', [CheckoutController::class, 'process'])->name('checkout.process');
 Route::get('/checkout/qris/{id}', [CheckoutController::class, 'qris'])->name('checkout.qris');
 Route::get('/checkout/bank-transfer/{id}', [CheckoutController::class, 'bankTransfer'])->name('checkout.bank');
-Route::post('/checkout/{id}/upload-bukti', [UploadBuktiController::class, 'upload'])->name('checkout.uploadBukti');
+// Route::post('/checkout/{id}/upload-bukti', [UploadBuktiController::class, 'upload'])->name('checkout.uploadBukti');
 
 // User Dashboard (Protected)
 Route::middleware(['auth'])->prefix('user')->group(function () {
@@ -265,3 +265,17 @@ Route::get('/link-storage', function () {
         return 'Error: ' . $e->getMessage();
     }
 })->name('link.storage');
+
+// Temporary comment jika controller belum ada
+// Route::get('/upload-bukti', [App\Http\Controllers\UploadBuktiController::class, 'index']);
+// Route::post('/upload-bukti', [App\Http\Controllers\UploadBuktiController::class, 'store']);
+
+// Chatbot Routes
+Route::get('/chatbot', [App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
+Route::post('/chatbot/clear', [App\Http\Controllers\ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
+Route::get('/chatbot/test', [App\Http\Controllers\ChatbotController::class, 'test'])->name('chatbot.test');
+
+// WhatsApp Webhook (Groq AI Enabled)
+Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook'])->name('webhook.whatsapp');
+Route::delete('/webhook/history/{phone}', [App\Http\Controllers\WhatsAppWebhookController::class, 'clearHistory'])->name('webhook.clear');

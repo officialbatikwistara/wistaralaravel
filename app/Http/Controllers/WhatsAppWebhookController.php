@@ -2,198 +2,131 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\GroqService;
 use Illuminate\Http\Request;
-use App\Services\WhatsAppService;
 use Illuminate\Support\Facades\Log;
-use App\Models\Order;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Http;
 
 class WhatsAppWebhookController extends Controller
 {
-    protected $whatsappService;
+    protected $groq;
 
-    public function __construct(WhatsAppService $whatsappService)
+    public function __construct(GroqService $groq)
     {
-        $this->whatsappService = $whatsappService;
+        $this->groq = $groq;
     }
 
-    /**
-     * Handle incoming WhatsApp messages (webhook dari Fonnte/Wablas)
-     * URL: POST /api/whatsapp/webhook
-     */
-    public function handleIncoming(Request $request)
+    public function webhook(Request $request)
     {
-        Log::info('📥 WhatsApp webhook received', $request->all());
+        try {
+            Log::info('📥 [GROQ] WhatsApp Message Received', $request->all());
 
-        $message = $request->input('message') ?? $request->input('text') ?? $request->input('body');
-        $sender = $request->input('sender') ?? $request->input('phone') ?? $request->input('from');
+            $from = $request->input('from') ?? $request->input('sender') ?? 'unknown';
+            $message = $request->input('message') ?? $request->input('text') ?? '';
+            $name = $request->input('name') ?? $request->input('pushname') ?? 'Customer';
 
-        if (!$sender || !$message) {
-            Log::warning('❌ Invalid webhook data', $request->all());
-            return response()->json([
-                'status' => 'invalid',
-                'error' => 'Missing sender or message'
-            ], 400);
-        }
+            if (empty($message)) {
+                return response()->json(['status' => 'ignored']);
+            }
 
-        $reply = $this->processMessage($message, $sender);
+            $message = trim($message);
+            $history = Cache::get("wa_groq_{$from}", []);
 
-        if ($reply) {
-            if (app()->environment('testing') || !config('services.whatsapp.api_token')) {
-                Log::info('🧪 TEST MODE - Would send reply', [
-                    'to' => $sender,
-                    'message' => substr($reply, 0, 100) . '...'
-                ]);
+            // Check if menu command
+            $isMenu = in_array(strtolower($message), ['0', '1', '2', '3', '4', 'menu']);
+
+            if ($isMenu) {
+                Log::info('🔹 [MENU] Handling menu: ' . $message);
+                $response = $this->getMenuResponse($message);
             } else {
-                try {
-                    $result = $this->whatsappService->sendMessage($sender, $reply);
+                Log::info('🤖 [GROQ AI] Processing with AI');
+                $response = $this->getAIResponse($message, $name, $history);
 
-                    if ($result['success']) {
-                        Log::info('✅ Auto-reply sent successfully', [
-                            'to' => $sender,
-                            'preview' => substr($reply, 0, 50) . '...'
-                        ]);
-                    } else {
-                        Log::error('❌ Failed to send auto-reply', [
-                            'to' => $sender,
-                            'error' => $result['error'] ?? 'Unknown error'
-                        ]);
-                    }
-                } catch (\Exception $e) {
-                    Log::error('❌ Exception sending auto-reply', [
-                        'to' => $sender,
-                        'error' => $e->getMessage()
+                // Save to history
+                $history[] = ['role' => 'user', 'content' => $message];
+                $history[] = ['role' => 'assistant', 'content' => $response];
+
+                if (count($history) > 10) {
+                    $history = array_slice($history, -10);
+                }
+
+                Cache::put("wa_groq_{$from}", $history, now()->addHours(24));
+            }
+
+            Log::info('📤 [SEND] Response: ' . substr($response, 0, 100));
+
+            $this->sendWhatsApp($from, $response);
+
+            return response()->json(['status' => 'success', 'ai_powered' => !$isMenu]);
+
+        } catch (\Exception $e) {
+            Log::error('❌ [ERROR] ' . $e->getMessage());
+            return response()->json(['status' => 'error'], 500);
+        }
+    }
+
+    protected function getMenuResponse($command)
+    {
+        $menus = [
+            '0' => "✨ *Menu Utama Batik Wistara*\n\n1️⃣ Katalog Produk\n2️⃣ Berita Terbaru\n3️⃣ Alamat & Jam Buka\n4️⃣ Hubungi Admin\n\n💡 Atau tanya apa saja!\nContoh: 'Ada batik tulis?'",
+            '1' => "🛍️ *Katalog Produk*\n\nKoleksi kami:\n• Batik Tulis Premium\n• Batik Cap\n• Kemeja & Dress Batik\n\nLihat: " . url('/produk') . "\n\n💬 Tanya AI: 'Ada batik untuk acara formal?'\n\nKetik 0 = Menu",
+            '2' => "📰 *Berita Terbaru*\n\nCek update: " . url('/berita') . "\n\nKetik 0 = Menu",
+            '3' => "📍 *Alamat & Jam Buka*\n\n🏪 Batik Wistara\n📍 [Alamat Toko]\n⏰ Sen-Sab: 09:00-17:00\n📞 [Telepon]\n\nKetik 0 = Menu",
+            '4' => "💬 *Hubungi Admin*\n\nSilakan hubungi admin untuk bantuan.\n\nKetik 0 = Menu",
+            'menu' => "✨ *Menu Utama*\n\n0️⃣ Menu Utama\n1️⃣ Katalog\n2️⃣ Berita\n3️⃣ Alamat\n4️⃣ Admin\n\n💡 Atau tanya apa saja ke AI!",
+        ];
+
+        return $menus[strtolower($command)] ?? $menus['0'];
+    }
+
+    protected function getAIResponse($message, $name, $history)
+    {
+        $systemPrompt = "Anda adalah customer service Batik Wistara yang ramah dan profesional.\n\nNama customer: {$name}\n\nINFORMASI:\n- Produk: Batik tulis, batik cap, kemeja batik, dress batik\n- Harga: Rp 150k - 2jt\n- Jam: Senin-Sabtu 09:00-17:00\n- Website: " . url('/') . "\n\nCara menjawab:\n1. Gunakan bahasa Indonesia ramah dengan emoji 😊\n2. Berikan info jelas tapi ringkas\n3. Jika ditanya harga, beri range umum\n4. Akhiri dengan tawaran bantuan\n\nPANTANGAN:\n❌ Jangan buat-buat harga pasti\n❌ Jangan terlalu panjang (max 150 kata)";
+
+        $result = $this->groq->chatWithSystemPrompt($message, $systemPrompt, $history);
+
+        if ($result['success']) {
+            Log::info('✅ [AI] Success - Tokens: ' . ($result['usage']['total_tokens'] ?? 0));
+            return $result['response'] . "\n\n─────────\n💡 Ketik *0* untuk menu";
+        }
+
+        Log::error('❌ [AI] Failed: ' . $result['error']);
+        return "Maaf {$name}, AI sedang sibuk 😅\nSilakan ketik *4* untuk hubungi admin.\n\nTerima kasih! 🙏";
+    }
+
+    protected function sendWhatsApp($to, $message)
+    {
+        $provider = config('services.whatsapp.provider');
+        $apiUrl = config('services.whatsapp.api_url');
+        $token = config('services.whatsapp.api_token');
+
+        if (empty($token)) {
+            Log::error('WhatsApp token not configured');
+            return false;
+        }
+
+        try {
+            if ($provider === 'fonnte') {
+                $response = Http::withHeaders(['Authorization' => $token])
+                    ->post($apiUrl . '/send', [
+                        'target' => $to,
+                        'message' => $message,
                     ]);
-                }
-            }
-        }
-
-        return response()->json([
-            'status' => 'ok',
-            'received' => true,
-            'reply_sent' => !empty($reply),
-            'timestamp' => now()->toISOString()
-        ], 200);
-    }
-
-    /**
-     * Process incoming message and generate auto-reply
-     */
-    protected function processMessage($message, $sender)
-    {
-        $msg = strtolower(trim($message));
-
-        // Greeting
-        if (str_contains($msg, 'halo') || str_contains($msg, 'hai') || str_contains($msg, 'hello')) {
-            return "Halo! 👋\n\nSelamat datang di *Wistara*.\nAda yang bisa kami bantu?\n\nKetik *HELP* untuk melihat menu.";
-        }
-
-        // Order/Pemesanan
-        if (str_contains($msg, 'order') || str_contains($msg, 'pesan') || str_contains($msg, 'beli')) {
-            return "📦 *PEMESANAN*\n\n" .
-                   "Untuk melakukan pemesanan:\n" .
-                   "1. Kunjungi website kami\n" .
-                   "2. Pilih produk yang diinginkan\n" .
-                   "3. Checkout dan bayar\n\n" .
-                   "Atau kirim nama produk yang Anda inginkan.";
-        }
-
-        // Status pesanan - format: STATUS 12345
-        if (str_contains($msg, 'status')) {
-            // Extract order ID from message
-            preg_match('/status\s*(\d+)/i', $msg, $matches);
-
-            if (isset($matches[1])) {
-                $orderId = $matches[1];
-                $order = Order::find($orderId);
-
-                if ($order) {
-                    return "📋 *STATUS PESANAN #$orderId*\n\n" .
-                           "Nama: {$order->nama}\n" .
-                           "Total: Rp " . number_format($order->total, 0, ',', '.') . "\n" .
-                           "Status: {$order->status}\n" .
-                           "Pembayaran: {$order->status_pembayaran}\n" .
-                           "Tanggal: " . $order->created_at->format('d/m/Y H:i');
-                } else {
-                    return "❌ Pesanan dengan ID *$orderId* tidak ditemukan.\n\n" .
-                           "Pastikan nomor pesanan Anda benar.";
-                }
+            } else {
+                $response = Http::withHeaders(['Authorization' => $token])
+                    ->post($apiUrl . '/api/send-message', [
+                        'phone' => $to,
+                        'message' => $message,
+                    ]);
             }
 
-            return "ℹ️ Untuk cek status pesanan, kirim:\n" .
-                   "*STATUS [NOMOR_ORDER]*\n\n" .
-                   "Contoh: STATUS 12345";
+            Log::info('📱 WhatsApp sent: ' . $response->status());
+            return $response->successful();
+
+        } catch (\Exception $e) {
+            Log::error('📱 Send failed: ' . $e->getMessage());
+            return false;
         }
-
-        // Produk
-        if (str_contains($msg, 'produk') || str_contains($msg, 'katalog')) {
-            return "🛍️ *KATALOG PRODUK*\n\n" .
-                   "Lihat produk kami di:\n" .
-                   "https://wistara.com/produk\n\n" .
-                   "Atau hubungi CS untuk rekomendasi produk.";
-        }
-
-        // Customer Service
-        if (str_contains($msg, 'cs') || str_contains($msg, 'customer service') || str_contains($msg, 'admin')) {
-            return "👤 *CUSTOMER SERVICE*\n\n" .
-                   "Hubungi CS kami:\n" .
-                   "📞 WhatsApp: 0812-3456-7890\n" .
-                   "📧 Email: cs@wistara.com\n\n" .
-                   "Jam operasional:\n" .
-                   "Senin - Jumat: 08:00 - 17:00\n" .
-                   "Sabtu: 08:00 - 12:00";
-        }
-
-        // Help menu
-        if (str_contains($msg, 'help') || str_contains($msg, 'bantuan') || str_contains($msg, 'menu')) {
-            return "📋 *MENU BANTUAN*\n\n" .
-                   "Ketik keyword berikut:\n\n" .
-                   "🛒 *ORDER* - Informasi pemesanan\n" .
-                   "📦 *STATUS* - Cek status pesanan\n" .
-                   "🛍️ *PRODUK* - Lihat katalog\n" .
-                   "👤 *CS* - Hubungi customer service\n" .
-                   "❓ *HELP* - Menu bantuan ini\n\n" .
-                   "Atau langsung kirim pertanyaan Anda.";
-        }
-
-        // Terima kasih
-        if (str_contains($msg, 'terima kasih') || str_contains($msg, 'thanks') || str_contains($msg, 'makasih')) {
-            return "Sama-sama! 😊\n\nSenang bisa membantu Anda.\nJangan ragu untuk bertanya lagi ya!";
-        }
-
-        // Default reply - forward to admin
-        Log::info('Unhandled message - forwarding to admin', [
-            'from' => $sender,
-            'message' => $message
-        ]);
-
-        return "Terima kasih atas pesan Anda! 🙏\n\n" .
-               "Tim kami akan segera merespons.\n" .
-               "Untuk respon lebih cepat, ketik *HELP* untuk melihat menu.";
-    }
-
-    /**
-     * Handle status updates from WhatsApp provider
-     * URL: POST /api/whatsapp/status
-     */
-    public function handleStatus(Request $request)
-    {
-        Log::info('📊 WhatsApp status update', $request->all());
-
-        $messageSid = $request->input('MessageSid') ?? $request->input('message_id');
-        $status = $request->input('MessageStatus') ?? $request->input('status');
-
-        // Log delivery status
-        if ($messageSid && $status) {
-            Log::info('📬 Message delivery status', [
-                'message_id' => $messageSid,
-                'status' => $status,
-                'timestamp' => now()->toISOString()
-            ]);
-        }
-
-        return response()->json([
-            'status' => 'ok',
-            'received' => true
-        ], 200);
     }
 }
