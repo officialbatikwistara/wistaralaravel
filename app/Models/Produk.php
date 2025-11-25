@@ -11,61 +11,49 @@ class Produk extends Model
 
     protected $table = 'produk';
     protected $primaryKey = 'id_produk';
+    public $incrementing = true;
+    protected $keyType = 'int';
+    public $timestamps = false;
 
     protected $fillable = [
         'nama_produk',
         'slug',
-        'kategori_id',
+        'deskripsi',
         'harga',
         'stok',
-        'deskripsi',
         'gambar',
-        'status'
+        'id_kategori',
+        'link_shopee',
+        'link_tiktok',
+        'status',
+        'tanggal_upload',
+        'tanggal_update'
     ];
 
-    /**
-     * Relationship to Kategori
-     */
     public function kategori()
     {
-        return $this->belongsTo(Kategori::class, 'kategori_id', 'id');
+        return $this->belongsTo(KategoriProduk::class, 'id_kategori', 'id_kategori');
     }
 
-    /**
-     * Relationship to Reviews
-     * Update foreign key to match your database column name
-     */
     public function reviews()
     {
-        // Try common column names: id_produk, product_id, or produk_id
         return $this->hasMany(Review::class, 'id_produk', 'id_produk');
     }
 
-    /**
-     * Get average rating - dengan error handling
-     */
-    public function getAverageRatingAttribute()
+    public function approvedReviews()
     {
-        try {
-            return $this->reviews()->avg('rating') ?? 0;
-        } catch (\Exception $e) {
-            \Log::warning('Failed to get average rating', [
-                'produk_id' => $this->id_produk,
-                'error' => $e->getMessage()
-            ]);
-            return 0;
-        }
+        return $this->hasMany(Review::class, 'id_produk', 'id_produk')
+                    ->where('status', 'approved');
     }
 
-    /**
-     * Get review count - dengan error handling
-     */
+    // ⭐ FIX: gunakan field dari withAvg / withCount
+    public function getAverageRatingAttribute()
+    {
+        return round($this->attributes['average_rating'] ?? 0, 1);
+    }
+
     public function getReviewCountAttribute()
     {
-        try {
-            return $this->reviews()->count();
-        } catch (\Exception $e) {
-            return 0;
-        }
+        return $this->attributes['review_count'] ?? 0;
     }
 }

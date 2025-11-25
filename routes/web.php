@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Http\Request;  // ✅ Gunakan ini, bukan Facade
+use Illuminate\Http\Request;
 use App\Models\Produk;
 use App\Models\Berita;
 use App\Models\Order;
