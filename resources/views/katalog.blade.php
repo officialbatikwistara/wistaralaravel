@@ -69,7 +69,7 @@
                             <div class="produk-img-wrapper position-relative">
                                 <img src="{{ $img }}" class="produk-img" alt="{{ $p->nama_produk }}">
                                 <span class="kategori-badge badge bg-light text-gold position-absolute top-0 start-0 m-2">
-                                    {{ $p->nama_kategori }}
+                                    {{ $p->kategori->nama_kategori ?? 'Kategori' }}
                                 </span>
                             </div>
 
