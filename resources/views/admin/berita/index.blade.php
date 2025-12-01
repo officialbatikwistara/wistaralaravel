@@ -1,9 +1,4 @@
-@extends('layouts.admin')
-
-@section('title', 'Kelola Berita')
-
-@section('content')
-
+@include('admin.header')
 <style>
 /* 🌄 Background fullscreen solid */
 body {
@@ -218,4 +213,4 @@ h2 {
   </div>
 </div>
 
-@endsection
+@include('admin.footer')

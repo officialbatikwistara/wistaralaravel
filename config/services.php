@@ -35,4 +35,29 @@ return [
         ],
     ],
 
+    'twilio' => [
+        'sid' => env('TWILIO_SID'),
+        'token' => env('TWILIO_AUTH_TOKEN'),
+        'whatsapp_from' => env('TWILIO_WHATSAPP_FROM'),
+    ],
+
+    'whatsapp' => [
+        'provider' => env('WHATSAPP_PROVIDER', 'fonnte'), // 'fonnte' or 'wablas'
+        'api_url' => env('WHATSAPP_API_URL', 'https://api.fonnte.com'),
+        'api_token' => env('WHATSAPP_API_TOKEN'),
+    ],
+
+    'groq' => [
+        'api_key' => env('GROQ_API_KEY'),
+        'api_url' => env('GROQ_API_URL', 'https://api.groq.com/openai/v1'),
+        'model' => env('GROQ_MODEL', 'llama-3.3-70b-versatile'),
+        'temperature' => env('GROQ_TEMPERATURE', 0.7),
+        'max_tokens' => env('GROQ_MAX_TOKENS', 1000),
+    ],
+
+    'telegram' => [
+        'bot_token' => env('TELEGRAM_BOT_TOKEN'),
+        'bot_username' => env('TELEGRAM_BOT_USERNAME'),
+    ],
+
 ];

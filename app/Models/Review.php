@@ -3,14 +3,10 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Review extends Model
 {
-    use HasFactory;
-
-    protected $table = 'reviews';
-    protected $primaryKey = 'id';
+    protected $table = "reviews";
 
     protected $fillable = [
         'user_id',
@@ -21,54 +17,25 @@ class Review extends Model
         'photos',
         'video',
         'status',
-        'reply',
-        'replied_at',
         'is_verified_purchase',
         'helpful_count'
     ];
 
-    protected $casts = [
-        'photos' => 'array',
-        'rating' => 'integer',
-        'is_verified_purchase' => 'boolean',
-        'helpful_count' => 'integer',
-        'replied_at' => 'datetime',
-    ];
-
-    /* ===========================
-       RELASI KE USER
-    ============================ */
+    // 🔗 Relasi ke User
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id', 'id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    /* ===========================
-       RELASI KE PRODUK
-    ============================ */
-    public function product()
+    // 🔗 Relasi ke Produk
+    public function produk()
     {
-        return $this->belongsTo(Produk::class, 'id_produk', 'id_produk');
+        return $this->belongsTo(\App\Models\Produk::class, 'id_produk', 'id_produk');
     }
 
-    /* ===========================
-       RELASI KE ORDER
-    ============================ */
+    // 🔗 Relasi ke Order
     public function order()
     {
-        return $this->belongsTo(Order::class, 'order_id', 'id');
-    }
-
-    /* ===========================
-       HELPFUL VOTES
-    ============================ */
-    public function helpfulVotes()
-    {
-        return $this->hasMany(ReviewHelpfulVote::class, 'review_id', 'id');
-    }
-
-    public function hasUserVotedHelpful($userId)
-    {
-        return $this->helpfulVotes()->where('user_id', $userId)->exists();
+        return $this->belongsTo(\App\Models\Order::class, 'order_id', 'id');
     }
 }

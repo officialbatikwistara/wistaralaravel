@@ -9,32 +9,47 @@ class ProdukController extends Controller
 {
     public function index(Request $request)
     {
-        // Ambil filter kategori dari URL (?kategori=xxx)
         $filter = $request->input('kategori', 'all');
 
         // Ambil semua kategori
         $kategori = DB::table('kategori_produk')->get();
 
-        // Ambil semua produk (filter jika kategori dipilih)
-        $produk = DB::table('produk')
-            ->join('kategori_produk', 'produk.id_kategori', '=', 'kategori_produk.id_kategori')
-            ->select('produk.*', 'kategori_produk.nama_kategori')
+        // Ambil produk dengan relasi kategori + rating
+        $produk = Produk::with('kategori:id_kategori,nama_kategori')
+            ->withAvg('approvedReviews as average_rating', 'rating')
+            ->withCount('approvedReviews as review_count')
             ->when($filter !== 'all', function ($query) use ($filter) {
-                $query->where('kategori_produk.id_kategori', $filter);
+                $query->where('id_kategori', $filter);
             })
             ->orderBy('tanggal_upload', 'desc')
-            ->get();
+            ->get()
+            ->map(function ($p) {
+                $p->average_rating = round($p->average_rating ?? 0, 1);
+                return $p;
+            });
 
         return view('katalog', compact('kategori', 'produk', 'filter'));
     }
 
     public function show($slug)
     {
-        $product = Produk::with('kategori')->where('slug', $slug)->firstOrFail();
+        $product = Produk::with(['kategori'])
+            ->withCount([
+                'approvedReviews as review_count' => function ($q) {
+                    $q->where('status', 'approved');
+                }
+            ])
+            ->withAvg([
+                'approvedReviews as average_rating' => function ($q) {
+                    $q->where('status', 'approved');
+                }
+            ], 'rating')
+            ->where('slug', $slug)
+            ->firstOrFail();
 
-        // Gunakan view backup yang sudah ada header/footer
-        return view('produk.show-backup', compact('product'));
+        return view('produk.show', compact('product'));
     }
+
     public function nonaktif($id)
     {
         $produk = Produk::findOrFail($id);

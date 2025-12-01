@@ -40,24 +40,28 @@
 
                 <h2 class="fw-bold">{{ $product->nama_produk }}</h2>
 
-                <!-- Rating -->
-                @php
-                    $avgRating = round($product->average_rating, 1);
-                    $reviewCount = $product->review_count;
-                @endphp
+{{-- Rating --}}
+@php
+    $avgRating = round($product->average_rating ?? 0, 1);
+    $reviewCount = $product->review_count ?? 0;
+@endphp
 
-                <div class="rating-stars mb-2">
-                    @for($i = 1; $i <= 5; $i++)
-                        @if($i <= floor($avgRating))
-                            <i class="fa-solid fa-star text-warning"></i>
-                        @elseif($i == ceil($avgRating) && $avgRating - floor($avgRating) >= 0.5)
-                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
-                        @else
-                            <i class="fa-regular fa-star text-secondary"></i>
-                        @endif
-                    @endfor
-                    <span class="text-muted ms-1 small">({{ $reviewCount }} ulasan)</span>
-                </div>
+<div class="rating-stars mb-2">
+    @for($i = 1; $i <= 5; $i++)
+        @if($i <= floor($avgRating))
+            <i class="fa-solid fa-star text-warning"></i>
+        @elseif($i == ceil($avgRating) && ($avgRating - floor($avgRating)) >= 0.5)
+            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+        @else
+            <i class="fa-regular fa-star text-secondary"></i>
+        @endif
+    @endfor
+
+    <span class="text-muted ms-1 small">
+        ({{ $reviewCount }} ulasan)
+    </span>
+</div>
+
 
                 <!-- Harga -->
                 <h3 class="fw-bold text-warning mb-3">
@@ -152,19 +156,30 @@
 
                 <p class="mb-2">{{ $review->comment }}</p>
 
-                @if($review->photos)
-                    <div class="d-flex gap-2 mt-2">
-                        @foreach($review->photos as $photo)
-                            <img src="{{ asset('storage/'.$photo) }}" class="rounded" width="90">
-                        @endforeach
-                    </div>
+                {{-- FOTO REVIEW --}}
+                @if(!empty($review->photos) && is_string($review->photos))
+                    @php
+                        $photoArray = json_decode($review->photos, true);
+                    @endphp
+
+                    @if(is_array($photoArray))
+                        <div class="d-flex gap-2 mt-2">
+                            @foreach($photoArray as $photo)
+                                <img src="{{ asset('uploads/reviews/photos/'.$photo) }}" 
+                                    class="rounded shadow-sm"
+                                    width="90" height="90"
+                                    style="object-fit: cover;">
+                            @endforeach
+                        </div>
+                    @endif
                 @endif
 
-                @if($review->video)
-                    <video class="mt-3 rounded" width="200" controls>
-                        <source src="{{ asset('storage/'.$review->video) }}">
-                    </video>
-                @endif
+
+            @if($review->video)
+                <video class="mt-3 rounded shadow-sm" width="200" controls>
+                    <source src="{{ asset('uploads/reviews/videos/'.$review->video) }}" type="video/mp4">
+                </video>
+            @endif
 
             </div>
         @empty

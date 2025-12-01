@@ -102,7 +102,7 @@
                                         class="rounded shadow-sm border">
                                     <div>
                                         <span class="fw-semibold">{{ $item->produk->nama_produk }}</span><br>
-                                        <small class="text-muted">#{{ $item->id_produk }}</small>
+                                        <small class="text-muted">#{{ $item->produk->id }}</small>
                                     </div>
                                 </div>
                             </td>
@@ -112,19 +112,20 @@
                             @if($order->status == 'selesai')
                             <td>
                                 @php
-                                    // Cek apakah user sudah pernah review produk ini dalam order ini
                                     $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
-                                        ->where('id_produk', $item->id_produk)
+                                        ->where('id_produk', $item->produk->id_produk)
                                         ->where('order_id', $order->id)
                                         ->exists();
                                 @endphp
+
                                 @if($hasReviewed)
                                     <span class="badge bg-success">✓ Sudah Direview</span>
                                 @else
-                                    <a href="{{ route('produk.show', $item->produk->slug) }}?order_id={{ $order->id }}#review-form"
-                                       class="btn btn-sm btn-warning">
+                                    <button class="btn btn-sm btn-warning"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#modalReview{{ $item->id }}">
                                         <i class="fa-solid fa-star me-1"></i> Tulis Review
-                                    </a>
+                                    </button>
                                 @endif
                             </td>
                             @endif
@@ -132,12 +133,6 @@
                         @endforeach
                     </tbody>
                 </table>
-            </div>
-
-            <!-- 💰 Total -->
-            <div class="d-flex justify-content-between align-items-center p-3 bg-dark text-white rounded-3 shadow-sm">
-                <strong>Total</strong>
-                <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong>
             </div>
 
             <!-- 📤 Upload Bukti Pembayaran (jika Bank Transfer & Belum Bayar) -->
@@ -165,26 +160,120 @@
                 style="max-width: 350px;">
             @endif
 
-            <!-- ❌ Batalkan Pesanan -->
-            @if($order->status == 'pending')
-            <div class="text-end mt-4">
-                <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Yakin batalkan pesanan ini?')">
-                    @csrf
-                    <button type="submit" class="btn btn-danger rounded-pill px-4">
-                        <i class="fa-solid fa-times me-2"></i> Batalkan Pesanan
-                    </button>
-                </form>
-            </div>
-            @endif
+<!-- 💰 Total -->
+<div class="d-flex justify-content-between align-items-center p-3 bg-dark text-white rounded-3 shadow-sm">
+    <strong>Total</strong>
+    <strong>Rp {{ number_format($order->total, 0, ',', '.') }}</strong>
+</div>
 
-            <!-- ⬅️ Kembali -->
-            <div class="mt-3">
-                <a href="{{ url('/user/dashboard') }}" class="btn btn-outline-dark rounded-pill px-4">
-                    <i class="fa-solid fa-arrow-left me-2"></i> Kembali
-                </a>
-            </div>
+<!-- ❌ Batalkan Pesanan -->
+@if($order->status == 'pending')
+<div class="text-end mt-4">
+    <form action="{{ route('user.order.cancel', $order->id) }}" method="POST" onsubmit="return confirm('Yakin batalkan pesanan ini?')">
+        @csrf
+        <button type="submit" class="btn btn-danger rounded-pill px-4">
+            <i class="fa-solid fa-times me-2"></i> Batalkan Pesanan
+        </button>
+    </form>
+</div>
+@endif
+
+<!-- 📄 Lihat Invoice -->
+<a href="{{ route('user.orders.invoice', $order->id) }}"
+   class="btn btn-outline-dark rounded-pill px-4 mt-3">
+   <i class="fa-solid fa-file-pdf me-2"></i> Lihat Invoice
+</a>
+
+<!-- ⬅️ Kembali -->
+<div class="mt-3">
+    <a href="{{ url('/user/dashboard') }}" class="btn btn-outline-dark rounded-pill px-4">
+        <i class="fa-solid fa-arrow-left me-2"></i> Kembali
+    </a>
+</div>
+
         </div>
     </div>
 </div>
+
+<!-- ========== MODAL REVIEW PER PRODUK ==========  -->
+@foreach($order->items as $item)
+
+    @php
+    $hasReviewed = \App\Models\Review::where('user_id', auth()->id())
+        ->where('id_produk', $item->produk->id)
+        ->where('order_id', $order->id)
+        ->exists();
+    @endphp
+
+    @if(!$hasReviewed)
+        <div class="modal fade" id="modalReview{{ $item->id }}" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form class="modal-content"
+                      action="{{ route('review.store') }}"
+                      method="POST"
+                      enctype="multipart/form-data">
+                    @csrf
+
+                    <input type="hidden" name="order_id" value="{{ $order->id }}">
+                    <input type="hidden" name="id_produk" value="{{ $item->id_produk }}">
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">
+                            Tulis Review • {{ $item->produk->nama_produk }}
+                        </h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        {{-- Rating --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Rating</label>
+                            <select name="rating" class="form-select" required>
+                                <option value="">Pilih rating</option>
+                                <option value="5">⭐⭐⭐⭐⭐ Sangat Puas</option>
+                                <option value="4">⭐⭐⭐⭐ Puas</option>
+                                <option value="3">⭐⭐⭐ Cukup</option>
+                                <option value="2">⭐⭐ Kurang</option>
+                                <option value="1">⭐ Tidak Puas</option>
+                            </select>
+                        </div>
+
+                        {{-- Comment --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Review</label>
+                            <textarea name="comment" class="form-control" rows="4" required></textarea>
+                        </div>
+
+                        {{-- Foto (opsional) --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Foto (opsional)</label>
+                            <input type="file" name="photos[]" class="form-control" multiple accept="image/*">
+                            <small class="text-muted">Bisa upload beberapa foto produk.</small>
+                        </div>
+
+                        {{-- Video (opsional) --}}
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Video (opsional)</label>
+                            <input type="file" name="video" class="form-control" accept="video/*">
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            Batal
+                        </button>
+                        <button type="submit" class="btn btn-warning">
+                            Kirim Review
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    @endif
+
+@endforeach
+
+
 
 @include('inc.footer')

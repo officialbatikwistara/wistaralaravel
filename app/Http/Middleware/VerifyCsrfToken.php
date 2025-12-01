@@ -12,8 +12,9 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        'api/reviews',
-        'api/reviews/*',
-        'api/csrf-token',
+        'webhook/*',
+        '/webhook/whatsapp',
+        'api/*',           // Semua API routes
+        'chatbot/*',       // Semua chatbot routes
     ];
 }

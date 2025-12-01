@@ -67,12 +67,12 @@
           <small class="text-muted ms-1">Tanggal rilis berita internal atau eksternal.</small>
         </div>
 
-        <!-- Status Draft / Publish -->
+        <!-- Status -->
         <div class="mb-4">
           <label class="form-label fw-semibold text-dark-navy">Status Berita</label>
           <select name="status" class="form-select border-0 shadow-sm rounded-3 p-3">
-            <option value="draft">Simpan sebagai Draft</option>
-            <option value="published">Publikasikan</option>
+              <option value="aktif">Aktif (tampil)</option>
+              <option value="nonaktif">Nonaktif (disembunyikan)</option>
           </select>
         </div>
 

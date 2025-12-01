@@ -20,42 +20,45 @@ class BeritaAdminController extends Controller
         return view('admin.berita.create');
     }
 
-public function store(Request $request)
-{
-    $request->validate([
-        'judul' => 'required|string|max:255',
-        'konten' => 'required',
-        'gambar_url' => 'nullable|url',
-        'gambar_file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-        'sumber' => 'nullable|string|max:255',
-        'tautan_sumber' => 'nullable|url',
-        'tanggal' => 'required|date'
-    ]);
+    public function store(Request $request)
+    {
+        $request->validate([
+            'judul' => 'required|string|max:255',
+            'konten' => 'required',
+            'gambar_url' => 'nullable|url',
+            'gambar_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'sumber' => 'nullable|string|max:255',
+            'tautan_sumber' => 'nullable|url',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:aktif,nonaktif'
+        ]);
 
-    $slug = Str::slug($request->judul);
+        $slug = Str::slug($request->judul);
 
-    $gambar = null;
-    if ($request->hasFile('gambar_file')) {
-        $gambar = time().'_'.$request->gambar_file->getClientOriginalName();
-        $request->gambar_file->move(public_path('uploads/berita'), $gambar);
-        $gambar = 'uploads/berita/'.$gambar;
-    } elseif ($request->filled('gambar_url')) {
-        $gambar = $request->gambar_url;
+        // Handle gambar
+        $gambar = null;
+        if ($request->hasFile('gambar_file')) {
+            $filename = time() . '_' . $request->gambar_file->getClientOriginalName();
+            $request->gambar_file->move(public_path('uploads/berita'), $filename);
+            $gambar = 'uploads/berita/' . $filename;
+        } elseif ($request->filled('gambar_url')) {
+            $gambar = $request->gambar_url;
+        }
+
+        // Simpan berita
+        Berita::create([
+            'judul' => $request->judul,
+            'slug' => $slug,
+            'konten' => $request->konten,
+            'gambar' => $gambar,
+            'tanggal' => $request->tanggal,
+            'sumber' => $request->sumber,
+            'tautan_sumber' => $request->tautan_sumber,
+            'status' => $request->status
+        ]);
+
+        return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil ditambahkan!');
     }
-
-    Berita::create([
-        'judul' => $request->judul,
-        'slug' => $slug,
-        'konten' => $request->konten,
-        'gambar' => $gambar,
-        'tanggal' => $request->tanggal, // 🆕 ambil dari input
-        'sumber' => $request->sumber,
-        'tautan_sumber' => $request->tautan_sumber,
-    ]);
-
-    return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil ditambahkan!');
-}
-
 
     public function edit($id)
     {
@@ -71,30 +74,35 @@ public function store(Request $request)
             'judul' => 'required|string|max:255',
             'konten' => 'required',
             'gambar_url' => 'nullable|url',
-            'gambar_file' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'gambar_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
             'sumber' => 'nullable|string|max:255',
             'tautan_sumber' => 'nullable|url',
+            'tanggal' => 'required|date',
+            'status' => 'required|in:aktif,nonaktif'
         ]);
 
         $gambar = $berita->gambar;
 
+        // Gambar baru
         if ($request->hasFile('gambar_file')) {
-            $gambar = time().'_'.$request->gambar_file->getClientOriginalName();
-            $request->gambar_file->move(public_path('uploads/berita'), $gambar);
-            $gambar = 'uploads/berita/'.$gambar;
+            $filename = time() . '_' . $request->gambar_file->getClientOriginalName();
+            $request->gambar_file->move(public_path('uploads/berita'), $filename);
+            $gambar = 'uploads/berita/' . $filename;
         } elseif ($request->filled('gambar_url')) {
             $gambar = $request->gambar_url;
         }
 
-$berita->update([
-    'judul' => $request->judul,
-    'slug' => Str::slug($request->judul),
-    'konten' => $request->konten,
-    'gambar' => $gambar,
-    'tanggal' => $request->tanggal, // 🆕 update tanggal
-    'sumber' => $request->sumber,
-    'tautan_sumber' => $request->tautan_sumber,
-]);
+        // Update berita
+        $berita->update([
+            'judul' => $request->judul,
+            'slug' => Str::slug($request->judul),
+            'konten' => $request->konten,
+            'gambar' => $gambar,
+            'tanggal' => $request->tanggal,
+            'sumber' => $request->sumber,
+            'tautan_sumber' => $request->tautan_sumber,
+            'status' => $request->status
+        ]);
 
         return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil diperbarui!');
     }
@@ -103,7 +111,7 @@ $berita->update([
     {
         $berita = Berita::findOrFail($id);
 
-        // Hapus file jika local upload (bukan URL)
+        // Jika gambar lokal → hapus file
         if ($berita->gambar && !filter_var($berita->gambar, FILTER_VALIDATE_URL)) {
             if (file_exists(public_path($berita->gambar))) {
                 unlink(public_path($berita->gambar));
@@ -111,6 +119,7 @@ $berita->update([
         }
 
         $berita->delete();
+
         return redirect()->route('admin.berita.index')->with('success', 'Berita berhasil dihapus!');
     }
 }

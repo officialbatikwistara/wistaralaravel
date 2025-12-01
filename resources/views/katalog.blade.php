@@ -2,301 +2,117 @@
 @include('inc.header')
 
 <!-- ================= HERO SECTION ================= -->
-<section class="katalog-hero d-flex align-items-center justify-content-center position-relative">
-  <div class="hero-overlay"></div>
-  <div class="container text-center text-light position-relative z-2">
-    <h1 class="display-4 fw-bold mb-2">Katalog Produk</h1>
-    <p class="lead opacity-75">Temukan keindahan batik terbaik khas Wistara</p>
-  </div>
+<!-- ===== Page Header / Banner Section ===== -->
+<section class="page-header d-flex align-items-center justify-content-center">
+    <div class="overlay"></div>
+    <div class="container position-relative text-center">
+        <h1 class="fw-bold page-title">Katalog</h1>
+    </div>
 </section>
 
 <!-- ================= FILTER KATEGORI ================= -->
 <section class="filter-section py-4 bg-white shadow-sm position-relative z-2">
-  <div class="container">
-    <div class="d-flex justify-content-center flex-wrap gap-2 filter-pills">
-      <a href="{{ route('katalog', ['kategori' => 'all']) }}"
-         class="btn kategori-pill {{ $filter === 'all' ? 'active' : '' }}">
-         Semua
-      </a>
-      @foreach($kategori as $k)
-        <a href="{{ route('katalog', ['kategori' => $k->id_kategori]) }}"
-           class="btn kategori-pill {{ (string)$filter === (string)$k->id_kategori ? 'active' : '' }}">
-           {{ $k->nama_kategori }}
-        </a>
-      @endforeach
+    <div class="container text-center">
+        <div class="d-flex justify-content-center flex-wrap gap-2 filter-pills">
+            <!-- Semua -->
+            <a href="{{ route('katalog', ['kategori' => 'all']) }}"
+               class="btn kategori-pill {{ $filter === 'all' ? 'active' : '' }}">
+               Semua
+            </a>
+
+            <!-- Loop Kategori -->
+            @foreach($kategori as $k)
+                <a href="{{ route('katalog', ['kategori' => $k->id_kategori]) }}"
+                   class="btn kategori-pill {{ (string)$filter === (string)$k->id_kategori ? 'active' : '' }}">
+                    {{ $k->nama_kategori }}
+                </a>
+            @endforeach
+        </div>
     </div>
-  </div>
 </section>
 
 <!-- ================= KATALOG PRODUK ================= -->
 <section class="section-katalog py-5 bg-light">
-  <div class="container">
-    <div class="row g-4">
-      @foreach($produk as $p)
-        @php
-          $fileName = basename($p->gambar ?? '');
-          // Map old database paths to actual filenames
-          $imageMap = [
-              'batik-parang.jpg' => '1760930150_14.jpg',
-              'batik-mega-mendung.jpg' => '1760930168_6.jpg',
-              'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
-          ];
-          $actualFileName = $imageMap[$fileName] ?? $fileName;
-          $gambarPath = public_path('uploads/produk/'.$actualFileName);
-          $gambarUrl = (file_exists($gambarPath) && $actualFileName)
-              ? asset('uploads/produk/'.$actualFileName)
-              : asset('img/logo.png');
-        @endphp
+    <div class="container">
+        <div class="row g-4">
 
-        <div class="col-12 col-sm-6 col-lg-4">
-          <div class="produk-card border-0 rounded-4 shadow-sm h-100 d-flex flex-column overflow-hidden bg-white">
+            @foreach($produk as $p)
 
-            <!-- Gambar Produk -->
-            <div class="position-relative" style="height: 240px;">
-              <img src="{{ $gambarUrl }}"
-                  alt="{{ $p->nama_produk }}"
-                  class="w-100 h-100 object-fit-cover rounded-top-4">
-              <span class="badge bg-light text-gold position-absolute top-0 end-0 m-2 px-3 py-2 rounded-pill">
-                {{ $p->nama_kategori }}
-              </span>
-            </div>
+                @php
+                    // Mapping gambar lama ke file baru
+                    $fileName = basename($p->gambar ?? '');
+                    $imageMap = [
+                        'batik-parang.jpg' => '1760930150_14.jpg',
+                        'batik-mega-mendung.jpg' => '1760930168_6.jpg',
+                        'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
+                    ];
 
-            <!-- Body Produk -->
-            <div class="p-3 d-flex flex-column flex-grow-1">
-              <h5 class="fw-bold mb-1 text-dark text-truncate">{{ $p->nama_produk }}</h5>
-              <p class="text-gold fw-bold mb-2">
-                Rp {{ number_format($p->harga, 0, ',', '.') }}
-              </p>
-              <p class="text-muted small flex-grow-1 mb-3">
-                {{ Str::limit($p->deskripsi, 70) }}
-              </p>
-              <div class="d-flex gap-2">
-                <a href="{{ route('produk.show', $p->slug) }}"
-                   class="btn btn-gold flex-fill rounded-pill fw-semibold">
-                  <i class="bi bi-eye me-1"></i> Detail
-                </a>
-                <button type="button"
-                        class="btn btn-outline-secondary flex-fill rounded-pill fw-semibold"
-                        data-bs-toggle="modal"
-                        data-bs-target="#produkModal{{ $p->id_produk }}">
-                  <i class="bi bi-cart-plus me-1"></i> Beli
-                </button>
-                @auth
-                <button id="wishlist-btn-{{ $p->id_produk }}" onclick="toggleWishlist({{ $p->id_produk }})"
-                        class="btn btn-outline-danger rounded-pill fw-semibold"
-                        style="border-color: #cda349; color: #cda349; padding: 0.375rem 0.75rem;">
-                  ❤️
-                </button>
-                @endauth
-              </div>
-            </div>
+                    $actualFile = $imageMap[$fileName] ?? $fileName;
 
-          </div>
+                    // Cek file
+                    $path = public_path('uploads/produk/' . $actualFile);
+                    $img = file_exists($path) && $actualFile
+                        ? asset('uploads/produk/' . $actualFile)
+                        : asset('img/logo.png');
+
+                    // Rating
+                    $avg = round($p->average_rating ?? 0, 1);
+                    $count = $p->review_count ?? 0;
+                @endphp
+
+                <div class="col-12 col-sm-6 col-lg-3">
+                    <a href="{{ route('produk.show', $p->slug) }}" class="text-decoration-none">
+
+                        <div class="card produk-card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+
+                            <!-- Gambar Produk -->
+                            <div class="produk-img-wrapper position-relative">
+                                <img src="{{ $img }}" class="produk-img" alt="{{ $p->nama_produk }}">
+                                <span class="kategori-badge badge bg-light text-gold position-absolute top-0 start-0 m-2">
+                                    {{ $p->kategori->nama_kategori ?? 'Kategori' }}
+                                </span>
+                            </div>
+
+                            <!-- BODY -->
+                            <div class="card-body">
+
+                                <h6 class="fw-bold text-dark text-truncate mb-1">{{ $p->nama_produk }}</h6>
+
+                                <!-- RATING -->
+                                <div class="rating-stars mb-2">
+                                    @for ($i = 1; $i <= 5; $i++)
+                                        @if ($i <= floor($avg))
+                                            <i class="fa-solid fa-star text-warning"></i>
+                                        @elseif ($i == ceil($avg) && ($avg - floor($avg)) >= 0.5)
+                                            <i class="fa-solid fa-star-half-stroke text-warning"></i>
+                                        @else
+                                            <i class="fa-regular fa-star text-secondary"></i>
+                                        @endif
+                                    @endfor
+                                    <span class="small text-muted ms-1">({{ $count }})</span>
+                                </div>
+
+                                <!-- HARGA -->
+                                <p class="fw-bold text-warning mb-2">
+                                    Rp {{ number_format($p->harga, 0, ',', '.') }}
+                                </p>
+
+                                <!-- DESKRIPSI -->
+                                <p class="text-muted small mb-0">
+                                    {{ Str::limit(strip_tags($p->deskripsi), 60) }}
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </a>
+                </div>
+
+            @endforeach
+
         </div>
-      @endforeach
     </div>
-  </div>
-
-  <!-- ============= Modal Detail Produk & Qty ============= -->
-  @foreach($produk as $p)
-  @php
-    $fileName = basename($p->gambar ?? '');
-    // Map old database paths to actual filenames
-    $imageMap = [
-        'batik-parang.jpg' => '1760930150_14.jpg',
-        'batik-mega-mendung.jpg' => '1760930168_6.jpg',
-        'batik-sekar-jagad.jpg' => '1760930223_2.jpg',
-    ];
-    $actualFileName = $imageMap[$fileName] ?? $fileName;
-    $gambarPath = public_path('uploads/produk/'.$actualFileName);
-    $gambarUrl = (file_exists($gambarPath) && $actualFileName)
-        ? asset('uploads/produk/'.$actualFileName)
-        : asset('img/logo.png');
-  @endphp
-
-  <!-- Modal Produk -->
-  <div class="modal fade" id="produkModal{{ $p->id_produk }}" tabindex="-1" aria-labelledby="produkModalLabel{{ $p->id_produk }}" aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-      <div class="modal-content rounded-4 border-0 shadow-lg overflow-hidden">
-
-        <!-- HEADER -->
-        <div class="modal-header border-0 bg-dark text-light py-3 px-4">
-          <h5 class="modal-title fw-bold">{{ $p->nama_produk }}</h5>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-
-        <!-- BODY -->
-        <div class="modal-body p-4">
-          <div class="row g-4 align-items-start">
-
-            <!-- Gambar Produk -->
-            <div class="col-md-5 text-center">
-              <img src="{{ $gambarUrl }}" class="img-fluid rounded-4 shadow-sm border" alt="{{ $p->nama_produk }}">
-            </div>
-
-            <!-- Info Produk -->
-            <div class="col-md-7">
-              <span class="badge bg-secondary mb-2">{{ $p->nama_kategori }}</span>
-              <h4 class="fw-bold text-warning mb-3">
-                Rp {{ number_format($p->harga, 0, ',', '.') }}
-              </h4>
-              <p class="mb-4 text-muted" style="line-height: 1.7;">
-                {!! nl2br(e($p->deskripsi)) !!}
-              </p>
-
-              <!-- Tombol Aksi -->
-              <div class="d-flex flex-column flex-md-row gap-2 mb-3">
-                <!-- Beli Sekarang -->
-                <a href="{{ route('checkout.direct', $p->id_produk) }}"
-                  class="btn btn-dark flex-fill fw-semibold py-2">
-                  🛍️ Beli Sekarang
-                </a>
-
-                @auth
-                <!-- Tombol Icon Keranjang -->
-                <button type="button"
-                        class="btn btn-outline-dark d-flex align-items-center justify-content-center"
-                        style="width: 45px; height: 45px; padding: 0;"
-                        data-bs-toggle="modal"
-                        data-bs-target="#qtyModal{{ $p->id_produk }}">
-                  <i class="bi bi-cart-plus fs-5"></i>
-                </button>
-                @else
-                <a href="{{ route('login') }}"
-                  class="btn btn-outline-dark d-flex align-items-center justify-content-center"
-                  style="width: 45px; height: 45px; padding: 0;">
-                  <i class="bi bi-cart-plus fs-5"></i>
-                </a>
-                @endauth
-              </div>
-
-              <hr class="my-3">
-
-              <!-- Channel Lain -->
-              <p class="fw-semibold mb-2">Atau beli melalui:</p>
-              <div class="d-flex flex-wrap gap-2">
-                <a href="https://wa.me/62895381110035?text={{ urlencode('Halo admin, saya tertarik dengan produk '.$p->nama_produk) }}"
-                  target="_blank" class="btn btn-outline-success btn-sm d-flex align-items-center gap-2">
-                  <i class="bi bi-whatsapp"></i> WhatsApp
-                </a>
-                @if($p->link_shopee)
-                <a href="{{ $p->link_shopee }}" target="_blank" class="btn btn-outline-warning btn-sm d-flex align-items-center gap-2">
-                  <i class="bi bi-bag"></i> Shopee
-                </a>
-                @endif
-                @if($p->link_tiktok)
-                <a href="{{ $p->link_tiktok }}" target="_blank" class="btn btn-outline-dark btn-sm d-flex align-items-center gap-2">
-                  <i class="bi bi-tiktok"></i> TikTokShop
-                </a>
-                @endif
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Modal Qty Kecil -->
-  @auth
-  <div class="modal fade" id="qtyModal{{ $p->id_produk }}" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-sm">
-      <div class="modal-content border-0 rounded-4 shadow-lg">
-        <div class="modal-header bg-dark text-white py-2">
-          <h6 class="modal-title fw-semibold">Jumlah ke Keranjang</h6>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <form action="{{ route('cart.add', $p->id_produk) }}" method="POST">
-          @csrf
-          <div class="modal-body text-center">
-            <input type="number" name="qty" value="1" min="1" max="{{ $p->stok }}"
-                  class="form-control text-center mb-3 mx-auto" style="max-width: 100px;">
-            <button type="submit" class="btn btn-dark w-100 rounded-pill">
-              <i class="bi bi-cart-plus me-1"></i> Tambah ke Keranjang
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-  </div>
-  @endauth
-  @endforeach
 </section>
 
-@auth
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-   // Check wishlist status for all products
-   @foreach($produk as $p)
-   checkWishlistStatus({{ $p->id_produk }});
-   @endforeach
-});
-
-function checkWishlistStatus(productId) {
-   fetch(`/wishlist/check/${productId}`)
-       .then(response => response.json())
-       .then(data => {
-           const btn = document.getElementById(`wishlist-btn-${productId}`);
-           if (data.in_wishlist) {
-               btn.classList.remove('btn-outline-danger');
-               btn.classList.add('btn-danger');
-               btn.style.backgroundColor = '#cda349';
-               btn.style.borderColor = '#cda349';
-               btn.style.color = 'white';
-           } else {
-               btn.classList.remove('btn-danger');
-               btn.classList.add('btn-outline-danger');
-               btn.style.backgroundColor = 'transparent';
-               btn.style.borderColor = '#cda349';
-               btn.style.color = '#cda349';
-           }
-       });
-}
-
-function toggleWishlist(productId) {
-   const btn = document.getElementById(`wishlist-btn-${productId}`);
-   const isInWishlist = btn.style.backgroundColor === 'rgb(205, 163, 73)'; // #cda349
-
-   if (isInWishlist) {
-       // Remove from wishlist
-       fetch(`/wishlist/remove/${productId}`, {
-           method: 'DELETE',
-           headers: {
-               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-               'Content-Type': 'application/json'
-           }
-       })
-       .then(response => response.json())
-       .then(data => {
-           btn.classList.remove('btn-danger');
-           btn.classList.add('btn-outline-danger');
-           btn.style.backgroundColor = 'transparent';
-           btn.style.borderColor = '#cda349';
-           btn.style.color = '#cda349';
-       });
-   } else {
-       // Add to wishlist
-       fetch(`/wishlist/add/${productId}`, {
-           method: 'POST',
-           headers: {
-               'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-               'Content-Type': 'application/json'
-           }
-       })
-       .then(response => response.json())
-       .then(data => {
-           if (data.message === 'Added to wishlist') {
-               btn.classList.remove('btn-outline-danger');
-               btn.classList.add('btn-danger');
-               btn.style.backgroundColor = '#cda349';
-               btn.style.borderColor = '#cda349';
-               btn.style.color = 'white';
-           }
-       });
-   }
-}
-</script>
-@endauth
-
-{{-- ==================== Footer ==================== --}}
 @include('inc.footer')

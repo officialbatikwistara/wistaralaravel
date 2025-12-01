@@ -1,6 +1,21 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
+use App\Models\Produk;
+use App\Models\Berita;
+use App\Models\Order;
+use App\Models\User;
+
+use App\Services\WhatsAppService;
+use App\Http\Controllers\WhatsAppWebhookController;
+
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\UserAuthController;
@@ -10,25 +25,27 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\UserReviewController;
-use App\Http\Controllers\Admin\ProdukAdminController;
-use App\Http\Controllers\Admin\BeritaAdminController;
-use App\Http\Controllers\Admin\KategoriAdminController;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Admin\AdminOrderController;
-use App\Http\Controllers\Admin\SalesAnalyticsController;
-use App\Http\Controllers\Api\ReviewController;
-
-use Illuminate\Http\Request;
-
+use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\ReviewController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 
+use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\ProdukAdminController;
+use App\Http\Controllers\Admin\KategoriAdminController;
+use App\Http\Controllers\Admin\BeritaAdminController;
+use App\Http\Controllers\Admin\AdminOrderController;
+use App\Http\Controllers\Admin\ReviewAdminController;
+use App\Http\Controllers\Admin\SalesAnalyticsController;
+
+use App\Http\Controllers\UploadBuktiController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\InvoiceController;
 /*
 |--------------------------------------------------------------------------
 | Route Halaman Utama & Static Page
 |--------------------------------------------------------------------------
 */
-// HOME
 Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/tentang', 'tentang')->name('tentang');
 Route::view('/kontak', 'kontak')->name('kontak');
@@ -109,48 +126,12 @@ Route::get('/checkout/{id_produk?}', [CheckoutController::class, 'index'])
     ->middleware('auth')
     ->name('checkout');
 
-/*
-|--------------------------------------------------------------------------
-| Route Login & Auth User
-|--------------------------------------------------------------------------
-*/
-
-// 👤 Login User
-Route::get('/login', [UserAuthController::class, 'showUserLogin'])->name('login');
-Route::post('/login', [\App\Http\Controllers\UserAuthController::class, 'userLogin'])->name('user.login.post');
-
-// 👤 Logout User
-Route::get('/logout-user', [UserAuthController::class, 'userLogout'])->name('user.logout');
-Route::get('/register', [UserAuthController::class, 'showRegister'])->name('user.register');
-Route::post('/register', [UserAuthController::class, 'register'])->name('user.register.post');
-
-// 👤 edit User
-Route::middleware('auth')->group(function () {
-    Route::put('/user/update-profile', [\App\Http\Controllers\UserAuthController::class, 'updateProfile'])
-        ->name('user.update.profile');
-});
-
-// 🛡️ Dashboard User (middleware proteksi)
-Route::middleware('auth', 'verified')->group(function () {
-    Route::get('/user/dashboard', function () {
-        return view('user.dashboard');
-    });
-});
-
-// 📝 User Reviews
+    // 📝 User Reviews
 Route::middleware('auth')->group(function () {
     Route::get('/user/reviews', [UserReviewController::class, 'index'])->name('user.reviews.index');
     Route::get('/user/reviews/{id}/edit', [\App\Http\Controllers\UserReviewController::class, 'edit'])->name('user.reviews.edit');
     Route::patch('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'update'])->name('user.reviews.update');
     Route::delete('/user/reviews/{id}', [\App\Http\Controllers\UserReviewController::class, 'destroy'])->name('user.reviews.destroy');
-});
-
-// ❤️ Wishlist
-Route::middleware('auth')->group(function () {
-    Route::get('/wishlist', [\App\Http\Controllers\WishlistController::class, 'index'])->name('wishlist.index');
-    Route::post('/wishlist/add/{productId}', [\App\Http\Controllers\WishlistController::class, 'add'])->name('wishlist.add');
-    Route::delete('/wishlist/remove/{productId}', [\App\Http\Controllers\WishlistController::class, 'remove'])->name('wishlist.remove');
-    Route::get('/wishlist/check/{productId}', [\App\Http\Controllers\WishlistController::class, 'check'])->name('wishlist.check');
 });
 
 // 🎫 Coupon validation
@@ -182,6 +163,45 @@ Route::middleware('auth')->post('/api/coupons/validate', function (Request $requ
         'coupon_id' => $coupon->id,
         'message' => 'Kupon valid'
     ]);
+});
+
+// Invoice routes
+Route::get('/user/orders/{order}/invoice', 
+    [App\Http\Controllers\UserOrderController::class, 'invoice']
+)->name('user.orders.invoice')
+  ->middleware('auth');
+  
+Route::get('/user/orders/{order}/invoice/pdf', 
+    [App\Http\Controllers\InvoiceController::class, 'download']
+)->name('user.order.invoice.pdf')->middleware('auth');
+
+// REVIEW
+Route::post('/review/store', [ReviewController::class, 'store'])->name('review.store');
+
+/*
+|--------------------------------------------------------------------------
+| Route Login & Auth User
+|--------------------------------------------------------------------------
+*/
+
+// 👤 Login User
+Route::get('/login', [UserAuthController::class, 'showUserLogin'])->name('login');
+Route::post('/login', [\App\Http\Controllers\UserAuthController::class, 'userLogin'])->name('user.login.post');
+
+// 👤 Logout User
+Route::get('/logout-user', [UserAuthController::class, 'userLogout'])->name('user.logout');
+Route::get('/register', [UserAuthController::class, 'showRegister'])->name('user.register');
+Route::post('/register', [UserAuthController::class, 'register'])->name('user.register.post');
+
+// 👤 edit User
+Route::middleware('auth')->group(function () {
+    Route::put('/user/update-profile', [\App\Http\Controllers\UserAuthController::class, 'updateProfile'])
+        ->name('user.update.profile');
+});
+
+Route::middleware(['auth', 'verified'])->group(function () {
+    Route::get('/user/dashboard', [UserDashboardController::class, 'index'])
+        ->name('user.dashboard');
 });
 
 // Halaman verifikasi email
@@ -321,12 +341,8 @@ Route::get('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin
 | Dashboard Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/dashboard', function () {
-    if (!session()->has('admin_logged_in')) {
-        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
-    }
-    return view('admin.dashboard');
-})->name('admin.dashboard');
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
+    ->name('admin.dashboard');
 
 Route::get('/admin/sales-data', [SalesAnalyticsController::class, 'monthlySales'])
     ->name('admin.sales.data');
@@ -505,3 +521,22 @@ Route::delete('/admin/reviews/{id}', function ($id) {
     }
     return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->destroy($id);
 })->name('admin.reviews.delete');
+
+
+// Chatbot Routes
+Route::get('/chatbot', [App\Http\Controllers\ChatbotController::class, 'index'])->name('chatbot.index');
+Route::post('/chatbot/chat', [App\Http\Controllers\ChatbotController::class, 'chat'])->name('chatbot.chat');
+Route::post('/chatbot/clear', [App\Http\Controllers\ChatbotController::class, 'clearHistory'])->name('chatbot.clear');
+Route::get('/chatbot/test', [App\Http\Controllers\ChatbotController::class, 'test'])->name('chatbot.test');
+
+// WhatsApp Webhook - Update ke versi AI
+Route::post('/webhook/whatsapp', [App\Http\Controllers\WhatsAppWebhookController::class, 'webhook']);
+
+// Health Check
+Route::get('/health', function () {
+    return response()->json(['status' => 'ok']);
+
+})->name('health.check');// Products route
+Route::get('/produk', function() {
+    return view('produk.index');
+})->name('produk.index');

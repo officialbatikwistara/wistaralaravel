@@ -1,44 +1,9 @@
-body {
-    background-color: #f8f9fa;
-    font-family: "Poppins", sans-serif;
-    overflow-x: hidden;
+/* ===== HERO ===== */
+.admin-hero {
+    background: linear-gradient(to right, #f8f8f8, #ffffff);
 }
 
-/* ===== HERO SECTION ===== */
-.hero-admin {
-    position: relative;
-    height: 100vh; /* full layar */
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #fff;
-    overflow: hidden;
-    background: #071739; /* fallback warna */
-}
-
-.hero-admin video.background-video {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    min-width: 100%;
-    min-height: 100%;
-    width: auto;
-    height: auto;
-    object-fit: cover;
-    transform: translate(-50%, -50%);
-    z-index: 0;
-    opacity: 0;
-    animation: fadeInVideo 1.2s ease forwards;
-}
-
-@keyframes fadeInVideo {
-    to {
-        opacity: 1;
-    }
-}
-
+/* Hero overlay versi lama (kalau nanti pakai hero dengan background video) */
 .hero-admin::before {
     content: "";
     position: absolute;
@@ -63,6 +28,12 @@ body {
     font-size: 1.1rem;
 }
 
+/* Box putih di hero (dipakai di Blade) */
+.hero-box {
+    background: #fff;
+    border: 1px solid #f0f0f0;
+}
+
 /* ===== MAIN CONTAINER ===== */
 .dashboard-main {
     background: url('/img/background2.svg') repeat;
@@ -70,7 +41,7 @@ body {
     padding: 80px 5%;
 }
 
-/* ===== CARD STYLE ===== */
+/* ===== MENU CARD STYLE (BOTTOM SHORTCUTS) ===== */
 .dashboard-card {
     background: #fff;
     border-radius: 20px;
@@ -117,6 +88,7 @@ body {
     color: #071739;
 }
 
+/* ===== ANALYTICS (APEXCHARTS) ===== */
 .dashboard-analytics {
     padding: 60px 5% 40px;
     background: #f8f9fa;
@@ -217,8 +189,75 @@ body {
     opacity: 0.2;
     margin-top: 80px;
 }
-.bg-megamendung{
+
+.bg-megamendung {
     background: url('/img/background3.svg') no-repeat center/cover;
+}
+
+/* ===== STAT CARDS (ATAS DASHBOARD) ===== */
+.stat-card {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: #fff;
+    border-radius: 14px;
+    padding: 20px 22px;
+    border: 1px solid #ededed;
+    transition: .3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+}
+
+.stat-icon {
+    width: 55px;
+    height: 55px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 22px;
+}
+
+.stat-card h3 {
+    font-weight: 700;
+    margin: 0;
+}
+
+.stat-card p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #777;
+}
+
+/* ===== CHART CARDS (JIKA NANTI DIPAKAI UNTUK KARTU LAIN) ===== */
+.chart-card {
+    background: #fff;
+    border: 1px solid #e9e9e9;
+    border-radius: 16px;
+    transition: .3s;
+}
+
+.chart-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+/* ===== TABLE STYLE ===== */
+table.table {
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+table.table thead {
+    background: #ffd77b !important;
+}
+
+tbody tr:hover {
+    background: #fff7e7;
 }
 
 /* ===== RESPONSIVE ===== */
@@ -226,12 +265,11 @@ body {
     .hero-content h1 {
         font-size: 2rem;
     }
-    .dashboard-main {
-        padding: 50px 3%;
-    }
+
     .analytics-card {
         padding: 1.5rem;
     }
+
     .analytics-header {
         flex-direction: column;
         align-items: flex-start;

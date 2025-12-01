@@ -223,7 +223,7 @@
 
         <div class="footer">
             <p><strong>Batik Wistara</strong></p>
-            <p>Jl. Ketintang No.88, Surabaya</p>
+            <p>Jl. Tambak Medokan Ayu VI C No.56B, Medokan Ayu, Rungkut, Jawa Timur</p>
             <p>Email ini dikirim otomatis pada {{ now()->format('d M Y H:i') }}</p>
             <p style="margin-top: 15px; font-size: 12px; color: #999;">
                 Sistem Manajemen Pesanan Batik Wistara © {{ date('Y') }}

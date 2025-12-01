@@ -103,64 +103,28 @@
             <!-- ================= KANAN: PRODUK ================= -->
             <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800">
 
-                <!-- ======= MOBILE MODE: 2 CARD SCROLL HORIZONTAL ======= -->
+                <!-- ======= MOBILE: CARD SCROLL ======= -->
                 <div class="mobile-scroll d-lg-none">
                     <div class="scroll-inner">
 
                         @foreach ($produk as $p)
                             @php
                                 $gambarUrl = file_exists(public_path($p->gambar)) ? asset($p->gambar) : asset('img/no-image.jpg');
-                                $avgRating = round($p->average_rating, 1);
-                                $reviewCount = $p->review_count;
+                                $avg = round($p->average_rating, 1);
+                                $count = $p->review_count;
                             @endphp
 
                             <a href="{{ route('produk.show', $p->slug) }}" class="scroll-card text-decoration-none">
-                                <div class="card produk-card border-0 shadow-sm">
-
-                                    <div class="produk-img-wrapper">
-                                        <img src="{{ $gambarUrl }}" class="produk-img" alt="">
-                                        <span class="kategori-badge badge bg-light text-gold position-absolute top-0 start-0 m-2">
-                                            {{ $p->nama_kategori }}
-                                        </span>
-                                    </div>
-
-                                    <div class="card-body">
-                                        <h6 class="fw-bold text-dark text-truncate">{{ $p->nama_produk }}</h6>
-
-                                        <div class="rating-stars mb-1">
-                                            @for($i=1;$i<=5;$i++)
-                                                @if($i <= floor($avgRating))
-                                                    <i class="fa-solid fa-star text-warning"></i>
-                                                @elseif($i == ceil($avgRating) && ($avgRating - floor($avgRating)) >= 0.5)
-                                                    <i class="fa-solid fa-star-half-stroke text-warning"></i>
-                                                @else
-                                                    <i class="fa-regular fa-star text-secondary"></i>
-                                                @endif
-                                            @endfor
-                                            <span class="small text-muted">({{ $reviewCount }})</span>
-                                        </div>
-
-                                        <p class="harga-produk fw-bold text-warning mb-1">
-                                            Rp {{ number_format($p->harga, 0, ',', '.') }}
-                                        </p>
-
-                                        <p class="text-muted small mb-0">
-                                            {{ Str::limit(strip_tags($p->deskripsi), 50) }}
-                                        </p>
-                                    </div>
-
-                                </div>
+                                @include('components.card-produk', ['p' => $p, 'gambarUrl' => $gambarUrl, 'avg'=>$avg, 'count'=>$count])
                             </a>
                         @endforeach
 
                     </div>
                 </div>
 
-                <!-- ======= TOMBOL MOBILE ======= -->
+                <!-- ======= Tombol mobile ======= -->
                 <div class="text-center mt-4 d-lg-none">
-                    <a href="{{ url('/katalog') }}" class="about-button mt-3">
-                        Lihat Semua Katalog
-                    </a>
+                    <a href="{{ url('/katalog') }}" class="about-button mt-3">Lihat Semua Katalog</a>
                 </div>
 
                 <!-- ======= DESKTOP: CAROUSEL 3 ITEM ======= -->
@@ -174,45 +138,13 @@
                                     @foreach ($chunk as $p)
                                         @php
                                             $gambarUrl = file_exists(public_path($p->gambar)) ? asset($p->gambar) : asset('img/no-image.jpg');
-                                            $avgRating = round($p->average_rating, 1);
-                                            $reviewCount = $p->review_count;
+                                            $avg = round($p->average_rating, 1);
+                                            $count = $p->review_count;
                                         @endphp
 
                                         <div class="col-md-4">
                                             <a href="{{ route('produk.show', $p->slug) }}" class="text-decoration-none">
-                                                <div class="card produk-card h-100 border-0 shadow-sm">
-
-                                                    <div class="produk-img-wrapper">
-                                                        <img src="{{ $gambarUrl }}" class="produk-img">
-                                                        <span class="kategori-badge badge bg-light text-gold position-absolute top-0 start-0 m-2">{{ $p->nama_kategori }}</span>
-                                                    </div>
-
-                                                    <div class="card-body">
-                                                        <h6 class="fw-bold text-dark text-truncate">{{ $p->nama_produk }}</h6>
-
-                                                        <div class="rating-stars mb-1">
-                                                            @for($i=1;$i<=5;$i++)
-                                                                @if($i <= floor($avgRating))
-                                                                    <i class="fa-solid fa-star text-warning"></i>
-                                                                @elseif($i == ceil($avgRating) && ($avgRating-floor($avgRating)) >= 0.5)
-                                                                    <i class="fa-solid fa-star-half-stroke text-warning"></i>
-                                                                @else
-                                                                    <i class="fa-regular fa-star text-secondary"></i>
-                                                                @endif
-                                                            @endfor
-                                                            <span class="small text-muted">({{ $reviewCount }})</span>
-                                                        </div>
-
-                                                        <p class="fw-bold text-warning mb-1">
-                                                            Rp {{ number_format($p->harga, 0, ',', '.') }}
-                                                        </p>
-
-                                                        <p class="text-muted small">
-                                                            {{ Str::limit(strip_tags($p->deskripsi), 60) }}
-                                                        </p>
-                                                    </div>
-
-                                                </div>
+                                                @include('components.card-produk', ['p' => $p, 'gambarUrl' => $gambarUrl, 'avg'=>$avg, 'count'=>$count])
                                             </a>
                                         </div>
                                     @endforeach
@@ -233,11 +165,8 @@
 
                 </div>
 
-                <!-- ======= TOMBOL DESKTOP ======= -->
                 <div class="text-center mt-4 d-none d-lg-block">
-                    <a href="{{ url('/katalog') }}" class="about-button mt-3">
-                        Lihat Semua Katalog
-                    </a>
+                    <a href="{{ url('/katalog') }}" class="about-button mt-3">Lihat Semua Katalog</a>
                 </div>
 
             </div>

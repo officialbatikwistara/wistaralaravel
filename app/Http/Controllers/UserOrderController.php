@@ -33,7 +33,14 @@ class UserOrderController extends Controller
             ->with(['items.produk'])
             ->firstOrFail();
 
-        return view('user.pesanan.show', compact('order'));
+        return view('user.orders.show', compact('order'));
+    }
+
+    public function invoice($orderId)
+    {
+        $order = \App\Models\Order::with('items.produk')->findOrFail($orderId);
+
+        return view('user.orders.invoice', compact('order'));
     }
 
     /**
