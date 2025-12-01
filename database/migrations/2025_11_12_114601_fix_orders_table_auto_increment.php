@@ -12,10 +12,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // For development environment, recreate the orders table properly
-        // This will lose existing order data but fix the auto-increment issue
-
-        Schema::dropIfExists('orders');
+        // Jangan drop jika table sudah ada untuk menghindari masalah FK/produk data
+        if (Schema::hasTable('orders')) {
+            return;
+        }
 
         Schema::create('orders', function (Blueprint $table) {
             $table->id();

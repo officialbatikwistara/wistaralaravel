@@ -142,7 +142,7 @@ body {
 
 .analytics-chart svg {
     min-height: 340px; /* 320px base + 20px ekstra */
-    height: calc(100% + 500px) !important; /* tambah 20px pada tinggi svg */
+    height: calc(100% + 50px) !important; /* tambah 20px pada tinggi svg */
 }
 
 .analytics-chart svg foreignObject {

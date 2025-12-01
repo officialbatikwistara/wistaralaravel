@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Schema;
 use App\Models\Cart;
 use App\Models\Order;
 use App\Models\OrderItem;
@@ -67,22 +68,14 @@ class CheckoutController extends Controller
         if ($request->filled('id_produk')) {
             $produk = Produk::findOrFail($request->id_produk);
 
-            $order = Order::create([
-                'user_id' => $userId,
-                'coupon_id' => $request->coupon_id,
-                'nama' => $request->nama,
-                'telepon' => $request->telepon,
-                'total' => $produk->harga,
-                'discount_amount' => $request->discount_amount ?? 0,
-                'final_total' => $request->final_total ?? $produk->harga,
-                'status' => 'pending',
-                'status_pembayaran' => 'belum_bayar',
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'tanggal_ambil' => $request->tanggal_ambil,
-                'tipe_order' => $request->tipe_order,
-                'alamat' => $alamatFinal,
-                'catatan' => $request->catatan,
-            ]);
+            $orderData = $this->prepareOrderData(
+                $request,
+                $userId,
+                $produk->harga,
+                $alamatFinal
+            );
+
+            $order = Order::create($orderData);
 
             // Notify admin about new order
             $admin = \App\Models\Admin::first();
@@ -118,22 +111,14 @@ class CheckoutController extends Controller
 
             $total = $cartItems->sum(fn($item) => $item->qty * $item->produk->harga);
 
-            $order = Order::create([
-                'user_id' => $userId,
-                'coupon_id' => $request->coupon_id ?: null,
-                'nama' => $request->nama,
-                'telepon' => $request->telepon,
-                'total' => $total,
-                'discount_amount' => $request->discount_amount ?? 0,
-                'final_total' => $request->final_total ?? $total,
-                'status' => 'pending',
-                'status_pembayaran' => 'belum_bayar',
-                'metode_pembayaran' => $request->metode_pembayaran,
-                'tanggal_ambil' => $request->tanggal_ambil,
-                'tipe_order' => $request->tipe_order,
-                'alamat' => $alamatFinal,
-                'catatan' => $request->catatan,
-            ]);
+            $orderData = $this->prepareOrderData(
+                $request,
+                $userId,
+                $total,
+                $alamatFinal
+            );
+
+            $order = Order::create($orderData);
 
             // Notify admin about new order
             $admin = \App\Models\Admin::first();
@@ -215,5 +200,44 @@ class CheckoutController extends Controller
         } catch (\Exception $e) {
             Log::error('WhatsApp exception: ' . $e->getMessage());
         }
+    }
+
+    /**
+     * Susun data order tanpa memaksakan kolom yang mungkin belum ada di database (contoh: final_total).
+     */
+    protected function prepareOrderData(Request $request, $userId, $baseTotal, $alamatFinal): array
+    {
+        $data = [
+            'user_id' => $userId,
+            'nama' => $request->nama,
+            'telepon' => $request->telepon,
+            'total' => $baseTotal,
+            'status' => 'pending',
+            'status_pembayaran' => 'belum_bayar',
+            'metode_pembayaran' => $request->metode_pembayaran,
+            'tanggal_ambil' => $request->tanggal_ambil,
+            'tipe_order' => $request->tipe_order,
+            'alamat' => $alamatFinal,
+            'catatan' => $request->catatan,
+        ];
+
+        // Tambahkan kolom opsional hanya jika ada di schema
+        if (Schema::hasColumn('orders', 'coupon_id')) {
+            $data['coupon_id'] = $request->coupon_id ?: null;
+        }
+
+        if (Schema::hasColumn('orders', 'discount_amount')) {
+            $data['discount_amount'] = $request->discount_amount ?? 0;
+        }
+
+        if (Schema::hasColumn('orders', 'final_total')) {
+            $data['final_total'] = $request->final_total ?? $baseTotal;
+        }
+
+        if (Schema::hasColumn('orders', 'bukti_pembayaran')) {
+            $data['bukti_pembayaran'] = $request->bukti_pembayaran ?? null;
+        }
+
+        return $data;
     }
 }

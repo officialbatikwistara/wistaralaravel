@@ -11,7 +11,8 @@ return new class extends Migration
         Schema::create('chatbot_conversations', function (Blueprint $table) {
             $table->id();
             $table->string('session_id')->index();
-            $table->foreignId('user_id')->nullable()->constrained()->onDelete('cascade');
+            // Biarkan tanpa FK agar tidak tergantung urutan migrasi users
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->string('platform')->default('web'); // web, whatsapp, telegram, etc
             $table->string('status')->default('active'); // active, closed
             $table->timestamp('last_activity_at')->nullable();

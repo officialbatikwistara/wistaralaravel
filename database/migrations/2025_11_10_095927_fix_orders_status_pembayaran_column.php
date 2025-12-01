@@ -9,13 +9,15 @@ return new class extends Migration
     public function up()
     {
         Schema::table('orders', function (Blueprint $table) {
-            // Ubah kolom status_pembayaran
-            $table->enum('status_pembayaran', [
-                'belum_bayar',
-                'menunggu_verifikasi',
-                'lunas',
-                'gagal'
-            ])->default('belum_bayar')->change();
+            $statusValues = ['belum_bayar', 'menunggu_verifikasi', 'lunas', 'gagal'];
+
+            if (!Schema::hasColumn('orders', 'status_pembayaran')) {
+                // Tambah kolom jika belum ada
+                $table->enum('status_pembayaran', $statusValues)->default('belum_bayar');
+            } else {
+                // Ubah definisi kolom jika sudah ada
+                $table->enum('status_pembayaran', $statusValues)->default('belum_bayar')->change();
+            }
         });
     }
 

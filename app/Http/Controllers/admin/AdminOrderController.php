@@ -33,7 +33,8 @@ class AdminOrderController extends Controller
             });
         }
 
-        $orders = $query->orderBy('created_at', 'desc')->get();
+        // Urutkan dari transaksi paling lama ke terbaru agar nomor urut mengikuti waktu
+        $orders = $query->orderBy('created_at', 'asc')->get();
         return view('admin.pesanan.index', compact('orders'));
     }
 

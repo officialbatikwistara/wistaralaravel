@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('order_items', function (Blueprint $table) {
             $table->id(); // primary key
-            $table->unsignedBigInteger('order_id'); // relasi ke tabel orders
+            // relasi ke tabel orders (string ID)
+            $table->string('order_id', 30);
             $table->unsignedBigInteger('id_produk'); // relasi ke tabel produk
             $table->integer('qty'); // jumlah produk
             $table->decimal('harga', 15, 2); // harga satuan

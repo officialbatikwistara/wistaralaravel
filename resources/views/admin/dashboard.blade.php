@@ -102,6 +102,7 @@
                 <div>
                     <h3 class="mb-1">Monitoring Penjualan</h3>
                     <p class="text-muted mb-0">Ringkasan transaksi 12 bulan terakhir / klik untuk detail produk</p>
+                    <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
                 </div>
                 <div class="quarter-nav">
                     <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-prev-btn">
@@ -116,7 +117,7 @@
             </div>
             <div id="sales-chart" class="analytics-chart"></div>
             <div class="analytics-legend mt-3">
-                <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
+
             </div>
         </div>
     </div>
@@ -206,7 +207,7 @@
                 toolbar: { show: false },
                 animations: {
                     enabled: true,
-                    easing: 'easeout',
+                    easing: 'easeinout',
                     speed: 1000,
                     animateGradually: { enabled: true, delay: 150 },
                     dynamicAnimation: { enabled: true, speed: 400 }
@@ -273,11 +274,12 @@
         };
 
         const applyCurrencyFormatting = (maxValue = 0, categories = null, labelCssClass = '') => {
-            const baseMax = 1000000; // default 1 juta
-            const step = 250000;
-            const targetMax = Math.max(toValidNumber(maxValue), step);
-            const safeMax = Math.max(baseMax, Math.ceil(targetMax / step) * step);
-            const tickAmount = Math.max(Math.round(safeMax / step), 1);
+            // Tentukan step dinamis supaya axis tidak terlalu rapat untuk nilai besar
+            const niceSteps = [100_000, 250_000, 500_000, 1_000_000, 2_500_000, 5_000_000, 10_000_000];
+            const targetMax = Math.max(toValidNumber(maxValue), 100_000);
+            const pickedStep = niceSteps.find((s) => targetMax / s <= 8) || 10_000_000;
+            const safeMax = Math.ceil(targetMax / pickedStep) * pickedStep;
+            const tickAmount = Math.max(Math.round(safeMax / pickedStep), 2);
 
             let customFormatter = (value, index) => currencyFormatter.format(toValidNumber(value));
 
