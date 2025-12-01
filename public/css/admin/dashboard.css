@@ -1,6 +1,14 @@
+/* ===== GLOBAL BACKGROUND (match admin/produk) ===== */
+body {
+    font-family: 'Poppins', sans-serif;
+    background: url('/img/background1.svg') no-repeat center center fixed;
+    background-size: cover;
+    background-color: #ffffff; /* fallback jika SVG gagal load */
+}
+
 /* ===== HERO ===== */
 .admin-hero {
-    background: linear-gradient(to right, #f8f8f8, #ffffff);
+    background: transparent;
 }
 
 /* Hero overlay versi lama (kalau nanti pakai hero dengan background video) */
@@ -36,8 +44,7 @@
 
 /* ===== MAIN CONTAINER ===== */
 .dashboard-main {
-    background: url('/img/background2.svg') repeat;
-    background-size: contain;
+    background: transparent;
     padding: 80px 5%;
 }
 
@@ -90,8 +97,8 @@
 
 /* ===== ANALYTICS (APEXCHARTS) ===== */
 .dashboard-analytics {
-    padding: 60px 5% 40px;
-    background: #f8f9fa;
+    padding: 0 5% 40px;
+    background: transparent;
 }
 
 .analytics-card {
@@ -128,19 +135,19 @@
 }
 
 .analytics-chart {
-    min-height: 450px;
-    height: 450px;
+    min-height: 320px;
+    height: auto;
     overflow: visible;
 }
 
 .analytics-chart svg {
-    min-height: 450px;
-    height: 450px !important;
+    min-height: 340px; /* 320px base + 20px ekstra */
+    height: calc(100% + 500px) !important; /* tambah 20px pada tinggi svg */
 }
 
 .analytics-chart svg foreignObject {
-    min-height: 600px;
-    height: 600px !important;
+    min-height: 400px;
+    height: auto !important;
 }
 
 .apexcharts-currency-vertical {
@@ -184,14 +191,11 @@
 
 /* ===== FOOTER IMAGE ===== */
 .footer-image {
-    background: url('/img/background3.svg') no-repeat center/cover;
-    height: 200px;
-    opacity: 0.2;
-    margin-top: 80px;
+    display: none;
 }
 
 .bg-megamendung {
-    background: url('/img/background3.svg') no-repeat center/cover;
+    background: none !important;
 }
 
 /* ===== STAT CARDS (ATAS DASHBOARD) ===== */

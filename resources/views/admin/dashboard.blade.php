@@ -20,34 +20,6 @@
     </div>
 </section>
 
-<!-- ===== SALES ANALYTICS SECTION (APEXCHARTS) ===== -->
-<section class="dashboard-analytics bg-megamendung">
-    <div class="container">
-        <div class="analytics-card">
-            <div class="analytics-header">
-                <div>
-                    <h3 class="mb-1">Monitoring Penjualan</h3>
-                    <p class="text-muted mb-0">Ringkasan transaksi 12 bulan terakhir / klik untuk detail produk</p>
-                </div>
-                <div class="quarter-nav">
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-prev-btn">
-                        <i class="fa-solid fa-chevron-left me-1"></i> Quartal Sebelumnya
-                    </button>
-                    <span class="quarter-label text-muted mx-2" id="quarter-label">-</span>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-next-btn">
-                        Quartal Berikutnya <i class="fa-solid fa-chevron-right ms-1"></i>
-                    </button>
-                </div>
-                <button type="button" class="btn btn-outline-dark btn-sm" id="sales-back-btn" hidden>Level Bulanan</button>
-            </div>
-            <div id="sales-chart" class="analytics-chart"></div>
-            <div class="analytics-legend mt-3">
-                <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
-            </div>
-        </div>
-    </div>
-</section>
-
 <!-- ================= MAIN CONTENT ================= -->
 <section class="dashboard-main py-4">
     <div class="container">
@@ -110,7 +82,7 @@
                     <tr>
                         <td><strong>{{ $order->id }}</strong></td>
                         <td>{{ $order->nama }}</td>
-                        <td>Rp {{ number_format($order->final_total, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($order->final_total ?? $order->total, 0, ',', '.') }}</td>
                         <td><span class="badge bg-info">{{ $order->status }}</span></td>
                         <td>{{ date('d M Y', strtotime($order->created_at)) }}</td>
                     </tr>
@@ -119,7 +91,40 @@
             </table>
         </div>
 
-        <!-- ===== MENU CARDS (BOTTOM SHORTCUTS) ===== -->
+    </div>
+</section>
+
+<!-- ===== SALES ANALYTICS SECTION (APEXCHARTS) ===== -->
+<section class="dashboard-analytics bg-megamendung">
+    <div class="container">
+        <div class="analytics-card">
+            <div class="analytics-header">
+                <div>
+                    <h3 class="mb-1">Monitoring Penjualan</h3>
+                    <p class="text-muted mb-0">Ringkasan transaksi 12 bulan terakhir / klik untuk detail produk</p>
+                </div>
+                <div class="quarter-nav">
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-prev-btn">
+                        <i class="fa-solid fa-chevron-left me-1"></i> Quartal Sebelumnya
+                    </button>
+                    <span class="quarter-label text-muted mx-2" id="quarter-label">-</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary" id="quarter-next-btn">
+                        Quartal Berikutnya <i class="fa-solid fa-chevron-right ms-1"></i>
+                    </button>
+                </div>
+                <button type="button" class="btn btn-outline-dark btn-sm" id="sales-back-btn" hidden>Level Bulanan</button>
+            </div>
+            <div id="sales-chart" class="analytics-chart"></div>
+            <div class="analytics-legend mt-3">
+                <small class="text-muted">Tips: klik salah satu batang untuk drill-down ke penjualan per produk.</small>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== MENU CARDS (BOTTOM SHORTCUTS) ===== -->
+<section class="py-4">
+    <div class="container">
         <h4 class="fw-bold mb-3">Manajemen Toko</h4>
 
         <div class="row g-4">
@@ -161,7 +166,6 @@
             </div>
 
         </div>
-
     </div>
 </section>
 
@@ -200,7 +204,13 @@
                 type: 'bar',
                 height: 400,
                 toolbar: { show: false },
-                animations: { easing: 'easeinout', speed: 500 },
+                animations: {
+                    enabled: true,
+                    easing: 'easeout',
+                    speed: 1000,
+                    animateGradually: { enabled: true, delay: 150 },
+                    dynamicAnimation: { enabled: true, speed: 400 }
+                },
                 events: {
                     dataPointSelection(event, chartContext, config) {
                         if (!visibleSummaryItems.length || currentLevel !== 'summary') {
@@ -219,7 +229,7 @@
             colors: ['#d4af37'],
             plotOptions: {
                 bar: {
-                    horizontal: true,
+                    horizontal: true, // animasi kiri -> kanan
                     barHeight: '55%',
                     borderRadius: 8
                 }
