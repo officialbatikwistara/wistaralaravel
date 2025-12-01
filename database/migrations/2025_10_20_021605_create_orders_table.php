@@ -12,7 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('orders', function (Blueprint $table) {
-            $table->id(); // primary key
+            // Gunakan string ID (contoh: WST-YYYYMMDD-XXXX) agar sesuai dengan model Order
+            $table->string('id', 30)->primary();
             $table->unsignedBigInteger('user_id'); // relasi ke tabel users
             $table->string('nama'); // nama pemesan
             $table->string('telepon'); // no telepon

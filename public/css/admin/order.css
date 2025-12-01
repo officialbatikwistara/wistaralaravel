@@ -57,7 +57,12 @@ h2 {
     border-collapse: separate !important;
     border-spacing: 0;
     border-radius: 18px !important;
-    overflow: hidden !important;
+    overflow: visible !important; /* pastikan dropdown di dalam tabel tidak terpotong */
+}
+
+/* Izinkan dropdown keluar container responsif */
+.table-responsive {
+    overflow: visible !important;
 }
 
 .table tbody tr:hover {

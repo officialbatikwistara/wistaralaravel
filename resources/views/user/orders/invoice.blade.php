@@ -160,7 +160,7 @@
             </tr>
             <tr>
                 <td class="label">Total Akhir</td>
-                <td><strong>Rp {{ number_format($order->final_total, 0, ',', '.') }}</strong></td>
+                <td><strong>Rp {{ number_format($order->final_total ?? $order->total, 0, ',', '.') }}</strong></td>
             </tr>
             @else
             <tr>

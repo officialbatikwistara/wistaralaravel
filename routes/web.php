@@ -4,36 +4,43 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Validation\ValidationException;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
+
 use App\Models\Produk;
 use App\Models\Berita;
 use App\Models\Order;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\ValidationException;
-use App\Http\Controllers\WhatsAppWebhookController;
+
 use App\Services\WhatsAppService;
-use Illuminate\Foundation\Auth\EmailVerificationRequest;
-use App\Http\Controllers\Auth\ForgotPasswordController;
-use App\Http\Controllers\Auth\ResetPasswordController;
+use App\Http\Controllers\WhatsAppWebhookController;
+
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\ProdukController;
 use App\Http\Controllers\BeritaController;
-use App\Http\Controllers\CheckoutController;
-use App\Http\Controllers\CartController;
 use App\Http\Controllers\UserAuthController;
-use App\Http\Controllers\UserDashboardController;
+use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\CartController;
+use App\Http\Controllers\CheckoutController;
 use App\Http\Controllers\UserOrderController;
 use App\Http\Controllers\UserReviewController;
-use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserDashboardController;
 use App\Http\Controllers\ReviewController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
+use App\Http\Controllers\Auth\ResetPasswordController;
+
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ProdukAdminController;
 use App\Http\Controllers\Admin\KategoriAdminController;
 use App\Http\Controllers\Admin\BeritaAdminController;
 use App\Http\Controllers\Admin\AdminOrderController;
 use App\Http\Controllers\Admin\ReviewAdminController;
-use App\Http\Controllers\UploadBuktiController;
+use App\Http\Controllers\Admin\SalesAnalyticsController;
 
+use App\Http\Controllers\UploadBuktiController;
+use App\Http\Controllers\ChatbotController;
+use App\Http\Controllers\InvoiceController;
 /*
 |--------------------------------------------------------------------------
 | Route Halaman Utama & Static Page
@@ -334,15 +341,11 @@ Route::get('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin
 | Dashboard Admin
 |--------------------------------------------------------------------------
 */
-Route::get('/admin/dashboard', function () {
-    if (!session()->has('admin_logged_in')) {
-        return redirect()->route('admin.login')->with('error', 'Silakan login terlebih dahulu.');
-    }
-    return view('admin.dashboard');
-})->name('admin.dashboard');
-
 Route::get('/admin/dashboard', [AdminDashboardController::class, 'index'])
     ->name('admin.dashboard');
+
+Route::get('/admin/sales-data', [SalesAnalyticsController::class, 'monthlySales'])
+    ->name('admin.sales.data');
 
 /*
 |--------------------------------------------------------------------------

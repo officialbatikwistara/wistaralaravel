@@ -33,28 +33,34 @@ class CartController extends Controller
         // Pastikan produk valid dan tersedia
         $produk = Produk::findOrFail($produkId);
 
-        if ($produk->stok <= 0) {
-            return back()->with('error', 'Produk ini sedang habis stok');
+        
+        $qty = max((int) $request->input('qty', 1), 1);
+
+        // Cek stok
+        if ($qty > $produk->stok) {
+            return back()->with('error', 'Jumlah melebihi stok produk.');
         }
 
-        // Cek apakah produk sudah ada di keranjang user
+        // Cek apakah produk sudah ada di keranjang user (pakai id_produk sesuai skema DB)
         $cart = Cart::where('user_id', Auth::id())
             ->where('id_produk', $produkId)
             ->first();
 
         if ($cart) {
-            // Jika sudah ada, tambahkan qty tapi jangan melebihi stok
-            $newQty = $cart->qty + 1;
-            if ($newQty > $produk->stok) {
-                return back()->with('error', 'Jumlah melebihi stok tersedia');
-            }
-            $cart->increment('qty');
+            // Tambahkan qty tapi jangan melebihi stok
+            $newQty = min($cart->qty + $qty, $produk->stok);
+            $cart->update([
+                'qty' => $newQty,
+                'updated_at' => now(),
+            ]);
         } else {
             // Jika belum ada, buat baru
             Cart::create([
-                'user_id' => Auth::id(),
+                'user_id'   => Auth::id(),
                 'id_produk' => $produkId,
-                'qty' => 1,
+                'qty'       => $qty,
+                'created_at'=> now(),
+                'updated_at'=> now(),
             ]);
         }
 
@@ -66,20 +72,27 @@ class CartController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // Validasi dasar seperti di main
         $request->validate([
             'qty' => 'required|integer|min:1',
         ]);
 
+        // Ambil item keranjang milik user
         $cart = Cart::where('id', $id)
             ->where('user_id', Auth::id())
             ->with('produk')
             ->firstOrFail();
 
-        if ($request->qty > $cart->produk->stok) {
-            return back()->with('error', 'Jumlah melebihi stok tersedia');
+        // Pastikan tidak melebihi stok produk terkait
+        $produk = Produk::find($cart->id_produk);
+        if ($produk && $request->qty > $produk->stok) {
+            return back()->with('error', 'Jumlah melebihi stok produk.');
         }
 
-        $cart->update(['qty' => $request->qty]);
+        $cart->update([
+            'qty' => (int) $request->qty,
+            'updated_at' => now(),
+        ]);
 
         return back()->with('success', 'Jumlah produk berhasil diperbarui ✅');
     }

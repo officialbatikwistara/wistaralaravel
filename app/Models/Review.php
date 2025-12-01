@@ -27,8 +27,8 @@ class Review extends Model
         return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    // 🔗 Relasi ke Produk
-    public function produk()
+    // 🔗 Relasi ke Produk (alias "product" dipakai di controller/view)
+    public function product()
     {
         return $this->belongsTo(\App\Models\Produk::class, 'id_produk', 'id_produk');
     }

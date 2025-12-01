@@ -196,7 +196,7 @@
             </div>
             <div class="detail-row">
                 <span class="detail-label">Total Akhir:</span>
-                <span class="detail-value" style="color: #8B4513; font-size: 20px;"><strong>Rp {{ number_format($order->final_total, 0, ',', '.') }}</strong></span>
+                <span class="detail-value" style="color: #8B4513; font-size: 20px;"><strong>Rp {{ number_format($order->final_total ?? $order->total, 0, ',', '.') }}</strong></span>
             </div>
             @endif
         </div>
