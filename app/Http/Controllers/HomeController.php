@@ -17,20 +17,20 @@ class HomeController extends Controller
             ->get();
 
         // Ambil produk + kategori + avg rating + jumlah review
-$produk = Produk::with([
-        'kategori:id_kategori,nama_kategori',
-        'approvedReviews:id,id_produk,rating,status'
-    ])
-    ->withAvg('approvedReviews as average_rating', 'rating')
-    ->withCount('approvedReviews as review_count')
-    ->orderBy('tanggal_upload', 'desc')
-    ->limit(8)
-    ->get()
-    ->map(function ($p) {
-        $p->average_rating = $p->average_rating ? round($p->average_rating, 1) : 0;
-        return $p;
-    });
-
+        $produk = Produk::with([
+                'kategori:id_kategori,nama_kategori',
+                'approvedReviews:id,id_produk,rating,status'
+            ])
+            ->withAvg('approvedReviews as average_rating', 'rating')
+            ->withCount('approvedReviews as review_count')
+            ->where('status', 'aktif')          // ✅ hanya produk aktif
+            ->orderBy('tanggal_upload', 'desc')
+            ->limit(8)
+            ->get()
+            ->map(function ($p) {
+                $p->average_rating = $p->average_rating ? round($p->average_rating, 1) : 0;
+                return $p;
+            });
 
         return view('home', compact('berita', 'produk'));
     }
