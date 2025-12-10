@@ -89,93 +89,37 @@
             <hr class="mx-auto mt-3" style="width:100px;height:3px;background:#fff">
         </div>
 
-        <div class="row g-4 align-items-start">
+        <!-- FULL SECTION: GRID CARD PRODUK -->
+        <div class="row g-4" data-aos="fade-up" data-aos-duration="800">
 
-            <!-- ================= KIRI: VIDEO ================= -->
-            <div class="col-lg-5 d-flex justify-content-center mb-4 mb-lg-0" data-aos="fade-right" data-aos-duration="800">
-                <div class="katalog-media overflow-hidden rounded-4 shadow">
-                    <video autoplay muted loop playsinline>
-                        <source src="{{ asset('img/vidbatik.mp4') }}" type="video/mp4">
-                    </video>
+            @foreach ($produk as $p)
+                @php
+                    $gambarUrl = file_exists(public_path($p->gambar)) ? asset($p->gambar) : asset('img/no-image.jpg');
+                    $avg = round($p->average_rating, 1);
+                    $count = $p->review_count;
+                @endphp
+
+                <div class="col-6 col-md-4 col-lg-3 d-flex">
+                    <a href="{{ route('produk.show', $p->slug) }}" class="text-decoration-none w-100">
+                        @include('components.card-produk', [
+                            'p' => $p,
+                            'gambarUrl' => $gambarUrl,
+                            'avg' => $avg,
+                            'count' => $count
+                        ])
+                    </a>
                 </div>
-            </div>
+            @endforeach
 
-            <!-- ================= KANAN: PRODUK ================= -->
-            <div class="col-lg-7" data-aos="fade-left" data-aos-duration="800">
+        </div>
 
-                <!-- ======= MOBILE: CARD SCROLL ======= -->
-                <div class="mobile-scroll d-lg-none">
-                    <div class="scroll-inner">
-
-                        @foreach ($produk as $p)
-                            @php
-                                $gambarUrl = file_exists(public_path($p->gambar)) ? asset($p->gambar) : asset('img/no-image.jpg');
-                                $avg = round($p->average_rating, 1);
-                                $count = $p->review_count;
-                            @endphp
-
-                            <a href="{{ route('produk.show', $p->slug) }}" class="scroll-card text-decoration-none">
-                                @include('components.card-produk', ['p' => $p, 'gambarUrl' => $gambarUrl, 'avg'=>$avg, 'count'=>$count])
-                            </a>
-                        @endforeach
-
-                    </div>
-                </div>
-
-                <!-- ======= Tombol mobile ======= -->
-                <div class="text-center mt-4 d-lg-none">
-                    <a href="{{ url('/katalog') }}" class="about-button mt-3">Lihat Semua Katalog</a>
-                </div>
-
-                <!-- ======= DESKTOP: CAROUSEL 3 ITEM ======= -->
-                <div id="carouselKatalog" class="carousel slide d-none d-lg-block" data-bs-interval="0">
-                    <div class="carousel-inner">
-
-                        @foreach ($produk->chunk(3) as $chunkIndex => $chunk)
-                            <div class="carousel-item {{ $chunkIndex === 0 ? 'active' : '' }}">
-                                <div class="row g-4">
-
-                                    @foreach ($chunk as $p)
-                                        @php
-                                            $gambarUrl = file_exists(public_path($p->gambar)) ? asset($p->gambar) : asset('img/no-image.jpg');
-                                            $avg = round($p->average_rating, 1);
-                                            $count = $p->review_count;
-                                        @endphp
-
-                                        <div class="col-md-4">
-                                            <a href="{{ route('produk.show', $p->slug) }}" class="text-decoration-none">
-                                                @include('components.card-produk', ['p' => $p, 'gambarUrl' => $gambarUrl, 'avg'=>$avg, 'count'=>$count])
-                                            </a>
-                                        </div>
-                                    @endforeach
-
-                                </div>
-                            </div>
-                        @endforeach
-
-                    </div>
-
-                    <!-- Kontrol -->
-                    <button class="carousel-control-prev" type="button" data-bs-target="#carouselKatalog" data-bs-slide="prev">
-                        <span class="carousel-control-prev-icon bg-dark rounded-circle p-2"></span>
-                    </button>
-                    <button class="carousel-control-next" type="button" data-bs-target="#carouselKatalog" data-bs-slide="next">
-                        <span class="carousel-control-next-icon bg-dark rounded-circle p-2"></span>
-                    </button>
-
-                </div>
-
-                <div class="text-center mt-4 d-none d-lg-block">
-                    <a href="{{ url('/katalog') }}" class="about-button mt-3">Lihat Semua Katalog</a>
-                </div>
-
-            </div>
-
+        <!-- Tombol Lihat Semua -->
+        <div class="text-center mt-4">
+            <a href="{{ url('/katalog') }}" class="about-button mt-3">Lihat Semua Katalog</a>
         </div>
 
     </div>
 </section>
-
 
 <!-- ================= BERITA TERKINI ================= -->
 <section class="section-berita py-5">
