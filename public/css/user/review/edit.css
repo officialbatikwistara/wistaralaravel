@@ -1,0 +1,32 @@
+/* Judul Halaman */
+h1 {
+    font-weight: 700;
+    color: #0b1841;
+}
+
+/* 🌟 Container form */
+.form-container {
+    background: rgba(255, 255, 255, 0.97);
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    margin-top: 20px;
+    backdrop-filter: blur(6px);
+    padding: 2rem;
+}
+
+/* 🧩 Tombol utama */
+.btn-dark {
+    background-color: #081738 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+
+.btn-dark:hover {
+    background-color: #152a6e !important;
+}
+
+.btn-secondary {
+    border-radius: 12px !important;
+}
