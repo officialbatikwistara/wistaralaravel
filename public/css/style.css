@@ -227,15 +227,6 @@ h5 {
   object-fit: cover;
 }
 
-/* Mobile lebih pendek */
-@media (max-width: 991.98px) {
-  .hero-slider .carousel,
-  .hero-slider .carousel-inner,
-  .hero-slider .carousel-item {
-    height: 75vh;
-  }
-}
-
 /* SVG: jangan cover (sering kepotong / kosong) */
 .hero-svg {
   background: #fff;
