@@ -113,21 +113,33 @@
 </div>
 
 <script>
-  // 🛡️ Validasi Strength Password
+  // =========================
+  // ELEMENTS
+  // =========================
   const passwordField = document.getElementById('password');
   const strengthBar = document.querySelector('#passwordStrengthBar .progress-bar');
   const strengthText = document.getElementById('passwordStrengthText');
 
+  const phoneInput = document.getElementById('phone');
+  const phoneError = document.getElementById('phoneError');
+
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('emailError');
+
+  // =========================
+  // PASSWORD STRENGTH
+  // =========================
   passwordField.addEventListener('input', function () {
     const val = this.value;
     let strength = 0;
+
     if (/[a-z]/.test(val)) strength++;
     if (/[A-Z]/.test(val)) strength++;
     if (/[0-9]/.test(val)) strength++;
     if (/[\W_]/.test(val)) strength++;
     if (val.length >= 8) strength++;
 
-    let width = (strength / 5) * 100;
+    const width = (strength / 5) * 100;
     strengthBar.style.width = width + '%';
 
     if (strength === 0) {
@@ -145,29 +157,36 @@
     }
   });
 
-  // 👁️ Toggle Show / Hide Password
+  // =========================
+  // TOGGLE PASSWORD SHOW/HIDE
+  // =========================
   document.querySelectorAll('.toggle-password').forEach(btn => {
     btn.addEventListener('click', () => {
       const targetId = btn.getAttribute('data-target');
       const input = document.getElementById(targetId);
       const icon = btn.querySelector('i');
 
+      if (!input) return;
+
       if (input.type === 'password') {
         input.type = 'text';
-        icon.classList.replace('fa-eye', 'fa-eye-slash');
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
       } else {
         input.type = 'password';
-        icon.classList.replace('fa-eye-slash', 'fa-eye');
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
       }
     });
   });
 
-  // 📞 Validasi Nomor HP
-  const phoneInput = document.getElementById('phone');
-  const phoneError = document.getElementById('phoneError');
+  // =========================
+  // VALIDASI NOMOR HP
+  // =========================
   phoneInput.addEventListener('input', function () {
-    const val = this.value;
+    const val = this.value.trim();
     const regex = /^\+?[0-9]{10,15}$/;
+
     if (!regex.test(val)) {
       phoneError.textContent = "Nomor telepon harus 10–15 digit (boleh diawali +).";
       this.classList.add('is-invalid');
@@ -179,10 +198,11 @@
     }
   });
 
-  // 📧 Validasi Email
-  const emailInput = document.getElementById('email');
-  const emailError = document.getElementById('emailError');
+  // =========================
+  // VALIDASI EMAIL FORMAT
+  // =========================
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
   emailInput.addEventListener('input', function () {
     const val = this.value.trim();
     if (!emailRegex.test(val)) {
@@ -196,50 +216,47 @@
     }
   });
 
-// === 📧 Cek Email Sudah Terdaftar ===
-const emailInput = document.getElementById('email');
-const emailError = document.getElementById('emailError');
-emailInput.addEventListener('blur', async () => {
-  const val = emailInput.value.trim();
-  if (!val) return;
+  // =========================
+  // CEK EMAIL SUDAH TERDAFTAR
+  // =========================
+  emailInput.addEventListener('blur', async () => {
+    const val = emailInput.value.trim();
+    if (!val || !emailRegex.test(val)) return;
 
-  const response = await fetch(`{{ route('check.user') }}?email=${encodeURIComponent(val)}`);
-  const data = await response.json();
+    try {
+      const response = await fetch(`{{ route('check.user') }}?email=${encodeURIComponent(val)}`);
+      const data = await response.json();
 
-  if (data.exists) {
-    emailError.textContent = "⚠️ Email ini sudah terdaftar.";
-    emailInput.classList.add('is-invalid');
-    emailInput.classList.remove('is-valid');
-    alert("Email ini sudah digunakan. Silakan gunakan email lain.");
-  } else {
-    emailError.textContent = "";
-    emailInput.classList.remove('is-invalid');
-    emailInput.classList.add('is-valid');
-  }
-});
+      if (data.exists) {
+        emailError.textContent = "⚠️ Email ini sudah terdaftar.";
+        emailInput.classList.add('is-invalid');
+        emailInput.classList.remove('is-valid');
+        alert("Email ini sudah digunakan. Silakan gunakan email lain.");
+      }
+    } catch (e) {
+      console.error("Gagal cek email:", e);
+    }
+  });
 
-// === 📞 Cek Nomor HP Sudah Terdaftar ===
-const phoneInput = document.getElementById('phone');
-const phoneError = document.getElementById('phoneError');
-phoneInput.addEventListener('blur', async () => {
-  const val = phoneInput.value.trim();
-  if (!val) return;
+  // =========================
+  // CEK NOMOR HP SUDAH TERDAFTAR
+  // =========================
+  phoneInput.addEventListener('blur', async () => {
+    const val = phoneInput.value.trim();
+    if (!val) return;
 
-  const response = await fetch(`{{ route('check.user') }}?phone=${encodeURIComponent(val)}`);
-  const data = await response.json();
+    try {
+      const response = await fetch(`{{ route('check.user') }}?phone=${encodeURIComponent(val)}`);
+      const data = await response.json();
 
-  if (data.exists) {
-    phoneError.textContent = "⚠️ Nomor telepon ini sudah terdaftar.";
-    phoneInput.classList.add('is-invalid');
-    phoneInput.classList.remove('is-valid');
-    alert("Nomor telepon ini sudah digunakan. Silakan gunakan nomor lain.");
-  } else {
-    phoneError.textContent = "";
-    phoneInput.classList.remove('is-invalid');
-    phoneInput.classList.add('is-valid');
-  }
-});
-
+      if (data.exists) {
+        phoneError.textContent = "⚠️ Nomor telepon ini sudah terdaftar.";
+        phoneInput.classList.add('is-invalid');
+        phoneInput.classList.remove('is-valid');
+        alert("Nomor telepon ini sudah digunakan. Silakan gunakan nomor lain.");
+      }
+    } catch (e) {
+      console.error("Gagal cek phone:", e);
+    }
+  });
 </script>
-
-@include('inc.footer')

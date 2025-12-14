@@ -1,3 +1,5 @@
+
+
 <!-- Bootstrap Bundle -->
 <footer class="bg-light text-dark pt-5 pb-4 shadow-sm mt-0">
   <div class="container">
@@ -60,7 +62,6 @@
   </div>
 </footer>
 
-
 <!-- ================= SCRIPTS ================= -->
 <script type="module" src="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.0/src/lite-yt-embed.js"></script>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lite-youtube-embed@0.3.0/src/lite-yt-embed.css">
@@ -77,6 +78,16 @@
       });
     });
   </script>
+<script>
+  const loader = document.getElementById('page-loader');
+
+  document.querySelectorAll('form').forEach(form => {
+    form.addEventListener('submit', () => {
+      loader.classList.add('active');
+    });
+  });
+</script>
+
 
 </body>
 </html>
