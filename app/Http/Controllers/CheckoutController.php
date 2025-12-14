@@ -150,6 +150,10 @@ class CheckoutController extends Controller
             $admin->phone ?? env('ADMIN_PHONE'),
             $message
         );
+
+        // TELEGRAM
+        (new NotifikasiAdminController())->sendTelegram($message);
+
     }
 
     private function redirectPembayaran(Request $request, $order)
