@@ -89,8 +89,6 @@
 <!-- ✨ TinyMCE -->
 <script src="https://cdn.tiny.cloud/1/tuy4locoxw7b1g0t76h8p18h5dax2hw0a1y0ghclapgbpyw1/tinymce/7/tinymce.min.js"
     referrerpolicy="origin"></script>
-<script>
-    < script src = "{{ asset('js/berita/create.js') }}" >
-</script>
+<script src="{{ asset('js/berita/create.js') }}"></script>
 
 < /style>
