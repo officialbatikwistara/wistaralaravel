@@ -78,16 +78,6 @@
       });
     });
   </script>
-<script>
-  const loader = document.getElementById('page-loader');
-
-  document.querySelectorAll('form').forEach(form => {
-    form.addEventListener('submit', () => {
-      loader.classList.add('active');
-    });
-  });
-</script>
-
 
 </body>
 </html>

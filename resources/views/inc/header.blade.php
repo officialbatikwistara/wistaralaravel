@@ -53,11 +53,3 @@
 </head>
 <body>
   @include('inc.navbar')
-<!-- LOADING OVERLAY -->
-<div id="page-loader">
-  <div class="loader-content">
-    <img src="{{ asset('img/logo.png') }}" alt="Batik Wistara" class="loader-logo">
-    <div class="loader-ring"></div>
-    <p class="loader-text">Memproses...</p>
-  </div>
-</div>
