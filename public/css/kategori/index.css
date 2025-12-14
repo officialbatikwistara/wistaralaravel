@@ -1,0 +1,88 @@
+/* 🌟 Container tabel */
+.table-container {
+    background: rgba(255, 255, 255, 0.97); /* Lebih solid */
+    border-radius: 18px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    backdrop-filter: blur(6px);
+}
+
+/* 🧭 Header tabel */
+.table-header th {
+    background-color: #081738 !important;
+    color: #ffffff !important;
+    font-weight: 600 !important;
+    font-size: 15px !important;
+    border: none !important;
+    padding: 14px !important;
+    text-align: center !important;
+}
+
+/* Membulatkan header tabel */
+.table-container table {
+    border-collapse: separate !important;
+    border-spacing: 0 !important;
+    border-radius: 18px !important;
+    overflow: hidden !important;
+}
+.table-container thead th:first-child {
+    border-top-left-radius: 18px !important;
+}
+.table-container thead th:last-child {
+    border-top-right-radius: 18px !important;
+}
+
+/* 📦 Baris kategori */
+.produk-row {
+    border-bottom: 1px solid #e5e7eb;
+    transition: 0.25s ease;
+}
+.produk-row:hover {
+    background-color: #f9fafb;
+    transform: scale(1.002);
+}
+
+/* 📋 Isi tabel */
+.produk-cell {
+    padding: 16px 14px;
+    vertical-align: middle;
+}
+
+/* 🏷️ Nama kategori */
+.produk-name {
+    font-weight: 600;
+    font-size: 16px;
+    color: #0b1841;
+}
+
+/* ✏️ Tombol aksi */
+.btn-action {
+    border: none;
+    padding: 10px 12px;
+    border-radius: 8px;
+    color: white;
+    transition: 0.3s ease;
+}
+.btn-edit {
+    background-color: #fbbf24;
+}
+.btn-edit:hover {
+    background-color: #d1a106;
+}
+.btn-delete {
+    background-color: #dc2626;
+}
+.btn-delete:hover {
+    background-color: #b91c1c;
+}
+
+/* 🧩 Tombol utama */
+.btn-dark {
+    background-color: #081738 !important;
+    border: none !important;
+    border-radius: 12px !important;
+    font-weight: 600 !important;
+}
+.btn-dark:hover {
+    background-color: #152a6e !important;
+}

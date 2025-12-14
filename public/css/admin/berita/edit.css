@@ -1,0 +1,72 @@
+:root {
+    --dark-navy: #071739;
+    --blue-gray: #4b6382;
+    --light-gray: #f5f7fa;
+    --gold: #d4af37;
+}
+
+.text-dark-navy {
+    color: var(--dark-navy);
+}
+
+.card {
+    animation: fadeIn 0.5s ease;
+}
+
+textarea.form-control {
+    resize: vertical;
+    min-height: 140px;
+}
+
+input:focus,
+textarea:focus {
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(7, 23, 57, 0.2);
+}
+
+.btn-custom-primary {
+    background-color: var(--dark-navy);
+    color: #fff;
+    border: none;
+    transition: 0.3s ease;
+}
+
+.btn-custom-primary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-custom-primary:active {
+    background-color: var(--gold);
+    color: #000;
+    transform: scale(0.98);
+}
+
+.btn-custom-secondary {
+    background-color: var(--blue-gray);
+    color: #fff;
+    border: none;
+    transition: 0.3s ease;
+}
+
+.btn-custom-secondary:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
+}
+
+.btn-custom-secondary:active {
+    background-color: var(--gold);
+    color: #000;
+    transform: scale(0.98);
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(15px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
