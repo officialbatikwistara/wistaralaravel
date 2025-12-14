@@ -1,55 +1,132 @@
 @include('inc.header')
 
 <section class="hero-slider position-relative">
-    @php
-        $slides = glob(public_path('hero-slides/*'));
-    @endphp
 
-    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4500">
+@php
+  $desktopSlides = collect(glob(public_path('hero-slides/desktop/*')))
+      ->filter(fn($p) => is_file($p))
+      ->values();
 
-        <!-- Indicators -->
-        <div class="carousel-indicators">
-            @foreach ($slides as $key => $slide)
-                <button type="button" data-bs-target="#heroCarousel" 
-                        data-bs-slide-to="{{ $key }}" 
-                        class="{{ $key == 0 ? 'active' : '' }}"></button>
-            @endforeach
-        </div>
+  $mobileSlides = collect(glob(public_path('hero-slides/mobile/*')))
+      ->filter(fn($p) => is_file($p))
+      ->values();
+@endphp
 
-        <!-- Slides -->
-        <div class="carousel-inner">
+{{-- ================= DESKTOP HERO ================= --}}
+@if($desktopSlides->count())
+<div class="d-none d-lg-block">
+  <div id="heroDesktop" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4500" data-bs-touch="true">
 
-            @foreach ($slides as $key => $slide)
-                @php
-                    $fileName = basename($slide);
-                    $fileUrl = asset('hero-slides/' . $fileName);
-                    $ext = strtolower(pathinfo($fileName, PATHINFO_EXTENSION));
-                    $isVideo = in_array($ext, ['mp4', 'webm', 'mov']);
-                @endphp
-
-                <div class="carousel-item {{ $key == 0 ? 'active' : '' }}">
-                    @if ($isVideo)
-                        <video class="d-block w-100" autoplay muted loop playsinline>
-                            <source src="{{ $fileUrl }}" type="video/{{ $ext }}">
-                        </video>
-                    @else
-                        <img src="{{ $fileUrl }}" class="d-block w-100" alt="Slide {{ $key + 1 }}">
-                    @endif
-                </div>
-            @endforeach
-
-        </div>
-
-        <!-- Controls -->
-        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
-            <span class="carousel-control-prev-icon"></span>
-        </button>
-
-        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
-            <span class="carousel-control-next-icon"></span>
-        </button>
+    {{-- Indicators --}}
+    <div class="carousel-indicators">
+      @foreach ($desktopSlides as $i => $s)
+        <button type="button"
+                data-bs-target="#heroDesktop"
+                data-bs-slide-to="{{ $i }}"
+                class="{{ $i === 0 ? 'active' : '' }}"
+                aria-current="{{ $i === 0 ? 'true' : 'false' }}"
+                aria-label="Slide {{ $i+1 }}"></button>
+      @endforeach
     </div>
+
+    <div class="carousel-inner">
+      @foreach ($desktopSlides as $i => $slide)
+        @php
+          $file = basename($slide);
+          $url  = asset('hero-slides/desktop/' . $file);
+          $ext  = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+          $isVideo = in_array($ext, ['mp4','webm','mov']);
+          $isSvg   = $ext === 'svg';
+        @endphp
+
+        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+          @if ($isVideo)
+            <video class="hero-media" autoplay muted loop playsinline preload="metadata">
+              <source src="{{ $url }}" type="video/{{ $ext }}">
+            </video>
+          @else
+            <img src="{{ $url }}"
+                 class="hero-media {{ $isSvg ? 'hero-svg' : '' }}"
+                 alt="Hero Desktop {{ $i+1 }}"
+                 draggable="false">
+          @endif
+        </div>
+      @endforeach
+    </div>
+
+    {{-- Controls --}}
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroDesktop" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon hero-ctrl" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroDesktop" data-bs-slide="next">
+      <span class="carousel-control-next-icon hero-ctrl" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+
+  </div>
+</div>
+@endif
+
+
+{{-- ================= MOBILE HERO ================= --}}
+@if($mobileSlides->count())
+<div class="d-block d-lg-none">
+  <div id="heroMobile" class="carousel slide" data-bs-ride="carousel" data-bs-interval="4500" data-bs-touch="true">
+
+    {{-- Indicators --}}
+    <div class="carousel-indicators">
+      @foreach ($mobileSlides as $i => $s)
+        <button type="button"
+                data-bs-target="#heroMobile"
+                data-bs-slide-to="{{ $i }}"
+                class="{{ $i === 0 ? 'active' : '' }}"
+                aria-current="{{ $i === 0 ? 'true' : 'false' }}"
+                aria-label="Slide {{ $i+1 }}"></button>
+      @endforeach
+    </div>
+
+    <div class="carousel-inner">
+      @foreach ($mobileSlides as $i => $slide)
+        @php
+          $file = basename($slide);
+          $url  = asset('hero-slides/mobile/' . $file);
+          $ext  = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+          $isVideo = in_array($ext, ['mp4','webm','mov']);
+          $isSvg   = $ext === 'svg';
+        @endphp
+
+        <div class="carousel-item {{ $i === 0 ? 'active' : '' }}">
+          @if ($isVideo)
+            <video class="hero-media hero-mobile" autoplay muted loop playsinline preload="metadata">
+              <source src="{{ $url }}" type="video/{{ $ext }}">
+            </video>
+          @else
+            <img src="{{ $url }}"
+                 class="hero-media hero-mobile {{ $isSvg ? 'hero-svg' : '' }}"
+                 alt="Hero Mobile {{ $i+1 }}"
+                 draggable="false">
+          @endif
+        </div>
+      @endforeach
+    </div>
+
+    {{-- Controls --}}
+    <button class="carousel-control-prev" type="button" data-bs-target="#heroMobile" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon hero-ctrl" aria-hidden="true"></span>
+      <span class="visually-hidden">Previous</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#heroMobile" data-bs-slide="next">
+      <span class="carousel-control-next-icon hero-ctrl" aria-hidden="true"></span>
+      <span class="visually-hidden">Next</span>
+    </button>
+
+  </div>
+</div>
+@endif
+
 </section>
+
 
 <!-- ================= TENTANG KAMI ================= -->
 <section class="section-about py-5">
