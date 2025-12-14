@@ -116,14 +116,14 @@ class CheckoutController extends Controller
             'nama' => 'required|string|max:255',
             'telepon' => 'required|string|max:20',
             'metode_pembayaran' => 'required|string',
-            'tipe_order' => 'required|string|in:ambil,dikirim',
+            'tipe_order' => 'required|string|in:ambil,kirim',
         ];
 
         if ($request->tipe_order === 'ambil') {
             $rules['tanggal_ambil'] = 'required|date';
         }
 
-        if ($request->tipe_order === 'dikirim') {
+        if ($request->tipe_order === 'kirim') {
             $rules['alamat'] = 'required|string';
         }
 

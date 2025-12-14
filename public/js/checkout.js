@@ -5,6 +5,7 @@ document.getElementById("tanggal_ambil").setAttribute("min", today);
 // ===== Tampilkan Alamat Pengiriman Berdasarkan Tipe =====
 const tipeOrder = document.getElementById("tipe_order");
 const alamatField = document.getElementById("alamatField");
+// const alamatInput = document.getElementById("alamat");
 
 tipeOrder.addEventListener("change", () => {
     alamatField.style.display = tipeOrder.value === "kirim" ? "block" : "none";
@@ -99,6 +100,12 @@ const tanggalField = document.getElementById("tanggalField");
 const tanggalInput = document.getElementById("tanggal_ambil");
 
 tipeOrder.addEventListener("change", () => {
+    // Alamat kirim
+    const isKirim = tipeOrder.value === "kirim";
+    alamatField.style.display = isKirim ? "block" : "none";
+    document.getElementById("alamat").required = isKirim;
+
+    // Tanggal ambil
     if (tipeOrder.value === "ambil") {
         tanggalField.style.display = "block";
         tanggalInput.required = true;
