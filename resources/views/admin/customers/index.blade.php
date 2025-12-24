@@ -86,10 +86,10 @@
                             <td>{{ $cust->created_at->format('d M Y') }}</td>
 
                             <td>
-                                <a href="{{ route('admin.customers.show', $cust->id) }}"
+                                <!-- <a href="{{ route('admin.customers.show', $cust->id) }}"
                                     class="btn btn-sm btn-primary-navy rounded-pill px-3 me-1">
                                     <i class="fa-solid fa-eye me-1"></i> Detail
-                                </a>
+                                </a> -->
 
                                 <form action="{{ route('admin.customers.destroy', $cust->id) }}" method="POST"
                                     class="d-inline" onsubmit="return confirm('Yakin ingin menghapus pelanggan ini?')">
