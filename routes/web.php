@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\AdminCustomerController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -166,12 +167,12 @@ Route::middleware('auth')->post('/api/coupons/validate', function (Request $requ
 });
 
 // Invoice routes
-Route::get('/user/orders/{order}/invoice', 
+Route::get('/user/orders/{order}/invoice',
     [App\Http\Controllers\UserOrderController::class, 'invoice']
 )->name('user.orders.invoice')
   ->middleware('auth');
-  
-Route::get('/user/orders/{order}/invoice/pdf', 
+
+Route::get('/user/orders/{order}/invoice/pdf',
     [App\Http\Controllers\InvoiceController::class, 'download']
 )->name('user.order.invoice.pdf')->middleware('auth');
 
@@ -521,6 +522,16 @@ Route::delete('/admin/reviews/{id}', function ($id) {
     }
     return app(\App\Http\Controllers\Admin\ReviewAdminController::class)->destroy($id);
 })->name('admin.reviews.delete');
+
+/*
+|--------------------------------------------------------------------------
+| KELOLA USER
+|--------------------------------------------------------------------------
+*/
+Route::prefix('admin')->group(function () {
+    Route::resource('customers', AdminCustomerController::class)
+        ->names('admin.customers');
+});
 
 
 // Chatbot Routes

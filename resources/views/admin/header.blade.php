@@ -12,7 +12,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;700&family=Libre+Caslon+Text:wght@400;700&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Cabin:wght@400;700&family=Libre+Caslon+Text:wght@400;700&display=swap"
+        rel="stylesheet">
 
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -28,7 +30,8 @@
 
 <body>
     <!-- ================= ADMIN NAVBAR ================= -->
-    <nav id="navbarAdmin" class="navbar navbar-dark navbar-expand-lg position-fixed top-0 start-0 w-100" style="z-index: 1000;">
+    <nav id="navbarAdmin" class="navbar navbar-dark navbar-expand-lg position-fixed top-0 start-0 w-100"
+        style="z-index: 1000;">
         <div class="container">
 
             <!-- Logo -->
@@ -38,8 +41,9 @@
             </a>
 
             <!-- Toggler -->
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#adminNavbar"
-                aria-controls="adminNavbar" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse"
+                data-bs-target="#adminNavbar" aria-controls="adminNavbar" aria-expanded="false"
+                aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
@@ -47,19 +51,28 @@
             <div class="collapse navbar-collapse justify-content-center" id="adminNavbar">
                 <ul class="navbar-nav mx-auto">
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/dashboard') ? 'active' : '' }}" href="{{ url('/admin/dashboard') }}">Beranda</a>
+                        <a class="nav-link {{ Request::is('admin/dashboard') ? 'active' : '' }}"
+                            href="{{ url('/admin/dashboard') }}">Beranda</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/kategori*') ? 'active' : '' }}" href="{{ url('/admin/kategori') }}">Kategori</a>
+                        <a class="nav-link {{ Request::is('admin/kategori*') ? 'active' : '' }}"
+                            href="{{ url('/admin/kategori') }}">Kategori</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/produk*') ? 'active' : '' }}" href="{{ url('/admin/produk') }}">Produk</a>
+                        <a class="nav-link {{ Request::is('admin/produk*') ? 'active' : '' }}"
+                            href="{{ url('/admin/produk') }}">Produk</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/berita*') ? 'active' : '' }}" href="{{ url('/admin/berita') }}">Berita</a>
+                        <a class="nav-link {{ Request::is('admin/berita*') ? 'active' : '' }}"
+                            href="{{ url('/admin/berita') }}">Berita</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link {{ Request::is('admin/reviews*') ? 'active' : '' }}" href="{{ url('/admin/reviews') }}">Review</a>
+                        <a class="nav-link {{ Request::is('admin/customers*') ? 'active' : '' }}"
+                            href="{{ url('/admin/customers') }}">Pelanggan</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('admin/reviews*') ? 'active' : '' }}"
+                            href="{{ url('/admin/reviews') }}">Review</a>
                     </li>
                 </ul>
             </div>
@@ -68,9 +81,10 @@
             <div class="d-flex align-items-center gap-3" id="adminRightNavbar">
 
                 <!-- Orders/Cart -->
-                <a href="{{ url('/admin/pesanan') }}" class="nav-link text-white position-relative p-0 d-inline-flex align-items-center">
+                <a href="{{ url('/admin/pesanan') }}"
+                    class="nav-link text-white position-relative p-0 d-inline-flex align-items-center">
                     <i class="fa-solid fa-cart-shopping fa-lg"></i>
-                    @if(isset($jumlahPesanan) && $jumlahPesanan > 0)
+                    @if (isset($jumlahPesanan) && $jumlahPesanan > 0)
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
                             style="font-size: 0.7rem; min-width: 20px; padding: 4px 6px;">
                             {{ $jumlahPesanan }}
@@ -81,13 +95,15 @@
 
                 <!-- Admin Dropdown -->
                 <div class="dropdown">
-                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center px-3 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-outline-light dropdown-toggle d-flex align-items-center px-3 py-1"
+                        type="button" data-bs-toggle="dropdown" aria-expanded="false">
                         <i class="fa-solid fa-user me-2"></i>
                         {{ Str::limit(session('admin_name') ?? 'Super Admin', 12) }}
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end shadow">
                         <li>
-                            <a class="dropdown-item text-danger d-flex align-items-center" href="{{ route('admin.logout') }}">
+                            <a class="dropdown-item text-danger d-flex align-items-center"
+                                href="{{ route('admin.logout') }}">
                                 <i class="fa-solid fa-right-from-bracket me-2"></i> Logout
                             </a>
                         </li>
@@ -102,7 +118,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             const navbar = document.getElementById("navbarAdmin");
             const navbarNav = document.getElementById("adminNavbar");
             const rightIcons = document.getElementById("adminRightNavbar");
